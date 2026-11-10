@@ -4,8 +4,8 @@ import { createContext, useContext, type ReactNode } from 'react';
 import { useEventStream, type Stream } from '@/lib/use-events';
 
 const Ctx = createContext<Stream | null>(null);
-export function EventsProvider({ replay, children }: { replay?: string | null; children: ReactNode }) {
-  const stream = useEventStream({ replay });
+export function EventsProvider({ replay, at, children }: { replay?: string | null; at?: number | null; children: ReactNode }) {
+  const stream = useEventStream({ replay, at });
   return <Ctx.Provider value={stream}>{children}</Ctx.Provider>;
 }
 export function useStream(): Stream {

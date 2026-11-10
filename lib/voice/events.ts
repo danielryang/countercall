@@ -3,8 +3,9 @@
 import type { Decision } from "./decide";
 
 export type TranscriptItem = { id: string; role: "agent" | "user" | "tool" | "dtmf" | "system"; text: string; tSec: number };
+export type CallContact = { phoneMasked: string; label: string; source: string; sourceDoc: string | null; addedBy: string; firstSeenAt: string; lastVerifiedAt: string | null };
 export type CallEvent =
-  | { type: "call.created"; caseId: string; callId: string; mode: "phone" | "web" | "replay"; at: number }
+  | { type: "call.created"; caseId: string; callId: string; mode: "phone" | "web" | "replay"; contact?: CallContact; at: number }
   | { type: "call.status"; caseId: string; callId: string; status: "dialing" | "connected" | "ended" | "failed"; disconnectionReason?: string; at: number }
   | { type: "call.transcript.delta"; caseId: string; callId: string; items: TranscriptItem[]; final: boolean; at: number } // replace-by-id; items = whole transcript so far
   | { type: "call.tool"; caseId: string; callId: string; name: "report_answer" | "report_challenge" | "report_flag"; args: Record<string, unknown>; at: number }

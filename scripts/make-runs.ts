@@ -3,6 +3,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { makeDeps } from '../lib/detect/deps';
 import { FIXTURES, fixtureToEmail, replayExtract } from '../lib/detect/fixtures';
+import { HISTORY } from '../lib/detect/history';
 import { ingestEmail } from '../lib/detect/ingest';
 import { DbMockRampClient } from '../lib/ramp.mock-db';
 import { pace, type Envelope, type Run, type RunEvent } from '../lib/runs';
@@ -24,8 +25,8 @@ for (const sc of SCENARIOS.filter((s) => NAMES[s.name])) {
     dial: async (c) => (callId = `call_${c.caseId.toLowerCase().replace(/-/g, '')}`),
   }, { provider: 'make-runs' });
   const seedIds: string[] = [];                               // seeded history first: the queue must look like a real inbox where the detector does not flag everything
-  for (const id of ['07', '09', '10', '19']) {
-    const sf = FIXTURES.find((x) => x.id.startsWith(id))!; const se = fixtureToEmail(sf);
+  for (const sf of HISTORY) {
+    const se = fixtureToEmail(sf);
     await ingestEmail(se, { ...deps, extract: replayExtract(sf) });
     seedIds.push((await t.q<{ id: string }>(`select id from cases where email_provider_event_id = $1`, [se.providerEventId]))[0].id);
   }

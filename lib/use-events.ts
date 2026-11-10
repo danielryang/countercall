@@ -13,8 +13,9 @@ export interface Stream { state: State; status: StreamStatus; resume(): void; re
 
 const PAGE = 1000;
 
-export function useEventStream(opts: { replay?: string | null } = {}): Stream {
+export function useEventStream(opts: { replay?: string | null; at?: number | null } = {}): Stream {
   const replayName = opts.replay ?? null;
+  const at = opts.at ?? null;                       // freeze a replay at event N (exact frames for screenshots and review)
   const [state, setState] = useState<State>(initial);
   const [status, setStatus] = useState<StreamStatus>(replayName ? 'replay' : 'connecting');
   const stateRef = useRef(state); stateRef.current = state;
@@ -58,9 +59,13 @@ export function useEventStream(opts: { replay?: string | null } = {}): Stream {
     if (!replayName) return;
     let stop = false;
     setState(initial); setPosition(0); setPlaying(true); setStatus('replay');
-    fetch(`/runs/${encodeURIComponent(replayName)}.json`).then((r) => r.json() as Promise<Run>).then((r) => { if (!stop) setRun(r); }).catch(() => { if (!stop) setStatus('reconnecting'); });
+    fetch(`/runs/${encodeURIComponent(replayName)}.json`).then((r) => r.json() as Promise<Run>).then((r) => {
+      if (stop) return;
+      setRun(r);
+      if (at !== null) { setState(r.events.slice(0, at).reduce(apply, initial)); setPosition(Math.min(at, r.events.length)); setPlaying(false); }
+    }).catch(() => { if (!stop) setStatus('reconnecting'); });
     return () => { stop = true; };
-  }, [replayName]);
+  }, [replayName, at]);
   useEffect(() => {
     if (!run || !playing || position >= run.events.length) return;
     const next = run.events[position];

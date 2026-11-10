@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { apply, initial, reduce, type Ev } from './reducer';
 import type { Run } from './runs';
+import { HISTORY } from './detect/history';
 import { fmtCents, GROUP_OF, heldCents, queue } from './selectors';
 
 const run = (name: string): Run => JSON.parse(readFileSync(new URL(`../public/runs/${name}.json`, import.meta.url), 'utf8'));
@@ -73,13 +74,15 @@ test('unknown event types advance lastSeq and change nothing else', () => {
 });
 
 test('system.reset drops live cases above keepThrough, keeps seeded history, and ignores late pre-reset events', () => {
-  const r = run('fraud'); const s = reduce(r.events);                       // seeded CC-0100..0103, hero CC-0104
-  assert.equal(Object.keys(s.cases).length, 5);
-  const reset: Ev = { seq: s.lastSeq + 1, id: 'r', ts: '2026-11-10T19:00:00.000Z', case_id: null, type: 'system.reset', actor: 'system', payload: { keepThrough: 103 } };
+  const r = run('fraud'); const s = reduce(r.events);                       // seeded history first, then the hero
+  const seeded = HISTORY.length; const lastSeeded = 99 + seeded;
+  assert.equal(Object.keys(s.cases).length, seeded + 1);
+  const reset: Ev = { seq: s.lastSeq + 1, id: 'r', ts: '2026-11-10T19:00:00.000Z', case_id: null, type: 'system.reset', actor: 'system', payload: { keepThrough: lastSeeded } };
   const after = apply(s, reset);
-  assert.deepEqual(Object.keys(after.cases).sort(), ['CC-0100', 'CC-0101', 'CC-0102', 'CC-0103']);
+  assert.equal(Object.keys(after.cases).length, seeded);
+  assert.ok(!(only(r) in after.cases), 'the live hero case is dropped, seeded history stays');
   assert.equal(heldCents(after), 0, 'the frozen money went with the live case');
-  assert.equal(apply(after, r.events.find((e) => e.case_id === only(r))!).order.length, 4, 'a replayed pre-reset event is ignored');
+  assert.equal(apply(after, r.events.find((e) => e.case_id === only(r))!).order.length, seeded, 'a replayed pre-reset event is ignored');
 });
 
 test('queue groups follow the state mapping and money formats as dollars', () => {

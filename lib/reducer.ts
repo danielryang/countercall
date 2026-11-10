@@ -6,14 +6,14 @@ import type { CaseState, EmittedEvent, HeldBill } from './events';
 import type { Envelope } from './runs';
 import type { Decision as DetectDecision, Extraction, Signal, Span } from './detect/types';
 import type { Decision as CallDecision } from './voice/decide';
-import type { TranscriptItem } from './voice/events';
+import type { CallContact, TranscriptItem } from './voice/events';
 
 type P<K extends EmittedEvent['type']> = Omit<Extract<EmittedEvent, { type: K }>, 'type' | 'caseId' | 'at'>;
 export type Ev = Envelope;
 
 export type CallStatus = 'dialing' | 'connected' | 'ended' | 'failed';
 export interface CallView {
-  id: string; mode: 'phone' | 'web' | 'replay'; status: CallStatus; startedAt: string; connectedAt?: string; endedAt?: string; disconnectionReason?: string;
+  id: string; mode: 'phone' | 'web' | 'replay'; contact?: CallContact; status: CallStatus; startedAt: string; connectedAt?: string; endedAt?: string; disconnectionReason?: string;
   turns: TranscriptItem[]; transcriptFinal: boolean;
   tools: { name: 'report_answer' | 'report_challenge' | 'report_flag'; args: Record<string, unknown>; seq: number }[];
   recording?: { monoUrl?: string; stereoUrl?: string };
@@ -62,7 +62,7 @@ function reduceCase(c: CaseView, e: Ev): CaseView {
     case 'payment.held': { const p = e.payload as unknown as P<'payment.held'>;
       return { ...c, payments: p.bills ?? c.payments, vendorHold: p.vendorHold ?? c.vendorHold, rampMode: p.rampMode ?? c.rampMode }; }
     case 'call.requested': { const p = e.payload as unknown as { phoneMasked: string }; return { ...c, trusted: { phoneMasked: p.phoneMasked } }; }
-    case 'call.created': { const p = e.payload as unknown as P<'call.created'>; return { ...c, call: { ...blankCall(p.callId, ts), mode: p.mode } }; }
+    case 'call.created': { const p = e.payload as unknown as P<'call.created'>; return { ...c, call: { ...blankCall(p.callId, ts), mode: p.mode, contact: p.contact } }; }
     case 'call.status': { const p = e.payload as unknown as P<'call.status'>; const call = callFor(c, p.callId, ts); if (!call) return c;
       return { ...c, call: { ...call, status: p.status, disconnectionReason: p.disconnectionReason ?? call.disconnectionReason,
         connectedAt: p.status === 'connected' ? ts : call.connectedAt, endedAt: p.status === 'ended' || p.status === 'failed' ? ts : call.endedAt } }; }

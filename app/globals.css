@@ -263,3 +263,36 @@
 
 /* PLAN 7.4 #2: dense app label tracking */
 [data-app] { --tracking-label: 0.08em; }
+
+/* ---------- App furniture (S4+) ---------- */
+@layer components {
+  /* Neutral status chips are hairline rectangles; only RISK states get the solid cut-corner chip. */
+  .chip-plain {
+    display: inline-flex; align-items: center; gap: .375rem; height: 1.5rem; padding: 0 .5rem; white-space: nowrap;
+    font-family: var(--font-mono); font-size: var(--text-micro); font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    border: 1px solid var(--rule); color: var(--fg);
+  }
+  .chip-plain[data-variant="dashed"] { border-style: dashed; }
+  .chip-plain[data-variant="danger"] { border-color: var(--color-blocked); color: var(--color-blocked); }
+  .chip-plain[data-variant="quiet"] { color: var(--fg-muted); }
+  .scan-dots::after { content: "..."; animation: blink 1s steps(1) infinite; }
+
+  /* Evidence highlights: marker-pen sweeps, not fades. --sweep-delay staggers them in reading order. */
+  .ev, .ev-strong { background-repeat: no-repeat; background-size: 0% 100%; animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms); }
+  .ev { background-image: linear-gradient(var(--color-evidence), var(--color-evidence)); }
+  .ev-strong { background-image: linear-gradient(var(--color-evidence-strong), var(--color-evidence-strong)); }
+  .ev-quiet { text-decoration: underline dashed; text-underline-offset: 3px; }
+  .ev-quiet[data-struck="true"] { text-decoration: line-through; color: var(--fg-muted); }
+  [data-hot="true"] { outline: 1px solid var(--fg); outline-offset: 1px; }
+  @keyframes sweep { to { background-size: 100% 100%; } }
+
+  /* Frozen money: hatching over the amount. A pattern, so it survives greyscale and video compression. */
+  .frozen { background-image: var(--hatch); }
+  .tick { position: absolute; width: 11px; height: 11px; pointer-events: none; color: var(--fg); }
+  .tick::before, .tick::after { content: ""; position: absolute; background: currentColor; }
+  .tick::before { left: 5px; top: 0; width: 1px; height: 11px; }
+  .tick::after { left: 0; top: 5px; width: 11px; height: 1px; }
+  .stamp { transform: rotate(-4deg); animation: stamp var(--d-stamp) var(--ease-snap) both; }
+  @keyframes stamp { from { opacity: 0; transform: rotate(-4deg) scale(1.18); } to { opacity: 1; transform: rotate(-4deg) scale(1); } }
+  .caret::after { content: ""; display: inline-block; width: .5ch; height: 1em; margin-left: 2px; vertical-align: text-bottom; background: currentColor; animation: blink 1s steps(1) infinite; }
+}

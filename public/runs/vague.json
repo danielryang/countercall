@@ -6,7 +6,7 @@
  "events": [
   {
    "seq": 1,
-   "id": "70a78b55-8b56-4151-854f-996f9817d358",
+   "id": "49350701-0a47-4562-bb22-ec7dca3a936f",
    "ts": "2026-11-09T15:00:00.000Z",
    "case_id": "CC-0100",
    "type": "email.received",
@@ -21,72 +21,33 @@
       "dkim": "pass",
       "dmarc": "pass"
      },
-     "body": "Hello,\n\nPlease find invoice 4472 for $12,400.00, due Dec 5. Payment details are unchanged: Embarcadero Community Bank, routing 121007775, account ending 4417.\n\nThank you for your business,\nAcme Corp AR",
+     "body": "Hello,\n\nInvoice KF-3302 for $18,500.00 is attached for October freight, due Nov 17.\n\nRegards,\nKestrel Freight Billing",
      "from": {
-      "name": "Acme Corp AR",
-      "address": "ap@acmecorp.com"
+      "name": "Kestrel Freight Billing",
+      "address": "billing@kestrelfreight.com"
      },
      "source": "injector",
      "replyTo": [],
-     "subject": "Invoice 4472 - November services",
-     "bodyFull": "Hello,\n\nPlease find invoice 4472 for $12,400.00, due Dec 5. Payment details are unchanged: Embarcadero Community Bank, routing 121007775, account ending 4417.\n\nThank you for your business,\nAcme Corp AR",
+     "subject": "Invoice KF-3302: freight, October lanes",
+     "bodyFull": "Hello,\n\nInvoice KF-3302 for $18,500.00 is attached for October freight, due Nov 17.\n\nRegards,\nKestrel Freight Billing",
      "htmlOnly": false,
-     "messageId": "<dec1a94a-56c8-4722-b9c8-6e5d9f28e050@injector.local>",
-     "receivedAt": "2026-11-10T05:38:03.071Z",
+     "messageId": "<b0c0a1db-3676-4a6f-9d19-d3bc1dd6300a@injector.local>",
+     "receivedAt": "2026-11-10T05:43:10.432Z",
      "attachments": [],
      "hiddenChars": 0,
-     "providerEventId": "inj-dec1a94a-56c8-4722-b9c8-6e5d9f28e050",
+     "providerEventId": "inj-b0c0a1db-3676-4a6f-9d19-d3bc1dd6300a",
      "unauthenticatedLabel": false
     },
-    "spans": [
-     {
-      "end": 136,
-      "label": "routing number",
-      "start": 127,
-      "source": "rule"
-     },
-     {
-      "end": 157,
-      "label": "account number",
-      "start": 153,
-      "source": "rule"
-     }
-    ],
-    "signals": [
-     {
-      "id": "bank_details_present",
-      "spans": [
-       {
-        "end": 136,
-        "label": "routing number",
-        "start": 127,
-        "source": "rule"
-       },
-       {
-        "end": 157,
-        "label": "account number",
-        "start": 153,
-        "source": "rule"
-       }
-      ],
-      "detail": "Bank details in email: routing 121007775, acct ****4417.",
-      "severity": "medium"
-     },
-     {
-      "id": "bank_details_match_on_file",
-      "spans": [],
-      "detail": "Bank details in email match what is on file.",
-      "severity": "info"
-     }
-    ],
-    "vendorId": "v_acme",
-    "vendorName": "Acme Corp"
+    "spans": [],
+    "signals": [],
+    "vendorId": "v_kestrel",
+    "vendorName": "Kestrel Freight"
    },
    "delay_ms": 0
   },
   {
    "seq": 2,
-   "id": "fc574b5d-62be-4117-a6c7-5fb28cf7aa53",
+   "id": "16674b48-88b6-4deb-b311-55377ea8698a",
    "ts": "2026-11-09T15:01:30.000Z",
    "case_id": "CC-0100",
    "type": "email.classified",
@@ -95,15 +56,15 @@
     "llmMs": 0,
     "spans": [],
     "extraction": {
-     "summary": "Invoice 4472 for $12,400 due Dec 5; payment details stated as unchanged.",
+     "summary": "Freight invoice KF-3302, $18,500 due Nov 17.",
      "urgency": "none",
      "category": "invoice_normal",
      "evidence": [],
      "new_bank": null,
      "change_type": "none",
-     "claimed_vendor": "Acme Corp",
+     "claimed_vendor": "Kestrel Freight",
      "invoice_numbers": [
-      "4472"
+      "KF-3302"
      ],
      "pressure_not_to_call": false,
      "callback_number_in_email": null,
@@ -115,7 +76,7 @@
   },
   {
    "seq": 3,
-   "id": "f8d26e3e-d294-4914-92eb-ba1408199a0c",
+   "id": "b5ab254a-ad98-4fca-a7b1-a29fde554b14",
    "ts": "2026-11-09T15:03:00.000Z",
    "case_id": "CC-0100",
    "type": "case.cleared",
@@ -132,7 +93,7 @@
       }
      ],
      "category": "invoice_normal",
-     "vendorId": "v_acme",
+     "vendorId": "v_kestrel",
      "llmStatus": "ok",
      "bankChange": false
     }
@@ -141,7 +102,7 @@
   },
   {
    "seq": 4,
-   "id": "4c6a10e8-c83e-4272-967a-b0725766b1b8",
+   "id": "33a58bf7-d72b-44d2-b85b-002d9e126911",
    "ts": "2026-11-09T15:04:30.000Z",
    "case_id": "CC-0100",
    "type": "case.state",
@@ -155,7 +116,7 @@
   },
   {
    "seq": 5,
-   "id": "39687432-0898-4020-8043-df5f36959c74",
+   "id": "ff33a3e7-8b05-446e-ae3d-ecd962423cbd",
    "ts": "2026-11-09T15:06:00.000Z",
    "case_id": "CC-0101",
    "type": "email.received",
@@ -170,33 +131,33 @@
       "dkim": "pass",
       "dmarc": "pass"
      },
-     "body": "Hi Priya,\n\nOur controller is refreshing the vendor file for 2027. Could you send us Rice Robotics' current W-9 when you have a moment? No rush.\n\nThanks,\nJordan",
+     "body": "Hi AP team,\n\nInvoice SP-1190 for $5,400.00 covers the November pallet order, due Nov 24. Let us know if you need a PO match.\n\nSummit Packaging AR",
      "from": {
-      "name": "Jordan Lee",
-      "address": "jordan.lee@acmecorp.com"
+      "name": "Summit Packaging AR",
+      "address": "ar@summitpackaging.com"
      },
      "source": "injector",
      "replyTo": [],
-     "subject": "W-9 for our vendor file",
-     "bodyFull": "Hi Priya,\n\nOur controller is refreshing the vendor file for 2027. Could you send us Rice Robotics' current W-9 when you have a moment? No rush.\n\nThanks,\nJordan",
+     "subject": "Summit Packaging: invoice SP-1190",
+     "bodyFull": "Hi AP team,\n\nInvoice SP-1190 for $5,400.00 covers the November pallet order, due Nov 24. Let us know if you need a PO match.\n\nSummit Packaging AR",
      "htmlOnly": false,
-     "messageId": "<e59b67f0-2238-406c-a36b-0a45c29e903e@injector.local>",
-     "receivedAt": "2026-11-10T05:38:03.076Z",
+     "messageId": "<e0b7c91a-1ec3-465e-99bf-3bf08ae92176@injector.local>",
+     "receivedAt": "2026-11-10T05:43:10.436Z",
      "attachments": [],
      "hiddenChars": 0,
-     "providerEventId": "inj-e59b67f0-2238-406c-a36b-0a45c29e903e",
+     "providerEventId": "inj-e0b7c91a-1ec3-465e-99bf-3bf08ae92176",
      "unauthenticatedLabel": false
     },
     "spans": [],
     "signals": [],
-    "vendorId": "v_acme",
-    "vendorName": "Acme Corp"
+    "vendorId": "v_summit",
+    "vendorName": "Summit Packaging Co"
    },
    "delay_ms": 0
   },
   {
    "seq": 6,
-   "id": "fc41e00d-59ad-415c-9326-78529bb6657e",
+   "id": "c3cb6bd1-2d87-450c-8135-981402193356",
    "ts": "2026-11-09T15:07:30.000Z",
    "case_id": "CC-0101",
    "type": "email.classified",
@@ -205,14 +166,16 @@
     "llmMs": 0,
     "spans": [],
     "extraction": {
-     "summary": "Sender asks for our current W-9 for their vendor file.",
+     "summary": "Packaging invoice SP-1190, $5,400 due Nov 24.",
      "urgency": "none",
-     "category": "vendor_info_request",
+     "category": "invoice_normal",
      "evidence": [],
      "new_bank": null,
      "change_type": "none",
-     "claimed_vendor": "Acme Corp",
-     "invoice_numbers": [],
+     "claimed_vendor": "Summit Packaging Co",
+     "invoice_numbers": [
+      "SP-1190"
+     ],
      "pressure_not_to_call": false,
      "callback_number_in_email": null,
      "contains_instructions_to_ai": false,
@@ -223,7 +186,7 @@
   },
   {
    "seq": 7,
-   "id": "cd54ebcc-b4b4-4888-b07a-07def8bde1c8",
+   "id": "570b3a08-3ea4-466e-9fb6-def2219c5b59",
    "ts": "2026-11-09T15:09:00.000Z",
    "case_id": "CC-0101",
    "type": "case.cleared",
@@ -239,8 +202,8 @@
        "text": "No payment-instruction change and no money-moving request detected."
       }
      ],
-     "category": "vendor_info_request",
-     "vendorId": "v_acme",
+     "category": "invoice_normal",
+     "vendorId": "v_summit",
      "llmStatus": "ok",
      "bankChange": false
     }
@@ -249,7 +212,7 @@
   },
   {
    "seq": 8,
-   "id": "e356c421-392c-4430-8890-0e25ee886e17",
+   "id": "180bf698-29a5-4126-926b-3bd9e2de663f",
    "ts": "2026-11-09T15:10:30.000Z",
    "case_id": "CC-0101",
    "type": "case.state",
@@ -263,7 +226,7 @@
   },
   {
    "seq": 9,
-   "id": "fa5ca964-f813-40e7-a18b-c179c96ce74d",
+   "id": "625c3c3a-b11e-4c4a-b6bf-0cd789d66b3e",
    "ts": "2026-11-09T15:12:00.000Z",
    "case_id": "CC-0102",
    "type": "email.received",
@@ -288,11 +251,11 @@
      "subject": "Globex Q4 product news + holiday ship dates",
      "bodyFull": "Globex Q4 Update\n\nNew: the GX-400 servo line is shipping. Holiday ship cutoff is Dec 15.\n\nYou are receiving this because you are a Globex customer. Unsubscribe: https://globex-industrial.com/unsub",
      "htmlOnly": false,
-     "messageId": "<50786a84-4eeb-4d30-93cd-8f0cd61cfcf5@injector.local>",
-     "receivedAt": "2026-11-10T05:38:03.078Z",
+     "messageId": "<ed48835a-38e5-4386-be4d-f339714c6d16@injector.local>",
+     "receivedAt": "2026-11-10T05:43:10.438Z",
      "attachments": [],
      "hiddenChars": 0,
-     "providerEventId": "inj-50786a84-4eeb-4d30-93cd-8f0cd61cfcf5",
+     "providerEventId": "inj-ed48835a-38e5-4386-be4d-f339714c6d16",
      "unauthenticatedLabel": false
     },
     "spans": [],
@@ -311,7 +274,7 @@
   },
   {
    "seq": 10,
-   "id": "5f88e1c5-d20a-4550-9c83-231c602648e4",
+   "id": "06cb8153-bf72-4097-b500-a8793611e40f",
    "ts": "2026-11-09T15:13:30.000Z",
    "case_id": "CC-0102",
    "type": "email.classified",
@@ -338,7 +301,7 @@
   },
   {
    "seq": 11,
-   "id": "f0ed221b-be25-4554-8123-32c693c46679",
+   "id": "7d95b3f1-cc28-430e-80e8-c44a609fcce1",
    "ts": "2026-11-09T15:15:00.000Z",
    "case_id": "CC-0102",
    "type": "case.cleared",
@@ -368,7 +331,7 @@
   },
   {
    "seq": 12,
-   "id": "eb369e18-602f-4572-a8f9-e3dc665ca54d",
+   "id": "910a8f53-789a-41ff-ae20-24e7bcee2b58",
    "ts": "2026-11-09T15:16:30.000Z",
    "case_id": "CC-0102",
    "type": "case.state",
@@ -382,7 +345,7 @@
   },
   {
    "seq": 13,
-   "id": "447eade7-49aa-4f97-abbb-baf09321783e",
+   "id": "f1671b74-aab0-4588-8c56-7208b3a77754",
    "ts": "2026-11-09T15:18:00.000Z",
    "case_id": "CC-0103",
    "type": "email.received",
@@ -397,46 +360,33 @@
       "dkim": "pass",
       "dmarc": "pass"
      },
-     "body": "Acme Corp sent you an invoice.\n\nInvoice 4474 - $12,400.00 - due Dec 10\nView and pay in the BillPortal app: https://billportal-mail.com/i/4474\n\nPayment instructions are unchanged. This message was sent on behalf of Acme Corp.",
+     "body": "Hello,\n\nPlease find invoice OO-5512 for $2,100.00 (office supplies), due Nov 30.\n\nOrchard Office Supply",
      "from": {
-      "name": "Acme Corp via BillPortal",
-      "address": "invoices@billportal-mail.com"
+      "name": "Orchard Accounts",
+      "address": "accounts@orchardoffice.com"
      },
      "source": "injector",
      "replyTo": [],
-     "subject": "Invoice 4474 from Acme Corp",
-     "bodyFull": "Acme Corp sent you an invoice.\n\nInvoice 4474 - $12,400.00 - due Dec 10\nView and pay in the BillPortal app: https://billportal-mail.com/i/4474\n\nPayment instructions are unchanged. This message was sent on behalf of Acme Corp.",
+     "subject": "Statement and invoice OO-5512",
+     "bodyFull": "Hello,\n\nPlease find invoice OO-5512 for $2,100.00 (office supplies), due Nov 30.\n\nOrchard Office Supply",
      "htmlOnly": false,
-     "messageId": "<b1ec2ee2-88c0-4a2b-861e-0fb921cb6142@injector.local>",
-     "receivedAt": "2026-11-10T05:38:03.080Z",
+     "messageId": "<3393e7ed-ab9a-4884-bc67-b025487de11e@injector.local>",
+     "receivedAt": "2026-11-10T05:43:10.439Z",
      "attachments": [],
      "hiddenChars": 0,
-     "providerEventId": "inj-b1ec2ee2-88c0-4a2b-861e-0fb921cb6142",
+     "providerEventId": "inj-3393e7ed-ab9a-4884-bc67-b025487de11e",
      "unauthenticatedLabel": false
     },
     "spans": [],
-    "signals": [
-     {
-      "id": "sender_domain_not_on_file",
-      "spans": [],
-      "detail": "billportal-mail.com is not a domain on file for Acme Corp (acmecorp.com).",
-      "severity": "medium"
-     },
-     {
-      "id": "sender_not_known_contact",
-      "spans": [],
-      "detail": "invoices@billportal-mail.com has never corresponded for Acme Corp (first-time sender).",
-      "severity": "low"
-     }
-    ],
-    "vendorId": "v_acme",
-    "vendorName": "Acme Corp"
+    "signals": [],
+    "vendorId": "v_orchard",
+    "vendorName": "Orchard Office Supply"
    },
    "delay_ms": 0
   },
   {
    "seq": 14,
-   "id": "cd03cdc0-0c2d-4df9-a07b-86dbf6b97cc5",
+   "id": "cda82db9-aa62-4332-a31c-60c363f92ca2",
    "ts": "2026-11-09T15:19:30.000Z",
    "case_id": "CC-0103",
    "type": "email.classified",
@@ -445,15 +395,15 @@
     "llmMs": 0,
     "spans": [],
     "extraction": {
-     "summary": "Invoice 4474 for $12,400 relayed through a billing portal.",
+     "summary": "Office supplies invoice OO-5512, $2,100 due Nov 30.",
      "urgency": "none",
      "category": "invoice_normal",
      "evidence": [],
      "new_bank": null,
      "change_type": "none",
-     "claimed_vendor": "Acme Corp",
+     "claimed_vendor": "Orchard Office Supply",
      "invoice_numbers": [
-      "4474"
+      "OO-5512"
      ],
      "pressure_not_to_call": false,
      "callback_number_in_email": null,
@@ -465,32 +415,24 @@
   },
   {
    "seq": 15,
-   "id": "4ce5381f-bfde-43d6-a8c9-49d5f07dcec2",
+   "id": "6b2c8c59-59af-4b2b-bc00-175e22d0212c",
    "ts": "2026-11-09T15:21:00.000Z",
    "case_id": "CC-0103",
    "type": "case.cleared",
    "actor": "policy",
    "payload": {
     "decision": {
-     "risk": "medium",
-     "score": 3,
+     "risk": "none",
+     "score": 0,
      "actions": [],
      "reasons": [
-      {
-       "code": "SENDER_DOMAIN_NOT_ON_FILE",
-       "text": "billportal-mail.com is not a domain on file for Acme Corp (acmecorp.com)."
-      },
-      {
-       "code": "SENDER_NOT_KNOWN_CONTACT",
-       "text": "invoices@billportal-mail.com has never corresponded for Acme Corp (first-time sender)."
-      },
       {
        "code": "NO_ACTION",
        "text": "No payment-instruction change and no money-moving request detected."
       }
      ],
      "category": "invoice_normal",
-     "vendorId": "v_acme",
+     "vendorId": "v_orchard",
      "llmStatus": "ok",
      "bankChange": false
     }
@@ -499,7 +441,7 @@
   },
   {
    "seq": 16,
-   "id": "288745b4-d2ab-4470-a7e2-e93f84934daf",
+   "id": "1cf587ec-c7ec-4339-b453-95670049bbfd",
    "ts": "2026-11-09T15:22:30.000Z",
    "case_id": "CC-0103",
    "type": "case.state",
@@ -513,9 +455,117 @@
   },
   {
    "seq": 17,
-   "id": "d0252053-7cf3-46bc-8b69-1d6209159760",
-   "ts": "2026-11-10T18:00:00.000Z",
+   "id": "19a60439-6adc-4ad2-8f99-839553a2f715",
+   "ts": "2026-11-09T15:24:00.000Z",
    "case_id": "CC-0104",
+   "type": "email.received",
+   "actor": "detector",
+   "payload": {
+    "email": {
+     "to": [
+      "ap@ricerobotics.com"
+     ],
+     "auth": {
+      "spf": "pass",
+      "dkim": "pass",
+      "dmarc": "pass"
+     },
+     "body": "Hi Priya,\n\nOur controller is refreshing the vendor file for 2027. Could you send us Rice Robotics' current W-9 when you have a moment? No rush.\n\nThanks,\nJordan",
+     "from": {
+      "name": "Jordan Lee",
+      "address": "jordan.lee@acmecorp.com"
+     },
+     "source": "injector",
+     "replyTo": [],
+     "subject": "W-9 for our vendor file",
+     "bodyFull": "Hi Priya,\n\nOur controller is refreshing the vendor file for 2027. Could you send us Rice Robotics' current W-9 when you have a moment? No rush.\n\nThanks,\nJordan",
+     "htmlOnly": false,
+     "messageId": "<4134bdab-b278-4fc8-b596-736e741b2a6c@injector.local>",
+     "receivedAt": "2026-11-10T05:43:10.441Z",
+     "attachments": [],
+     "hiddenChars": 0,
+     "providerEventId": "inj-4134bdab-b278-4fc8-b596-736e741b2a6c",
+     "unauthenticatedLabel": false
+    },
+    "spans": [],
+    "signals": [],
+    "vendorId": "v_acme",
+    "vendorName": "Acme Corp"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 18,
+   "id": "0b16b117-c3e0-4e3e-9e90-50b70e490e81",
+   "ts": "2026-11-09T15:25:30.000Z",
+   "case_id": "CC-0104",
+   "type": "email.classified",
+   "actor": "detector",
+   "payload": {
+    "llmMs": 0,
+    "spans": [],
+    "extraction": {
+     "summary": "Sender asks for our current W-9 for their vendor file.",
+     "urgency": "none",
+     "category": "vendor_info_request",
+     "evidence": [],
+     "new_bank": null,
+     "change_type": "none",
+     "claimed_vendor": "Acme Corp",
+     "invoice_numbers": [],
+     "pressure_not_to_call": false,
+     "callback_number_in_email": null,
+     "contains_instructions_to_ai": false,
+     "is_payment_instruction_change": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 19,
+   "id": "4c7d85b4-6d86-47b6-bf27-b9b4b0376e82",
+   "ts": "2026-11-09T15:27:00.000Z",
+   "case_id": "CC-0104",
+   "type": "case.cleared",
+   "actor": "policy",
+   "payload": {
+    "decision": {
+     "risk": "none",
+     "score": 0,
+     "actions": [],
+     "reasons": [
+      {
+       "code": "NO_ACTION",
+       "text": "No payment-instruction change and no money-moving request detected."
+      }
+     ],
+     "category": "vendor_info_request",
+     "vendorId": "v_acme",
+     "llmStatus": "ok",
+     "bankChange": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 20,
+   "id": "2a955f7a-d66b-4a73-8459-4471802b978b",
+   "ts": "2026-11-09T15:28:30.000Z",
+   "case_id": "CC-0104",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "cleared",
+    "from": "scanning",
+    "cause": "case.cleared"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 21,
+   "id": "214a0b82-d7f3-470d-b606-18a26029d09c",
+   "ts": "2026-11-10T18:00:00.000Z",
+   "case_id": "CC-0105",
    "type": "email.received",
    "actor": "detector",
    "payload": {
@@ -538,11 +588,11 @@
      "subject": "Important: Change of bank details",
      "bodyFull": "Hello Accounts Payable,\n\nWe have changed banks. Please send this month's payment for invoice 4471 ($12,400.00) to our new account:\n\nBank: Bluebird Neobank\nRouting number: 071003913\nAccount number: 000987654321\n\nPlease confirm once your records are updated.\n\nThanks,\nAcme Corp Accounts Receivable",
      "htmlOnly": false,
-     "messageId": "<ae92bda6-b543-4a5a-89b4-0253905b8288@injector.local>",
-     "receivedAt": "2026-11-10T05:38:03.081Z",
+     "messageId": "<37399ff1-38c2-4c47-969f-73dfe9b10233@injector.local>",
+     "receivedAt": "2026-11-10T05:43:10.442Z",
      "attachments": [],
      "hiddenChars": 0,
-     "providerEventId": "inj-ae92bda6-b543-4a5a-89b4-0253905b8288",
+     "providerEventId": "inj-37399ff1-38c2-4c47-969f-73dfe9b10233",
      "unauthenticatedLabel": false
     },
     "spans": [
@@ -660,10 +710,10 @@
    "delay_ms": 600
   },
   {
-   "seq": 18,
-   "id": "93b25c31-a035-419e-a9a0-c060d8279cf0",
+   "seq": 22,
+   "id": "e75dfd42-f2bd-4c19-998d-e96f1fc684ae",
    "ts": "2026-11-10T18:00:01.100Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "email.classified",
    "actor": "detector",
    "payload": {
@@ -719,10 +769,10 @@
    "delay_ms": 1100
   },
   {
-   "seq": 19,
-   "id": "0dab9552-7d39-4c4b-971e-3cf742392957",
+   "seq": 23,
+   "id": "e0bbb443-40a1-4041-87fd-3fc6868aa0a5",
    "ts": "2026-11-10T18:00:01.750Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "case.flagged",
    "actor": "policy",
    "payload": {
@@ -816,10 +866,10 @@
    "delay_ms": 650
   },
   {
-   "seq": 20,
-   "id": "a53d4148-eb7b-4448-9c09-d409c3c8c8c5",
+   "seq": 24,
+   "id": "1ed150c2-8f85-4cf5-b648-f395d3692d0f",
    "ts": "2026-11-10T18:00:01.750Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "case.state",
    "actor": "policy",
    "payload": {
@@ -830,10 +880,10 @@
    "delay_ms": 0
   },
   {
-   "seq": 21,
-   "id": "cdff75e9-aa02-4939-970d-826ae45711f5",
+   "seq": 25,
+   "id": "d00d8f72-9bdb-4656-a3e1-1b83b6a2e137",
    "ts": "2026-11-10T18:00:02.200Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "ramp.call",
    "actor": "policy",
    "payload": {
@@ -846,10 +896,10 @@
    "delay_ms": 450
   },
   {
-   "seq": 22,
-   "id": "3ff576a8-ab9a-48a7-926a-ce330e8e0242",
+   "seq": 26,
+   "id": "389d6528-925e-40cf-9316-a6b65091a680",
    "ts": "2026-11-10T18:00:02.650Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "ramp.call",
    "actor": "policy",
    "payload": {
@@ -862,10 +912,10 @@
    "delay_ms": 450
   },
   {
-   "seq": 23,
-   "id": "36cc0286-f56a-4886-b603-8d32b48e37d9",
+   "seq": 27,
+   "id": "dd094432-97c4-48ca-9880-52c381b7b975",
    "ts": "2026-11-10T18:00:03.100Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "ramp.call",
    "actor": "policy",
    "payload": {
@@ -878,10 +928,10 @@
    "delay_ms": 450
   },
   {
-   "seq": 24,
-   "id": "ff34005a-a891-4294-a925-2c59d87fec81",
+   "seq": 28,
+   "id": "d3d623e1-131a-4051-afaa-37391a3dd5eb",
    "ts": "2026-11-10T18:00:04.050Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "payment.held",
    "actor": "policy",
    "payload": {
@@ -918,10 +968,10 @@
    "delay_ms": 950
   },
   {
-   "seq": 25,
-   "id": "49eb3dc7-bf9f-4fce-8507-0997066b2295",
+   "seq": 29,
+   "id": "c4706cf8-657a-4143-bf9d-101f1d1cd97a",
    "ts": "2026-11-10T18:00:04.050Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "case.state",
    "actor": "policy",
    "payload": {
@@ -932,16 +982,16 @@
    "delay_ms": 0
   },
   {
-   "seq": 26,
-   "id": "f20a3e8e-1a4c-4391-b846-5181d3e4c565",
+   "seq": 30,
+   "id": "74dc62d7-6a30-4119-a5aa-ac6be8301c84",
    "ts": "2026-11-10T18:00:04.750Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.requested",
    "actor": "policy",
    "payload": {
     "context": {
      "requestSummary": "The request arrived by email on Monday, November 9.",
-     "emailReceivedAt": "2026-11-10T05:38:03.081Z"
+     "emailReceivedAt": "2026-11-10T05:43:10.442Z"
     },
     "vendorId": "v_acme",
     "phoneMasked": "+1 (415) ••• ••42"
@@ -949,23 +999,32 @@
    "delay_ms": 700
   },
   {
-   "seq": 27,
-   "id": "b4741ca5-27c8-480a-86eb-8e476f85059a",
+   "seq": 31,
+   "id": "489f00b0-8a36-4176-bca0-a730596cef84",
    "ts": "2026-11-10T18:00:05.650Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.created",
    "actor": "voice_agent",
    "payload": {
     "mode": "phone",
-    "callId": "call_cc0104"
+    "callId": "call_cc0105",
+    "contact": {
+     "label": "AP main line",
+     "source": "onboarding_w9",
+     "addedBy": "A. Patel",
+     "sourceDoc": "W-9 + vendor form, signed 2025-03-14",
+     "firstSeenAt": "2025-03-14T17:00:00.000Z",
+     "phoneMasked": "+1 (415) ••• ••42",
+     "lastVerifiedAt": "2026-09-02T18:30:00.000Z"
+    }
    },
    "delay_ms": 900
   },
   {
-   "seq": 28,
-   "id": "e628e37f-fe1f-44ff-acb2-cb83acb8f1ad",
+   "seq": 32,
+   "id": "e9395be7-25b3-4819-baa3-15318f3ebcbd",
    "ts": "2026-11-10T18:00:05.650Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "case.state",
    "actor": "policy",
    "payload": {
@@ -976,23 +1035,23 @@
    "delay_ms": 0
   },
   {
-   "seq": 29,
-   "id": "c8c8c527-2a07-42fe-a0c8-ad5c71d0721c",
+   "seq": 33,
+   "id": "e5e27af1-33aa-40ee-91f2-a03745445e4a",
    "ts": "2026-11-10T18:00:09.250Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.status",
    "actor": "voice_agent",
    "payload": {
-    "callId": "call_cc0104",
+    "callId": "call_cc0105",
     "status": "connected"
    },
    "delay_ms": 3600
   },
   {
-   "seq": 30,
-   "id": "227e04f6-4f09-495f-ba90-034299b6db2e",
+   "seq": 34,
+   "id": "b2c703e0-c5b3-43b4-8bdd-7636a1af463e",
    "ts": "2026-11-10T18:00:11.150Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
@@ -1011,15 +1070,15 @@
       "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme?"
      }
     ],
-    "callId": "call_cc0104"
+    "callId": "call_cc0105"
    },
    "delay_ms": 1900
   },
   {
-   "seq": 31,
-   "id": "2c04af0e-606f-4569-99aa-de19840a2af8",
+   "seq": 35,
+   "id": "2fa7e644-5102-4a7f-8e86-ab1e5472897d",
    "ts": "2026-11-10T18:00:11.600Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.tool",
    "actor": "voice_agent",
    "payload": {
@@ -1028,15 +1087,15 @@
      "speaker_role": "ar_or_finance"
     },
     "name": "report_answer",
-    "callId": "call_cc0104"
+    "callId": "call_cc0105"
    },
    "delay_ms": 450
   },
   {
-   "seq": 32,
-   "id": "3395fc5a-e9aa-4f78-bb2b-d107eaf8bc31",
+   "seq": 36,
+   "id": "c0adcce0-9946-4bc7-bf7f-affaf0bed350",
    "ts": "2026-11-10T18:00:13.500Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
@@ -1079,15 +1138,15 @@
       "text": "Thank you. Goodbye."
      }
     ],
-    "callId": "call_cc0104"
+    "callId": "call_cc0105"
    },
    "delay_ms": 1900
   },
   {
-   "seq": 33,
-   "id": "a3bc3283-78f8-49b2-839a-e8eed8c9468e",
+   "seq": 37,
+   "id": "ac16717e-6b8a-44d2-a9d6-b13167163067",
    "ts": "2026-11-10T18:00:15.400Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
@@ -1130,47 +1189,47 @@
       "text": "Thank you. Goodbye."
      }
     ],
-    "callId": "call_cc0104"
+    "callId": "call_cc0105"
    },
    "delay_ms": 1900
   },
   {
-   "seq": 34,
-   "id": "baed2de0-3f9b-4c60-8e9d-dc02436b2193",
+   "seq": 38,
+   "id": "e6f73f61-376f-47a0-b9c2-60730046257d",
    "ts": "2026-11-10T18:00:16.800Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.status",
    "actor": "voice_agent",
    "payload": {
-    "callId": "call_cc0104",
+    "callId": "call_cc0105",
     "status": "ended",
     "disconnectionReason": "agent_hangup"
    },
    "delay_ms": 1400
   },
   {
-   "seq": 35,
-   "id": "114159a4-7938-47af-a0fc-25121e3265c0",
+   "seq": 39,
+   "id": "b082f379-9d99-46df-aa21-c496ef1413d7",
    "ts": "2026-11-10T18:00:17.400Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.recording",
    "actor": "voice_agent",
    "payload": {
-    "callId": "call_cc0104",
+    "callId": "call_cc0105",
     "monoUrl": "https://example.invalid/mono.wav",
     "stereoUrl": "https://example.invalid/stereo.wav"
    },
    "delay_ms": 600
   },
   {
-   "seq": 36,
-   "id": "04f530c2-f134-4b86-9bdb-7660464c9e58",
+   "seq": 40,
+   "id": "23b76b96-1560-47f2-bf72-3f31a31663f1",
    "ts": "2026-11-10T18:00:18.300Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "call.outcome",
    "actor": "policy",
    "payload": {
-    "callId": "call_cc0104",
+    "callId": "call_cc0105",
     "summary": "(scripted)",
     "decision": {
      "flags": [],
@@ -1184,10 +1243,10 @@
    "delay_ms": 900
   },
   {
-   "seq": 37,
-   "id": "ecf5e1cc-7d00-410a-b869-0053cdd9da07",
+   "seq": 41,
+   "id": "34a037a2-05b3-4b64-99ad-748132e6bc58",
    "ts": "2026-11-10T18:00:18.300Z",
-   "case_id": "CC-0104",
+   "case_id": "CC-0105",
    "type": "case.state",
    "actor": "policy",
    "payload": {

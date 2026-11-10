@@ -46,8 +46,8 @@ export async function startCall(d: CallDeps, caseId: string, vendorId: string, c
   if ((await d.q(`select 1 from calls where ended_at is null and started_at > now() - make_interval(mins => $1) limit 1`, [IN_FLIGHT_MINUTES])).length) return refuse('another call is in flight');
 
   // Trust anchor: the vendor's PRIMARY trusted contact, seasoned. Never a number from the email, a prompt, a tool argument or a request body.
-  const [contact] = await d.q<{ id: string; phone_e164: string }>(
-    `select id, phone_e164 from trusted_contacts where vendor_id = $1 and is_primary and status = 'trusted' and first_seen_at <= now() - make_interval(days => $2)`, [vendorId, SEASONING_DAYS]);
+  const [contact] = await d.q<{ id: string; phone_e164: string; label: string; source: string; source_doc: string | null; added_by: string; first_seen_at: string | Date; last_verified_at: string | Date | null }>(
+    `select id, phone_e164, label, source, source_doc, added_by, first_seen_at, last_verified_at from trusted_contacts where vendor_id = $1 and is_primary and status = 'trusted' and first_seen_at <= now() - make_interval(days => $2)`, [vendorId, SEASONING_DAYS]);
   if (!contact) return refuse('no trusted, seasoned phone number on file for this vendor');
 
   // Challenge, derived server-side. Default: last 4 digits of the newest PAID invoice number (a fact only the vendor and we share).
@@ -79,6 +79,9 @@ export async function startCall(d: CallDeps, caseId: string, vendorId: string, c
     return refuse(`dial failed: ${(err as Error).message}`);
   }
   await d.q(`update calls set retell_call_id = $1 where id = $2`, [callId, callRowId]);
-  await d.emit({ type: 'call.created', caseId, callId, mode: 'phone', at: Date.now() });   // held -> calling
+  const iso = (v: string | Date | null) => (v === null ? null : new Date(v).toISOString());
+  // The contact's provenance as it was at dial time (public-safe: masked number, source document, who added it, since when). The UI card renders it.
+  await d.emit({ type: 'call.created', caseId, callId, mode: 'phone', at: Date.now(),
+    contact: { phoneMasked: mask(contact.phone_e164), label: contact.label, source: contact.source, sourceDoc: contact.source_doc, addedBy: contact.added_by, firstSeenAt: iso(contact.first_seen_at)!, lastVerifiedAt: iso(contact.last_verified_at) } });   // held -> calling
   return { started: true, callId, attempt };
 }
