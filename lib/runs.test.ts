@@ -47,3 +47,14 @@ test('the recorded inbound email replays to fail-closed: calls off, so no call i
   assert.equal(c.release, undefined);
   assert.ok(r.events.some((e) => e.type === 'task.created' && /calls disabled/.test(JSON.stringify(e.payload))), 'the hand-off says why');
 });
+
+test('the recorded happy path replays to a human release: the policy confirmed, the money waited, and only a person released it', () => {
+  const r = load('verified-live.json');
+  assert.equal(r.source, 'recorded');
+  const outcome = r.events.find((e) => e.type === 'call.outcome')!;
+  assert.equal((outcome.payload as { decision: { outcome: string } }).decision.outcome, 'CONFIRMED_LEGIT');
+  const released = r.events.filter((e) => e.type === 'payment.released');
+  assert.equal(released.length, 1, 'one release');
+  assert.match(released[0].actor, /^human:/, 'released by a person, never by the system');
+  assert.ok(r.events.findIndex((e) => e.type === 'call.outcome') < r.events.findIndex((e) => e.type === 'payment.released'), 'release comes after the outcome');
+});
