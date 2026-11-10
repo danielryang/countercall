@@ -5,8 +5,8 @@ import { startCall } from '../call';
 import { env, senderAllowed } from '../env';
 import type { EmittedEvent, RampMode, TaskKind } from '../events';
 import { applyHolds } from '../holds';
-import { makeRamp, type MockSeed } from '../ramp';
-import { DbMockRampClient, type HoldClient } from '../ramp.mock-db';
+import type { HoldClient } from '../ramp.mock-db';
+import { rampFor } from '../ramp-for';
 import type { Q } from '../sink';
 import { emit as storeEmit, q as storeQ } from '../store';
 import { startVerificationCall, type CaseForCall } from '../voice/retell';
@@ -95,14 +95,6 @@ export async function makeDeps(io: DepsIo, cfg: DepsConfig, src: { provider: str
 }
 
 // ---- production wiring (postgres.js + environment) -------------------------------------------------------------------------------------------------
-const EMPTY_SEED: MockSeed = { vendors: [], accounts: {}, contacts: {}, bills: [] };
-
-/** The Ramp client for the current mode. The mock is bound to the given query function (so a release can run inside its transaction). */
-export function rampFor(q: Q): HoldClient {
-  const e = env();
-  return e.RAMP_MODE === 'sandbox' ? makeRamp({ ...process.env, RAMP_MODE: 'sandbox' }, EMPTY_SEED) : new DbMockRampClient(q);   // sandbox throws without credentials: fail closed
-}
-
 export async function getDeps(src: { provider: string; payload?: unknown } = { provider: 'agentmail' }): Promise<Deps> {
   const e = env();
   const ramp = rampFor(storeQ);

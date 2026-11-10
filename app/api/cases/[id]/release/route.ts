@@ -1,6 +1,6 @@
 // POST /api/cases/[id]/release {destination, note?}: the ONLY way money moves. Session required; the approver is the session name, never the request body.
 import { requireSession } from '@/lib/auth';
-import { rampFor } from '@/lib/detect/deps';
+import { rampFor } from '@/lib/ramp-for';
 import { env } from '@/lib/env';
 import type { ReleaseDestination } from '@/lib/events';
 import { releaseCase } from '@/lib/release';
