@@ -41,13 +41,13 @@ test('vendor directory: held amount and open cases come from real holds; the out
   const out = JSON.stringify(vs);
   assert.doesNotMatch(out, /\+[1-9]\d{7,14}/, 'no unmasked E.164');
   assert.doesNotMatch(out, /challenge|claimed|routing/i, 'no secret columns by name');
-  assert.ok(!out.includes('4388'), 'challenge digits absent');
-  assert.ok(!out.includes('4321'), 'claimed digits absent');
-  const phones = (await t.q<{ p: string }>(`select phone_e164 p from trusted_contacts`)).map((r) => digitsOf(r.p));
-  const routing = (await t.q<{ r: string }>(`select routing_number r from bank_accounts`)).map((r) => r.r);
   // Ids are not data: case ids (CC-0002) are public by design, and random uuids contain digit runs that can collide with a seeded
   // routing number or phone by chance (021000021 contains 0002). Strip both, then scan everything else.
   const scanned = out.replace(/CC-\d+/g, 'CC-id').replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, 'uuid');
+  assert.ok(!scanned.includes('4388'), 'challenge digits absent');
+  assert.ok(!scanned.includes('4321'), 'claimed digits absent');
+  const phones = (await t.q<{ p: string }>(`select phone_e164 p from trusted_contacts`)).map((r) => digitsOf(r.p));
+  const routing = (await t.q<{ r: string }>(`select routing_number r from bank_accounts`)).map((r) => r.r);
   for (const run of scanned.match(/\d{4,}/g) ?? []) {
     for (let i = 0; i + 4 <= run.length; i++) {
       const g = run.slice(i, i + 4);
