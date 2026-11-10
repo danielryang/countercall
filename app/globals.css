@@ -149,8 +149,6 @@
   --fg-muted: #8D91A0;
   --rule: rgb(233 231 225 / 0.11);     /* solid, low-contrast hairlines: the dark theme separates by tone, not by dashed frames */
   --link: #8FA8FF;
-  --hl-strong: color-mix(in oklab, var(--color-signal) 62%, #0F1115);
-  --hl-strong-ink: #fff;
   --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 30%, transparent) 0 1px, transparent 1px 7px);
 }
 
@@ -160,7 +158,6 @@
   --surface: #161616; --surface-raised: #1F1F1E; --surface-sunk: #111111;
   --fg: #F1EFEA; --fg-muted: #A3A19A; --rule: rgb(241 239 234 / 0.10); --link: #9DB8FF;
   --live: #7BA7FF; --chip-mix: 100%;
-  --hl-strong: color-mix(in oklab, #7BA7FF 38%, #161616); --hl-strong-ink: #F1EFEA;
   --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 40%, transparent) 0 1.5px, transparent 1.5px 6px);
 }
 [data-theme="paper"] {
@@ -168,14 +165,12 @@
   --surface: #F6F4EF; --surface-raised: #FFFFFF; --surface-sunk: #EDEAE2;
   --fg: #1B1B18; --fg-muted: #6A6860; --rule: rgb(27 27 24 / 0.10); --link: #1743E0;
   --live: #1B4DFF; --chip-mix: 55%;
-  --hl-strong: color-mix(in oklab, #1B4DFF 20%, white); --hl-strong-ink: #1B1B18;
 }
 [data-theme="cloud"] {
   color-scheme: light;
   --surface: #F3F5F8; --surface-raised: #FFFFFF; --surface-sunk: #E9EDF2;
   --fg: #101828; --fg-muted: #667085; --rule: rgb(16 24 40 / 0.09); --link: #2F5BEA;
   --live: #2F5BEA; --chip-mix: 55%;
-  --hl-strong: color-mix(in oklab, #2F5BEA 18%, white); --hl-strong-ink: #101828;
 }
 body:has([data-theme="graphite"]) { background: #161616; }
 body:has([data-theme="paper"]) { background: #F6F4EF; }
@@ -314,10 +309,13 @@ body:has([data-theme="cloud"]) { background: #F3F5F8; }
   .scan-dots::after { content: "..."; animation: blink 1s steps(1) infinite; }
 
   /* Evidence highlights: marker-pen sweeps, not fades. --sweep-delay staggers them in reading order. */
-  :root { --hl-strong: var(--color-evidence-strong); --hl-strong-ink: var(--color-ink); }
-  .ev, .ev-strong { border-radius: var(--radius-sm); box-decoration-break: clone; padding: 0 2px; background-repeat: no-repeat; background-size: 0% 100%; animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms); }
-  .ev { background-image: linear-gradient(var(--color-evidence), var(--color-evidence)); color: var(--color-ink); }
-  .ev-strong { background-image: linear-gradient(var(--hl-strong), var(--hl-strong)); color: var(--hl-strong-ink); }
+  /* ONE quiet marker for everything that looks suspicious: a soft tint of the same amber used for 'needs attention', plus a thin underline. No second colour. */
+  .ev, .ev-strong {
+    border-radius: var(--radius-sm); box-decoration-break: clone; padding: 0 2px; color: inherit;
+    background-image: linear-gradient(color-mix(in oklab, var(--color-held) 24%, transparent), color-mix(in oklab, var(--color-held) 24%, transparent));
+    background-repeat: no-repeat; background-size: 0% 100%; border-bottom: 1.5px solid color-mix(in oklab, var(--color-held) 70%, transparent);
+    animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms);
+  }
   .ev-quiet { text-decoration: underline dashed; text-underline-offset: 3px; }
   .ev-quiet[data-struck="true"] { text-decoration: line-through; color: var(--fg-muted); }
   [data-hot="true"] { outline: 1px solid var(--fg); outline-offset: 1px; }

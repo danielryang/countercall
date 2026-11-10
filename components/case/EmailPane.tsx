@@ -47,9 +47,8 @@ export function EmailPane({ c }: { c: CaseView }) {
         })}
       </div>
       {flagged && (
-        <div className="flex flex-wrap gap-x-5 gap-y-1 border-t border-rule px-5 py-2.5 text-[12px] text-fg-muted">
-          <span className="flex items-center gap-1.5"><i className="ev-strong inline-block h-3 w-5" aria-hidden />who sent it, and where the money would go</span>
-          <span className="flex items-center gap-1.5"><i className="ev inline-block h-3 w-5" aria-hidden />what they are asking for</span>
+        <div className="flex items-center gap-2 border-t border-rule px-5 py-2.5 text-[12px] text-fg-muted">
+          <i className="ev inline-block h-3 w-5" aria-hidden />Highlighted: what looks suspicious
         </div>
       )}
     </div>

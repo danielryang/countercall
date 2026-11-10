@@ -8,7 +8,6 @@ import { EventsProvider, useStream } from '@/components/EventsProvider';
 import { fmtCents, heldCents } from '@/lib/selectors';
 
 const STATUS_TEXT = { connecting: 'Connecting', live: 'Live', reconnecting: 'Reconnecting', paused: 'Paused · click to resume', replay: 'Replay' } as const;
-const btn = 'rounded-md border border-rule px-2 py-0.5 text-fg-muted hover:bg-surface-raised hover:text-fg';
 const THEMES = ['graphite', 'paper', 'cloud'] as const;
 type Theme = (typeof THEMES)[number];
 
@@ -33,25 +32,23 @@ function Top() {
 function Foot({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void }) {
   const { status, replay, resume } = useStream();
   const live = status === 'live';
+  const link = 'hover:text-fg hover:underline underline-offset-4';
   return (
-    <footer className="flex h-9 shrink-0 items-center gap-4 border-t border-rule px-5 text-[12px] text-fg-muted">
+    <footer className="relative flex h-9 shrink-0 items-center gap-5 border-t border-rule px-5 text-[12px] text-fg-muted">
+      {replay && <i aria-hidden className="absolute -top-px left-0 h-px bg-fg/60 transition-[width] duration-[var(--d-base)]" style={{ width: `${(replay.position / Math.max(1, replay.total)) * 100}%` }} />}
       <button type="button" onClick={resume} className="flex items-center gap-2" aria-live="polite">
-        <i aria-hidden className={`h-1.5 w-1.5 ${live ? 'bg-verified' : status === 'replay' ? 'bg-signal-soft' : 'bg-held'}`} />
-        {STATUS_TEXT[status]}
+        <i aria-hidden className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-verified' : status === 'replay' ? 'bg-live' : 'bg-held'}`} />
+        {STATUS_TEXT[status]}{replay ? ` of a recorded run` : ''}
       </button>
       {replay && (
-        <div className="flex items-center gap-2" aria-label="Replay controls">
-          <span className="tabular-nums">{replay.name} · {replay.position}/{replay.total}</span>
-          <button type="button" className={btn} onClick={replay.playing ? replay.pause : replay.play}>{replay.playing ? 'Pause' : 'Play'}</button>
-          <button type="button" className={btn} onClick={replay.step}>Step</button>
-          <button type="button" className={btn} onClick={replay.restart}>Restart</button>
-          <button type="button" className={btn} onClick={() => replay.setSpeed(replay.speed === 1 ? 4 : 1)}>{replay.speed}x</button>
+        <div className="flex items-center gap-3" aria-label="Replay controls">
+          <button type="button" className={link} onClick={replay.playing ? replay.pause : replay.play}>{replay.playing ? 'Pause' : 'Play'}</button>
+          <button type="button" className={link} onClick={replay.step}>Step</button>
+          <button type="button" className={link} onClick={replay.restart}>Restart</button>
+          <button type="button" className={link} onClick={() => replay.setSpeed(replay.speed === 1 ? 4 : 1)} aria-label="Playback speed">{replay.speed}{'\u00d7'}</button>
         </div>
       )}
-      <div className="ml-auto flex items-center gap-2" aria-label="Theme">
-        <span className="hidden md:inline">Theme</span>
-        {THEMES.map((t) => <button key={t} type="button" onClick={() => setTheme(t)} aria-pressed={theme === t} className={`rounded-md border px-2 py-0.5 capitalize ${theme === t ? 'border-fg text-fg' : 'border-rule hover:text-fg'}`}>{t}</button>)}
-      </div>
+      <button type="button" className={`ml-auto ${link}`} onClick={() => setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length])} aria-label="Change theme">Theme: {theme}</button>
     </footer>
   );
 }
