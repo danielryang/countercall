@@ -1,30 +1,6 @@
-// The headline: one plain sentence that says what happened and what it means, so a first-time viewer understands the case in two seconds.
 import { Stamp } from '@/components/call/Stamp';
 import { headline, type Tone } from '@/lib/copy';
 import type { CaseView } from '@/lib/reducer';
 import { clockRunning, elapsedAt, mmss } from '@/lib/selectors';
-
-const TONE: Record<Tone, { box: string; icon: string; glyph: string }> = {
-  danger: { box: 'border-blocked/50 bg-blocked/15', icon: 'bg-blocked text-paper-raised', glyph: '\u2715' },
-  warn: { box: 'border-held/50 bg-held/15', icon: 'bg-held text-ink', glyph: '!' },
-  ok: { box: 'border-verified/50 bg-verified/15', icon: 'bg-verified text-ink', glyph: '\u2713' },
-  progress: { box: 'border-rule bg-surface-raised', icon: 'border border-fg text-fg animate-blink', glyph: '\u2022' },
-  neutral: { box: 'border-rule bg-surface-raised', icon: 'bg-fg-muted text-surface', glyph: '\u2022' },
-};
-
-export function StatusBanner({ c, nowMs }: { c: CaseView; /** wall clock, live view only: the case clock ticks while the case is still working */ nowMs?: number }) {
-  const h = headline(c);
-  const t = TONE[h.tone];
-  const done = !clockRunning(c);   // finished: an outcome, cleared, or handed to a person (same rule as the clock and the timing view)
-  return (
-    <div className={`flex items-center gap-5 rounded-xl border px-6 py-3.5 ${t.box}`}>
-      <span aria-hidden className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[16px] font-semibold ${t.icon}`}>{t.glyph}</span>
-      <div className="min-w-0 flex-1">
-        <div className="cap">{c.id} {'·'} {c.vendorName ?? 'Unknown sender'} {'·'} {done ? 'result in ' : ''}<span className="font-mono tabular-nums">{mmss(elapsedAt(c, nowMs))}</span>{done ? '' : ' so far'}</div>
-        <h1 className="text-[21px] font-semibold leading-7 tracking-tight">{h.title}</h1>
-        <p className="mt-0.5 text-[14px] leading-5 text-fg-muted">{h.sub}</p>
-      </div>
-      {c.call?.outcome && <Stamp c={c} />}
-    </div>
-  );
-}
+const TONE: Record<Tone, { box: string; icon: string; glyph: string }> = { danger: { box: 'border-red bg-red-soft', icon: 'bg-red text-page', glyph: '×' }, warn: { box: 'border-mustard bg-mustard-soft', icon: 'bg-mustard text-fg', glyph: '!' }, ok: { box: 'border-green bg-green-soft', icon: 'bg-green text-page', glyph: '✓' }, progress: { box: 'border-rule bg-warm', icon: 'border border-fg', glyph: '•' }, neutral: { box: 'border-rule bg-warm', icon: 'border border-fg-muted', glyph: '•' } };
+export function StatusBanner({ c, nowMs }: { c: CaseView; nowMs?: number }) { const h = headline(c); const t = TONE[h.tone]; const done = !clockRunning(c); return <div className={`flex items-center gap-4 border px-5 py-4 ${t.box}`}><span aria-hidden className={`flex size-8 shrink-0 items-center justify-center rounded-full text-[16px] ${t.icon}`}>{t.glyph}</span><div className="min-w-0 flex-1"><div className="cap">{c.id} · {c.vendorName ?? 'Unknown sender'} · {done ? 'Result in ' : ''}<span className="font-mono tabular-nums">{mmss(elapsedAt(c, nowMs))}</span>{done ? '' : ' so far'}</div><h2 className="mt-1 text-[22px] font-normal leading-7">{h.title}</h2><p className="text-[15px] leading-6 text-fg-muted">{h.sub}</p></div>{c.call?.outcome && <Stamp c={c} />}</div>; }

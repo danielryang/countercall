@@ -6,9 +6,6 @@ import { CallOutcomes, type Outcome } from './CallOutcomes';
 import { InterceptScene } from './InterceptScene';
 import { CALL, CTA, HERO, HOW, LIVE_QUEUE_HREF, NAV, PROBLEM, RAMP, RECORDED_RUN_HREF, REPO_URL, STRIP, TRUST } from './copy';
 
-export const THEMES = ['graphite', 'paper', 'cloud'] as const;
-export type LandingTheme = (typeof THEMES)[number];
-
 const wrap = 'mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8';
 const h2 = 'font-display text-[clamp(2rem,4.2vw,3.25rem)] font-semibold leading-[1.02] tracking-[-0.03em]';
 const btn = 'inline-flex h-11 items-center justify-center gap-2 rounded-lg px-5 text-[15px] font-medium transition-colors duration-[var(--d-fast)] ease-[var(--ease-out)]';
@@ -196,7 +193,7 @@ export function Ramp() {
   );
 }
 
-export function Footer({ theme }: { theme: LandingTheme }) {
+export function Footer() {
   return (
     <footer className="overflow-hidden border-t border-rule bg-surface-raised">
       <div className={`${wrap} pb-10 pt-20 lg:pt-28`}>
@@ -209,9 +206,7 @@ export function Footer({ theme }: { theme: LandingTheme }) {
           <span>{CTA.team}</span>
           <a href={REPO_URL} className="hover:text-fg" rel="noreferrer">github.com/danielryang/countercall</a>
           <a href={`${REPO_URL}/blob/main/LICENSE`} className="hover:text-fg" rel="noreferrer">{CTA.license}</a>
-          <span className="flex items-center gap-3 md:ml-auto">{CTA.themes}
-            {THEMES.map((t) => <a key={t} href={`/?theme=${t}`} aria-current={t === theme ? 'true' : undefined} className={t === theme ? 'text-fg underline underline-offset-4' : 'hover:text-fg'}>{t}</a>)}
-          </span>
+          <span className="md:ml-auto">{CTA.themes}</span>
         </div>
         <p className="cap mt-3">{CTA.fine}</p>
       </div>

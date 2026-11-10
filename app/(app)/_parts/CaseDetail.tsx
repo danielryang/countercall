@@ -1,6 +1,4 @@
 'use client';
-// One case, told as a story: a plain headline, the email that triggered it, and the four steps CounterCall took.
-// This file owns the local UI state the pure components share: which signal is lit up (email <-> reasons), the live case clock, and the timing disclosure.
 import { CaseStory } from '@/components/case/CaseStory';
 import { EmailPane } from '@/components/case/EmailPane';
 import { StatusBanner } from '@/components/case/StatusBanner';
@@ -13,56 +11,8 @@ import type { CaseView } from '@/lib/reducer';
 import { clockRunning } from '@/lib/selectors';
 import { waterfall } from '@/lib/waterfall';
 import { ReleaseDialog } from './ReleaseDialog';
-
-/** Wall clock, ticking once a second only while `on`. Replays never use it: their timestamps are not wall-clock time. */
-function useNow(on: boolean): number | undefined {
-  const [now, setNow] = useState<number | undefined>(undefined);
-  useEffect(() => {
-    if (!on) { setNow(undefined); return; }
-    setNow(Date.now());
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, [on]);
-  return now;
-}
-
+function useNow(on: boolean): number | undefined { const [now, setNow] = useState<number>(); useEffect(() => { if (!on) { setNow(undefined); return; } setNow(Date.now()); const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, [on]); return now; }
 export function CaseDetail({ c }: { c: CaseView }) {
-  const { replay, refresh } = useStream();
-  const [open, setOpen] = useState(false);
-  const [hot, setHot] = useState<string[] | null>(null);
-  const [timing, setTiming] = useState(false);
-  useEffect(() => { setHot(null); }, [c.id]);
-  const now = useNow(!replay && clockRunning(c));
-  const w = useMemo(() => waterfall(c), [c]);
-  const finished = !clockRunning(c);
-  /** opened on demand below the story: bring it into view (instant scroll; no smooth scrolling under reduced motion) */
-  const reveal = useCallback((el: HTMLDivElement | null) => {   // stable, so it runs once when the panel opens, not on every event
-    if (!el) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    el.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
-  }, []);
-  return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-5">
-      <StatusBanner c={c} nowMs={now} />
-      <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,5fr)_minmax(0,6fr)] gap-4">
-        <Card title="The email" aside="text only"><EmailPane c={c} hot={hot} onHot={setHot} /></Card>
-        {/* Flex column: the story may shrink an open call step (its transcript scrolls inside) so Result and the timing toggle stay on the stage; the column
-            itself scrolls only as a fallback on very short windows. */}
-        <div className="flex min-h-0 flex-col overflow-y-auto pr-1">
-          <h2 className="shrink-0 px-2 pb-1 pt-1 text-[14px] font-medium">What CounterCall did</h2>
-          <CaseStory key={c.id} c={c} hot={hot} onHot={setHot} onRelease={replay ? undefined : () => setOpen(true)} releaseBlocked="A replay is read-only. Open the live view to approve." />
-          {w && c.state !== 'scanning' && (
-            <div className="ml-10 mt-1 shrink-0">
-              <button type="button" aria-expanded={timing} onClick={() => setTiming(!timing)} className="flex w-full items-baseline gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] text-fg-muted hover:bg-surface-raised hover:text-fg">
-                <span>{TIMING.title}</span>
-                <span aria-hidden className="ml-auto">{timing ? '▾' : '▸'}</span>
-              </button>
-              {timing && <div ref={reveal} className="px-2 pb-3 pt-1"><Waterfall w={w} paced={replay?.source === 'generated'} finished={finished} /></div>}
-            </div>
-          )}
-        </div>
-      </div>
-      <ReleaseDialog c={c} open={open} onOpenChange={setOpen} onDone={refresh} />
-    </div>
-  );
+  const { replay, refresh } = useStream(); const [open, setOpen] = useState(false); const [hot, setHot] = useState<string[] | null>(null); const [timing, setTiming] = useState(false); const now = useNow(!replay && clockRunning(c)); const w = useMemo(() => waterfall(c), [c]); const cents = c.payments.reduce((n, b) => n + b.amountCents, 0); const reveal = useCallback((el: HTMLDivElement | null) => { if (el) el.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }, []);
+  return <div className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-7"><div className="mb-5 flex items-end justify-between gap-5"><div><a href="/cases" className="cap hover:text-fg">← Cases</a><div className="mt-2 flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-full bg-row text-[14px]">{(c.vendorName ?? 'U').slice(0, 2).toUpperCase()}</span><h1 className="display text-[40px] leading-none">{c.vendorName ?? 'Unknown vendor'}</h1></div></div><div className="flex items-center gap-3"><span className="chip-plain" data-variant="dashed">{replay ? 'REPLAY' : 'LIVE'}</span><button type="button" className="btn btn-primary" disabled={!!replay} onClick={() => setOpen(true)} title={replay ? 'Recorded runs are read-only' : 'Review and release'}>Review and release…</button></div></div><StatusBanner c={c} nowMs={now} /><div className="mt-6 grid min-h-0 grid-cols-[minmax(0,1fr)_300px] gap-8"><div className="min-w-0"><div className="mb-4 border-b border-rule"><p className="pb-3 text-[14px] text-fg-muted">Case journey</p></div><Card title="The email" aside="text only"><EmailPane c={c} hot={hot} onHot={setHot} /></Card><div className="mt-4"><CaseStory c={c} hot={hot} onHot={setHot} onRelease={replay ? undefined : () => setOpen(true)} releaseBlocked="A replay is read-only. Open the live view to approve." /></div>{w && c.state !== 'scanning' && <div className="mt-3"><button type="button" aria-expanded={timing} onClick={() => setTiming(!timing)} className="flex w-full items-center justify-between border-y border-rule py-3 text-left text-[14px] text-fg-muted hover:text-fg"><span>{TIMING.title}</span><span aria-hidden>{timing ? '−' : '+'}</span></button>{timing && <div ref={reveal} className="py-3"><Waterfall w={w} paced={replay?.source === 'generated'} finished={!clockRunning(c)} /></div>}</div>}</div><aside className="border-l border-rule pl-7"><h2 className="text-[18px] font-medium">Case details</h2><div className="mt-5 border-b border-rule pb-5"><p className="cap">Amount on hold</p><p className="mt-1 text-[28px] font-medium tabular-nums text-blaze">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100)}</p><p className="cap mt-1">{c.payments.length} invoices · Ramp mock</p></div><dl className="divide-y divide-rule text-[14px]"><div className="grid grid-cols-[90px_1fr] gap-3 py-3"><dt className="text-fg-muted">Vendor</dt><dd>{c.vendorName ?? 'Unknown'}</dd></div><div className="grid grid-cols-[90px_1fr] gap-3 py-3"><dt className="text-fg-muted">Case</dt><dd className="font-mono">{c.id}</dd></div><div className="grid grid-cols-[90px_1fr] gap-3 py-3"><dt className="text-fg-muted">Invoices</dt><dd>{c.payments.length} held</dd></div><div className="grid grid-cols-[90px_1fr] gap-3 py-3"><dt className="text-fg-muted">Number</dt><dd>{c.call?.contact?.phoneMasked ?? c.trusted?.phoneMasked ?? 'Masked'}<span className="block text-[12px] text-fg-muted">from the vendor record</span></dd></div><div className="grid grid-cols-[90px_1fr] gap-3 py-3"><dt className="text-fg-muted">Payments</dt><dd className="text-blaze-ink">Frozen until a person approves</dd></div></dl></aside></div><ReleaseDialog c={c} open={open} onOpenChange={setOpen} onDone={refresh} /></div>;
 }
