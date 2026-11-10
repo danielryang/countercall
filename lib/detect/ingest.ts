@@ -8,7 +8,7 @@ import { computeSignals, resolveVendor } from './signals';
 import type { Decision, Extraction, Facts, NormalizedEmail, OrgConfig, Signal, Span, Vendor, VendorMatch } from './types';
 
 export type AppEvent =
-  | { type: 'email.received'; caseId: string; email: NormalizedEmail; signals: Signal[]; spans: Span[]; vendorId: string | null }
+  | { type: 'email.received'; caseId: string; email: NormalizedEmail; signals: Signal[]; spans: Span[]; vendorId: string | null; vendorName?: string | null }
   | { type: 'email.classified'; caseId: string; extraction: Extraction | null; spans: Span[]; llmMs: number; error?: string }
   | { type: 'case.flagged'; caseId: string; decision: Decision; spans: Span[] }
   | { type: 'payment.held'; caseId: string; vendorId: string; paymentIds: string[]; bills?: HeldBill[]; vendorHold?: HoldReport['vendorHold']; rampMode?: RampMode }
@@ -60,7 +60,7 @@ export async function ingestEmail(email: NormalizedEmail, deps: Deps): Promise<D
   if (await deps.seen(email.providerEventId)) return null;               // webhooks are at-least-once
   const caseId = await deps.newCaseId();
   const a = await analyze(email, await deps.vendors(), deps.org, deps.extract ?? extract, async (signals, spans, vm) => {
-    await deps.emit({ type: 'email.received', caseId, email, signals, spans, vendorId: vm?.vendor.id ?? null });
+    await deps.emit({ type: 'email.received', caseId, email, signals, spans, vendorId: vm?.vendor.id ?? null, vendorName: vm?.vendor.name ?? null });
   });
   await deps.emit({ type: 'email.classified', caseId, extraction: a.ex.extraction, spans: a.ex.spans, llmMs: a.ex.ms, error: a.ex.error });
   const d = a.decision;

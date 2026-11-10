@@ -6,9 +6,516 @@
  "events": [
   {
    "seq": 1,
-   "id": "6f7fe741-c901-40a7-aef0-2f772e86d176",
-   "ts": "2026-11-10T18:00:00.000Z",
+   "id": "8a75641f-ed09-47e7-8814-53e5e0c6c92b",
+   "ts": "2026-11-09T15:00:00.000Z",
    "case_id": "CC-0100",
+   "type": "email.received",
+   "actor": "detector",
+   "payload": {
+    "email": {
+     "to": [
+      "ap@ricerobotics.com"
+     ],
+     "auth": {
+      "spf": "pass",
+      "dkim": "pass",
+      "dmarc": "pass"
+     },
+     "body": "Hello,\n\nPlease find invoice 4472 for $12,400.00, due Dec 5. Payment details are unchanged: Embarcadero Community Bank, routing 121007775, account ending 4417.\n\nThank you for your business,\nAcme Corp AR",
+     "from": {
+      "name": "Acme Corp AR",
+      "address": "ap@acmecorp.com"
+     },
+     "source": "injector",
+     "replyTo": [],
+     "subject": "Invoice 4472 - November services",
+     "bodyFull": "Hello,\n\nPlease find invoice 4472 for $12,400.00, due Dec 5. Payment details are unchanged: Embarcadero Community Bank, routing 121007775, account ending 4417.\n\nThank you for your business,\nAcme Corp AR",
+     "htmlOnly": false,
+     "messageId": "<793bbdac-3feb-4abd-88eb-a6f625378f95@injector.local>",
+     "receivedAt": "2026-11-10T05:38:01.750Z",
+     "attachments": [],
+     "hiddenChars": 0,
+     "providerEventId": "inj-793bbdac-3feb-4abd-88eb-a6f625378f95",
+     "unauthenticatedLabel": false
+    },
+    "spans": [
+     {
+      "end": 136,
+      "label": "routing number",
+      "start": 127,
+      "source": "rule"
+     },
+     {
+      "end": 157,
+      "label": "account number",
+      "start": 153,
+      "source": "rule"
+     }
+    ],
+    "signals": [
+     {
+      "id": "bank_details_present",
+      "spans": [
+       {
+        "end": 136,
+        "label": "routing number",
+        "start": 127,
+        "source": "rule"
+       },
+       {
+        "end": 157,
+        "label": "account number",
+        "start": 153,
+        "source": "rule"
+       }
+      ],
+      "detail": "Bank details in email: routing 121007775, acct ****4417.",
+      "severity": "medium"
+     },
+     {
+      "id": "bank_details_match_on_file",
+      "spans": [],
+      "detail": "Bank details in email match what is on file.",
+      "severity": "info"
+     }
+    ],
+    "vendorId": "v_acme",
+    "vendorName": "Acme Corp"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 2,
+   "id": "a7885295-d940-4f01-9443-b1300d84f8f1",
+   "ts": "2026-11-09T15:01:30.000Z",
+   "case_id": "CC-0100",
+   "type": "email.classified",
+   "actor": "detector",
+   "payload": {
+    "llmMs": 0,
+    "spans": [],
+    "extraction": {
+     "summary": "Invoice 4472 for $12,400 due Dec 5; payment details stated as unchanged.",
+     "urgency": "none",
+     "category": "invoice_normal",
+     "evidence": [],
+     "new_bank": null,
+     "change_type": "none",
+     "claimed_vendor": "Acme Corp",
+     "invoice_numbers": [
+      "4472"
+     ],
+     "pressure_not_to_call": false,
+     "callback_number_in_email": null,
+     "contains_instructions_to_ai": false,
+     "is_payment_instruction_change": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 3,
+   "id": "492e0476-7b89-4732-9d33-52bced74c40d",
+   "ts": "2026-11-09T15:03:00.000Z",
+   "case_id": "CC-0100",
+   "type": "case.cleared",
+   "actor": "policy",
+   "payload": {
+    "decision": {
+     "risk": "none",
+     "score": 0,
+     "actions": [],
+     "reasons": [
+      {
+       "code": "NO_ACTION",
+       "text": "No payment-instruction change and no money-moving request detected."
+      }
+     ],
+     "category": "invoice_normal",
+     "vendorId": "v_acme",
+     "llmStatus": "ok",
+     "bankChange": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 4,
+   "id": "4e7e6a4a-1bc4-40dd-b5bb-aae81c47ec49",
+   "ts": "2026-11-09T15:04:30.000Z",
+   "case_id": "CC-0100",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "cleared",
+    "from": "scanning",
+    "cause": "case.cleared"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 5,
+   "id": "03b8ffbb-b7ba-4ed5-bdae-3d48a25b7a71",
+   "ts": "2026-11-09T15:06:00.000Z",
+   "case_id": "CC-0101",
+   "type": "email.received",
+   "actor": "detector",
+   "payload": {
+    "email": {
+     "to": [
+      "ap@ricerobotics.com"
+     ],
+     "auth": {
+      "spf": "pass",
+      "dkim": "pass",
+      "dmarc": "pass"
+     },
+     "body": "Hi Priya,\n\nOur controller is refreshing the vendor file for 2027. Could you send us Rice Robotics' current W-9 when you have a moment? No rush.\n\nThanks,\nJordan",
+     "from": {
+      "name": "Jordan Lee",
+      "address": "jordan.lee@acmecorp.com"
+     },
+     "source": "injector",
+     "replyTo": [],
+     "subject": "W-9 for our vendor file",
+     "bodyFull": "Hi Priya,\n\nOur controller is refreshing the vendor file for 2027. Could you send us Rice Robotics' current W-9 when you have a moment? No rush.\n\nThanks,\nJordan",
+     "htmlOnly": false,
+     "messageId": "<5f828c67-3c4e-4bea-91b0-47b017c51526@injector.local>",
+     "receivedAt": "2026-11-10T05:38:01.759Z",
+     "attachments": [],
+     "hiddenChars": 0,
+     "providerEventId": "inj-5f828c67-3c4e-4bea-91b0-47b017c51526",
+     "unauthenticatedLabel": false
+    },
+    "spans": [],
+    "signals": [],
+    "vendorId": "v_acme",
+    "vendorName": "Acme Corp"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 6,
+   "id": "bf62cadc-71b6-4dfd-ad5d-7f4aaef50e4e",
+   "ts": "2026-11-09T15:07:30.000Z",
+   "case_id": "CC-0101",
+   "type": "email.classified",
+   "actor": "detector",
+   "payload": {
+    "llmMs": 0,
+    "spans": [],
+    "extraction": {
+     "summary": "Sender asks for our current W-9 for their vendor file.",
+     "urgency": "none",
+     "category": "vendor_info_request",
+     "evidence": [],
+     "new_bank": null,
+     "change_type": "none",
+     "claimed_vendor": "Acme Corp",
+     "invoice_numbers": [],
+     "pressure_not_to_call": false,
+     "callback_number_in_email": null,
+     "contains_instructions_to_ai": false,
+     "is_payment_instruction_change": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 7,
+   "id": "5b23370b-1fa3-4909-81d4-fe63de234a4c",
+   "ts": "2026-11-09T15:09:00.000Z",
+   "case_id": "CC-0101",
+   "type": "case.cleared",
+   "actor": "policy",
+   "payload": {
+    "decision": {
+     "risk": "none",
+     "score": 0,
+     "actions": [],
+     "reasons": [
+      {
+       "code": "NO_ACTION",
+       "text": "No payment-instruction change and no money-moving request detected."
+      }
+     ],
+     "category": "vendor_info_request",
+     "vendorId": "v_acme",
+     "llmStatus": "ok",
+     "bankChange": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 8,
+   "id": "50d535e5-481f-4e9b-9a94-51431f35b215",
+   "ts": "2026-11-09T15:10:30.000Z",
+   "case_id": "CC-0101",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "cleared",
+    "from": "scanning",
+    "cause": "case.cleared"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 9,
+   "id": "df9ec534-32a2-4c1c-99d1-08a971f374bc",
+   "ts": "2026-11-09T15:12:00.000Z",
+   "case_id": "CC-0102",
+   "type": "email.received",
+   "actor": "detector",
+   "payload": {
+    "email": {
+     "to": [
+      "ap@ricerobotics.com"
+     ],
+     "auth": {
+      "spf": "pass",
+      "dkim": "pass",
+      "dmarc": "pass"
+     },
+     "body": "Globex Q4 Update\n\nNew: the GX-400 servo line is shipping. Holiday ship cutoff is Dec 15.\n\nYou are receiving this because you are a Globex customer. Unsubscribe: https://globex-industrial.com/unsub",
+     "from": {
+      "name": "Globex Industrial",
+      "address": "news@globex-industrial.com"
+     },
+     "source": "injector",
+     "replyTo": [],
+     "subject": "Globex Q4 product news + holiday ship dates",
+     "bodyFull": "Globex Q4 Update\n\nNew: the GX-400 servo line is shipping. Holiday ship cutoff is Dec 15.\n\nYou are receiving this because you are a Globex customer. Unsubscribe: https://globex-industrial.com/unsub",
+     "htmlOnly": false,
+     "messageId": "<20d287c5-a47d-4029-84f9-4dbb3d6832de@injector.local>",
+     "receivedAt": "2026-11-10T05:38:01.762Z",
+     "attachments": [],
+     "hiddenChars": 0,
+     "providerEventId": "inj-20d287c5-a47d-4029-84f9-4dbb3d6832de",
+     "unauthenticatedLabel": false
+    },
+    "spans": [],
+    "signals": [
+     {
+      "id": "sender_not_known_contact",
+      "spans": [],
+      "detail": "news@globex-industrial.com has never corresponded for Globex Industrial Supply (first-time sender).",
+      "severity": "low"
+     }
+    ],
+    "vendorId": "v_globex",
+    "vendorName": "Globex Industrial Supply"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 10,
+   "id": "fa4d277f-78e1-4c9e-b1e3-dc248d6d03db",
+   "ts": "2026-11-09T15:13:30.000Z",
+   "case_id": "CC-0102",
+   "type": "email.classified",
+   "actor": "detector",
+   "payload": {
+    "llmMs": 0,
+    "spans": [],
+    "extraction": {
+     "summary": "Globex product newsletter with holiday shipping dates.",
+     "urgency": "none",
+     "category": "newsletter_marketing",
+     "evidence": [],
+     "new_bank": null,
+     "change_type": "none",
+     "claimed_vendor": "Globex Industrial Supply",
+     "invoice_numbers": [],
+     "pressure_not_to_call": false,
+     "callback_number_in_email": null,
+     "contains_instructions_to_ai": false,
+     "is_payment_instruction_change": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 11,
+   "id": "b058c75e-5cda-4c96-a9e6-5359ab845de0",
+   "ts": "2026-11-09T15:15:00.000Z",
+   "case_id": "CC-0102",
+   "type": "case.cleared",
+   "actor": "policy",
+   "payload": {
+    "decision": {
+     "risk": "low",
+     "score": 1,
+     "actions": [],
+     "reasons": [
+      {
+       "code": "SENDER_NOT_KNOWN_CONTACT",
+       "text": "news@globex-industrial.com has never corresponded for Globex Industrial Supply (first-time sender)."
+      },
+      {
+       "code": "NO_ACTION",
+       "text": "No payment-instruction change and no money-moving request detected."
+      }
+     ],
+     "category": "newsletter_marketing",
+     "vendorId": "v_globex",
+     "llmStatus": "ok",
+     "bankChange": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 12,
+   "id": "d2f4b5fe-91a5-4dce-9a33-21b863fc1e47",
+   "ts": "2026-11-09T15:16:30.000Z",
+   "case_id": "CC-0102",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "cleared",
+    "from": "scanning",
+    "cause": "case.cleared"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 13,
+   "id": "e2eda6be-7d6d-4ad4-92e2-4bf63adcf7e6",
+   "ts": "2026-11-09T15:18:00.000Z",
+   "case_id": "CC-0103",
+   "type": "email.received",
+   "actor": "detector",
+   "payload": {
+    "email": {
+     "to": [
+      "ap@ricerobotics.com"
+     ],
+     "auth": {
+      "spf": "pass",
+      "dkim": "pass",
+      "dmarc": "pass"
+     },
+     "body": "Acme Corp sent you an invoice.\n\nInvoice 4474 - $12,400.00 - due Dec 10\nView and pay in the BillPortal app: https://billportal-mail.com/i/4474\n\nPayment instructions are unchanged. This message was sent on behalf of Acme Corp.",
+     "from": {
+      "name": "Acme Corp via BillPortal",
+      "address": "invoices@billportal-mail.com"
+     },
+     "source": "injector",
+     "replyTo": [],
+     "subject": "Invoice 4474 from Acme Corp",
+     "bodyFull": "Acme Corp sent you an invoice.\n\nInvoice 4474 - $12,400.00 - due Dec 10\nView and pay in the BillPortal app: https://billportal-mail.com/i/4474\n\nPayment instructions are unchanged. This message was sent on behalf of Acme Corp.",
+     "htmlOnly": false,
+     "messageId": "<5e1eff76-bd34-4fb7-8903-7b5eaeb0e353@injector.local>",
+     "receivedAt": "2026-11-10T05:38:01.764Z",
+     "attachments": [],
+     "hiddenChars": 0,
+     "providerEventId": "inj-5e1eff76-bd34-4fb7-8903-7b5eaeb0e353",
+     "unauthenticatedLabel": false
+    },
+    "spans": [],
+    "signals": [
+     {
+      "id": "sender_domain_not_on_file",
+      "spans": [],
+      "detail": "billportal-mail.com is not a domain on file for Acme Corp (acmecorp.com).",
+      "severity": "medium"
+     },
+     {
+      "id": "sender_not_known_contact",
+      "spans": [],
+      "detail": "invoices@billportal-mail.com has never corresponded for Acme Corp (first-time sender).",
+      "severity": "low"
+     }
+    ],
+    "vendorId": "v_acme",
+    "vendorName": "Acme Corp"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 14,
+   "id": "5c51267f-7533-4053-a664-64aa09f8506b",
+   "ts": "2026-11-09T15:19:30.000Z",
+   "case_id": "CC-0103",
+   "type": "email.classified",
+   "actor": "detector",
+   "payload": {
+    "llmMs": 0,
+    "spans": [],
+    "extraction": {
+     "summary": "Invoice 4474 for $12,400 relayed through a billing portal.",
+     "urgency": "none",
+     "category": "invoice_normal",
+     "evidence": [],
+     "new_bank": null,
+     "change_type": "none",
+     "claimed_vendor": "Acme Corp",
+     "invoice_numbers": [
+      "4474"
+     ],
+     "pressure_not_to_call": false,
+     "callback_number_in_email": null,
+     "contains_instructions_to_ai": false,
+     "is_payment_instruction_change": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 15,
+   "id": "e5f71473-923e-4cbb-9f56-56663f385c00",
+   "ts": "2026-11-09T15:21:00.000Z",
+   "case_id": "CC-0103",
+   "type": "case.cleared",
+   "actor": "policy",
+   "payload": {
+    "decision": {
+     "risk": "medium",
+     "score": 3,
+     "actions": [],
+     "reasons": [
+      {
+       "code": "SENDER_DOMAIN_NOT_ON_FILE",
+       "text": "billportal-mail.com is not a domain on file for Acme Corp (acmecorp.com)."
+      },
+      {
+       "code": "SENDER_NOT_KNOWN_CONTACT",
+       "text": "invoices@billportal-mail.com has never corresponded for Acme Corp (first-time sender)."
+      },
+      {
+       "code": "NO_ACTION",
+       "text": "No payment-instruction change and no money-moving request detected."
+      }
+     ],
+     "category": "invoice_normal",
+     "vendorId": "v_acme",
+     "llmStatus": "ok",
+     "bankChange": false
+    }
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 16,
+   "id": "e6d32957-b0f5-4f3b-be51-c82828ba150b",
+   "ts": "2026-11-09T15:22:30.000Z",
+   "case_id": "CC-0103",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "cleared",
+    "from": "scanning",
+    "cause": "case.cleared"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 17,
+   "id": "367180a2-9a43-4e3d-bd68-9981d9ba225b",
+   "ts": "2026-11-10T18:00:00.000Z",
+   "case_id": "CC-0104",
    "type": "email.received",
    "actor": "detector",
    "payload": {
@@ -31,11 +538,11 @@
      "subject": "Important: Change of bank details",
      "bodyFull": "Hello Accounts Payable,\n\nWe have changed banks. Please send this month's payment for invoice 4471 ($12,400.00) to our new account:\n\nBank: Bluebird Neobank\nRouting number: 071003913\nAccount number: 000987654321\n\nPlease confirm once your records are updated.\n\nThanks,\nAcme Corp Accounts Receivable",
      "htmlOnly": false,
-     "messageId": "<c8c02fba-8f60-43e4-8d33-4948f154009a@injector.local>",
-     "receivedAt": "2026-11-10T05:31:09.588Z",
+     "messageId": "<2226393e-9b02-4045-bc51-62243efdd554@injector.local>",
+     "receivedAt": "2026-11-10T05:38:01.766Z",
      "attachments": [],
      "hiddenChars": 0,
-     "providerEventId": "inj-c8c02fba-8f60-43e4-8d33-4948f154009a",
+     "providerEventId": "inj-2226393e-9b02-4045-bc51-62243efdd554",
      "unauthenticatedLabel": false
     },
     "spans": [
@@ -147,15 +654,16 @@
       "severity": "medium"
      }
     ],
-    "vendorId": "v_acme"
+    "vendorId": "v_acme",
+    "vendorName": "Acme Corp"
    },
-   "delay_ms": 0
+   "delay_ms": 600
   },
   {
-   "seq": 2,
-   "id": "0adcf1a2-3f80-4c04-87e8-76d88925d9ea",
+   "seq": 18,
+   "id": "4c63a4c6-3cef-41fb-bd93-2dedacd9b79b",
    "ts": "2026-11-10T18:00:01.100Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "email.classified",
    "actor": "detector",
    "payload": {
@@ -211,10 +719,10 @@
    "delay_ms": 1100
   },
   {
-   "seq": 3,
-   "id": "3713a394-bfae-4457-895c-4317c6c35c5c",
+   "seq": 19,
+   "id": "c7973a8c-4888-4838-b9ed-52889ede774c",
    "ts": "2026-11-10T18:00:01.750Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "case.flagged",
    "actor": "policy",
    "payload": {
@@ -308,10 +816,10 @@
    "delay_ms": 650
   },
   {
-   "seq": 4,
-   "id": "f78b31ca-c0ac-479b-a3ad-a4dc8d3e86da",
+   "seq": 20,
+   "id": "5d4c75a8-7e6e-4316-a2f9-751574d6e9cd",
    "ts": "2026-11-10T18:00:01.750Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "case.state",
    "actor": "policy",
    "payload": {
@@ -322,10 +830,10 @@
    "delay_ms": 0
   },
   {
-   "seq": 5,
-   "id": "d868e7ca-fabc-41ba-bdf2-5e101001dbbc",
+   "seq": 21,
+   "id": "5bbf9f2f-64cb-4f93-a61b-a709d4e51b76",
    "ts": "2026-11-10T18:00:02.200Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "ramp.call",
    "actor": "policy",
    "payload": {
@@ -338,14 +846,14 @@
    "delay_ms": 450
   },
   {
-   "seq": 6,
-   "id": "0769dff5-c283-43fb-87bd-ed37e3ade689",
+   "seq": 22,
+   "id": "b85b20c9-7f28-4c30-b8f2-235c7a166578",
    "ts": "2026-11-10T18:00:02.650Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "ramp.call",
    "actor": "policy",
    "payload": {
-    "ms": 0,
+    "ms": 1,
     "mode": "mock",
     "path": "/developer/v1/bills/pay_8102/hold",
     "method": "POST",
@@ -354,10 +862,10 @@
    "delay_ms": 450
   },
   {
-   "seq": 7,
-   "id": "f29d30d5-dfc2-4a9e-90a8-0d2acb29a700",
+   "seq": 23,
+   "id": "3512ab70-931b-4728-b199-5b9a1add90bf",
    "ts": "2026-11-10T18:00:03.100Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "ramp.call",
    "actor": "policy",
    "payload": {
@@ -370,10 +878,10 @@
    "delay_ms": 450
   },
   {
-   "seq": 8,
-   "id": "bad00c01-d1d6-4fc6-af81-db3601a0fe98",
+   "seq": 24,
+   "id": "4d65aed5-f075-49f2-b5d5-56d8d7f5aa96",
    "ts": "2026-11-10T18:00:04.050Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "payment.held",
    "actor": "policy",
    "payload": {
@@ -410,10 +918,10 @@
    "delay_ms": 950
   },
   {
-   "seq": 9,
-   "id": "88a93771-a566-496d-bd47-4aa97fcb2687",
+   "seq": 25,
+   "id": "c50ec537-ddcf-4490-bae8-2542abdf7024",
    "ts": "2026-11-10T18:00:04.050Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "case.state",
    "actor": "policy",
    "payload": {
@@ -424,16 +932,16 @@
    "delay_ms": 0
   },
   {
-   "seq": 10,
-   "id": "82535ad2-c89c-4e89-bba4-adfa68699b52",
+   "seq": 26,
+   "id": "d86656f7-69c2-4f91-ac10-353c85321b02",
    "ts": "2026-11-10T18:00:04.750Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.requested",
    "actor": "policy",
    "payload": {
     "context": {
      "requestSummary": "The request arrived by email on Monday, November 9.",
-     "emailReceivedAt": "2026-11-10T05:31:09.588Z"
+     "emailReceivedAt": "2026-11-10T05:38:01.766Z"
     },
     "vendorId": "v_acme",
     "phoneMasked": "+1 (415) ••• ••42"
@@ -441,23 +949,23 @@
    "delay_ms": 700
   },
   {
-   "seq": 11,
-   "id": "bd5f6e5d-9ffa-41ce-9369-c65a93a5e825",
+   "seq": 27,
+   "id": "353af477-52a1-44ca-b27e-d195b63d2171",
    "ts": "2026-11-10T18:00:05.650Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.created",
    "actor": "voice_agent",
    "payload": {
     "mode": "phone",
-    "callId": "call_cc0100"
+    "callId": "call_cc0104"
    },
    "delay_ms": 900
   },
   {
-   "seq": 12,
-   "id": "b0ee1697-c6c5-482e-a273-f6af20e0d8e7",
+   "seq": 28,
+   "id": "c36a379f-6f31-4462-9e75-e3ff28ca7306",
    "ts": "2026-11-10T18:00:05.650Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "case.state",
    "actor": "policy",
    "payload": {
@@ -468,23 +976,23 @@
    "delay_ms": 0
   },
   {
-   "seq": 13,
-   "id": "3fc37bf7-f9ce-4460-81ab-015e58a70797",
+   "seq": 29,
+   "id": "9be6e82f-e5a7-4178-8be5-b867561a496e",
    "ts": "2026-11-10T18:00:09.250Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.status",
    "actor": "voice_agent",
    "payload": {
-    "callId": "call_cc0100",
+    "callId": "call_cc0104",
     "status": "connected"
    },
    "delay_ms": 3600
   },
   {
-   "seq": 14,
-   "id": "a77d08fb-fb42-4b97-9d12-18a5c62ea485",
+   "seq": 30,
+   "id": "735f977e-9bdc-46df-a390-a87eb1493ad9",
    "ts": "2026-11-10T18:00:11.150Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
@@ -503,15 +1011,15 @@
       "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme?"
      }
     ],
-    "callId": "call_cc0100"
+    "callId": "call_cc0104"
    },
    "delay_ms": 1900
   },
   {
-   "seq": 15,
-   "id": "96957319-08c8-4986-828e-cd05c1204cf2",
+   "seq": 31,
+   "id": "d1f49fc1-751f-45ea-a8dc-e35d6e21d659",
    "ts": "2026-11-10T18:00:11.600Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.tool",
    "actor": "voice_agent",
    "payload": {
@@ -520,15 +1028,15 @@
      "speaker_role": "ar_or_finance"
     },
     "name": "report_answer",
-    "callId": "call_cc0100"
+    "callId": "call_cc0104"
    },
    "delay_ms": 450
   },
   {
-   "seq": 16,
-   "id": "1da3675a-2f33-4ceb-a632-b2f2fa278155",
+   "seq": 32,
+   "id": "3a549999-20eb-40c3-b1eb-090391e80e47",
    "ts": "2026-11-10T18:00:12.050Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.tool",
    "actor": "voice_agent",
    "payload": {
@@ -537,15 +1045,15 @@
      "heard_text": "4 3 8 8"
     },
     "name": "report_challenge",
-    "callId": "call_cc0100"
+    "callId": "call_cc0104"
    },
    "delay_ms": 450
   },
   {
-   "seq": 17,
-   "id": "4eb124b2-4e05-41f0-8ff6-fd049e32ba07",
+   "seq": 33,
+   "id": "f6ba7a9e-ed06-4c90-95be-2ba250f0e302",
    "ts": "2026-11-10T18:00:13.950Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
@@ -600,15 +1108,15 @@
       "text": "Thank you. Goodbye."
      }
     ],
-    "callId": "call_cc0100"
+    "callId": "call_cc0104"
    },
    "delay_ms": 1900
   },
   {
-   "seq": 18,
-   "id": "e6d4baed-ecf7-40f6-a21f-0dbdd33aa6ca",
+   "seq": 34,
+   "id": "ac5162e8-96ea-431d-8db8-f58fcfd91bd4",
    "ts": "2026-11-10T18:00:15.850Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
@@ -663,47 +1171,47 @@
       "text": "Thank you. Goodbye."
      }
     ],
-    "callId": "call_cc0100"
+    "callId": "call_cc0104"
    },
    "delay_ms": 1900
   },
   {
-   "seq": 19,
-   "id": "7d202f5f-50b0-469a-bf87-1a843f6ca50a",
+   "seq": 35,
+   "id": "e3ab05de-f710-47d9-ad19-714644c82c70",
    "ts": "2026-11-10T18:00:17.250Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.status",
    "actor": "voice_agent",
    "payload": {
-    "callId": "call_cc0100",
+    "callId": "call_cc0104",
     "status": "ended",
     "disconnectionReason": "agent_hangup"
    },
    "delay_ms": 1400
   },
   {
-   "seq": 20,
-   "id": "7a74eeb3-4522-4c78-97a2-7c6edbcf4fbc",
+   "seq": 36,
+   "id": "c250ed0e-6354-4399-8fdc-a8a40e5751ae",
    "ts": "2026-11-10T18:00:17.850Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.recording",
    "actor": "voice_agent",
    "payload": {
-    "callId": "call_cc0100",
+    "callId": "call_cc0104",
     "monoUrl": "https://example.invalid/mono.wav",
     "stereoUrl": "https://example.invalid/stereo.wav"
    },
    "delay_ms": 600
   },
   {
-   "seq": 21,
-   "id": "e33be533-c377-4869-9680-305798aed7d8",
+   "seq": 37,
+   "id": "58810bd5-816a-4649-a884-b6650fb0862b",
    "ts": "2026-11-10T18:00:18.750Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "call.outcome",
    "actor": "policy",
    "payload": {
-    "callId": "call_cc0100",
+    "callId": "call_cc0104",
     "summary": "(scripted)",
     "decision": {
      "flags": [],
@@ -717,10 +1225,10 @@
    "delay_ms": 900
   },
   {
-   "seq": 22,
-   "id": "88689d9b-c6a7-4c15-941c-cfaa26225bc1",
+   "seq": 38,
+   "id": "286ee2c8-d1fa-4e91-bc8d-f06309d4c1c2",
    "ts": "2026-11-10T18:00:18.750Z",
-   "case_id": "CC-0100",
+   "case_id": "CC-0104",
    "type": "case.state",
    "actor": "policy",
    "payload": {

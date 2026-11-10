@@ -7,7 +7,7 @@ import { fmtCents, GROUP_OF, heldCents, queue } from './selectors';
 
 const run = (name: string): Run => JSON.parse(readFileSync(new URL(`../public/runs/${name}.json`, import.meta.url), 'utf8'));
 const FINAL: Record<string, string> = { fraud: 'fraud_blocked', confirmed: 'awaiting_approval', voicemail: 'needs_human', vague: 'needs_human', impostor: 'needs_human' };
-const only = (r: Run) => r.events[0].case_id!;
+const only = (r: Run) => r.events.find((e) => e.type === 'call.requested')!.case_id!;   // the hero case; earlier cases are seeded history
 
 test('every recorded run replays to the expected terminal state, with the money still held', () => {
   for (const [name, state] of Object.entries(FINAL)) {
@@ -22,7 +22,7 @@ test('every recorded run replays to the expected terminal state, with the money 
 test('the fraud run tells the story in order: scanning -> flagged -> held -> calling -> fraud_blocked', () => {
   const r = run('fraud'); const seen: string[] = [];
   let s = initial;
-  for (const e of r.events) { s = apply(s, e); const st = s.cases[only(r)].state; if (seen.at(-1) !== st) seen.push(st); }
+  for (const e of r.events) { s = apply(s, e); const st = s.cases[only(r)]?.state; if (st && seen.at(-1) !== st) seen.push(st); }   // the hero appears after the seeded history
   assert.deepEqual(seen, ['scanning', 'flagged', 'held', 'calling', 'fraud_blocked']);
   const c = s.cases[only(r)];
   assert.equal(c.call?.status, 'ended');
@@ -72,15 +72,14 @@ test('unknown event types advance lastSeq and change nothing else', () => {
   assert.deepEqual(after.cases[only(run('fraud'))].state, s.cases[only(run('fraud'))].state);
 });
 
-test('system.reset drops cases above keepThrough, keeps seeded ones, and ignores late pre-reset events', () => {
-  const r = run('fraud'); const s = reduce(r.events);                       // case CC-0100
-  const reset: Ev = { seq: s.lastSeq + 1, id: 'r', ts: '2026-11-10T19:00:00.000Z', case_id: null, type: 'system.reset', actor: 'system', payload: { keepThrough: 99 } };
-  const cleared = apply(s, reset);
-  assert.deepEqual(Object.keys(cleared.cases), []);
-  assert.equal(heldCents(cleared), 0);
-  assert.equal(apply(cleared, r.events[0]).order.length, 0, 'a replayed pre-reset event is ignored');
-  const kept = apply(s, { ...reset, payload: { keepThrough: 100 } });
-  assert.deepEqual(Object.keys(kept.cases), [only(r)]);
+test('system.reset drops live cases above keepThrough, keeps seeded history, and ignores late pre-reset events', () => {
+  const r = run('fraud'); const s = reduce(r.events);                       // seeded CC-0100..0103, hero CC-0104
+  assert.equal(Object.keys(s.cases).length, 5);
+  const reset: Ev = { seq: s.lastSeq + 1, id: 'r', ts: '2026-11-10T19:00:00.000Z', case_id: null, type: 'system.reset', actor: 'system', payload: { keepThrough: 103 } };
+  const after = apply(s, reset);
+  assert.deepEqual(Object.keys(after.cases).sort(), ['CC-0100', 'CC-0101', 'CC-0102', 'CC-0103']);
+  assert.equal(heldCents(after), 0, 'the frozen money went with the live case');
+  assert.equal(apply(after, r.events.find((e) => e.case_id === only(r))!).order.length, 4, 'a replayed pre-reset event is ignored');
 });
 
 test('queue groups follow the state mapping and money formats as dollars', () => {

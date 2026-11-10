@@ -9,7 +9,7 @@ function Readout() {
   const { state, status, replay } = useStream();
   const speed = Number(useSearchParams().get('speed') ?? 1);
   useEffect(() => { replay?.setSpeed(speed); }, [replay?.name, speed]);   // eslint-disable-line react-hooks/exhaustive-deps
-  const c = Object.values(state.cases)[0];
+  const c = Object.values(state.cases).find((x) => x.call) ?? Object.values(state.cases).at(-1);
   return (
     <main data-app style={{ padding: 24 }}>
       <p id="status">{status}</p>

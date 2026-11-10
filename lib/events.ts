@@ -21,7 +21,7 @@ type Base = { caseId: string; at?: number };
 /** What producers hand to emit(). 02's AppEvent and 01's CallEvent are members (compat.ts proves it at compile time). */
 export type EmittedEvent =
   // detector (02 ingest.ts)
-  | (Base & { type: 'email.received'; email: NormalizedEmail; signals: Signal[]; spans: Span[]; vendorId: string | null })
+  | (Base & { type: 'email.received'; email: NormalizedEmail; signals: Signal[]; spans: Span[]; vendorId: string | null; vendorName?: string | null })
   | (Base & { type: 'email.classified'; extraction: Extraction | null; spans: Span[]; llmMs: number; error?: string })
   | (Base & { type: 'case.flagged'; decision: DetectDecision; spans: Span[] })
   | (Base & { type: 'case.cleared'; decision: DetectDecision })

@@ -18,7 +18,7 @@ export default async function States({ searchParams }: { searchParams: Promise<{
   const run = JSON.parse(readFileSync(join(DIR, `${name}.json`), 'utf8')) as Run;
   const at = Math.max(0, Math.min(run.events.length, Number.parseInt(sp.at ?? String(run.events.length), 10) || 0));
   const state = reduce(run.events.slice(0, at));
-  const c = Object.values(state.cases)[0];
+  const c = Object.values(state.cases).find((x) => x.call) ?? Object.values(state.cases).at(-1);   // the hero case, else the newest
   return (
     <main data-app style={{ padding: 24, maxWidth: 1100 }}>
       <p>runs: {names.map((n) => <a key={n} href={`?run=${n}&at=${run.events.length}`} style={{ marginRight: 12 }}>{n}</a>)}</p>

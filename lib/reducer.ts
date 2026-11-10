@@ -23,7 +23,7 @@ export interface TaskView { id: number; kind: string; title: string; reason: str
 export interface TimelineItem { seq: number; ts: string; type: string; actor: string }
 export interface CaseView {
   id: string; state: CaseState; createdAt: string; updatedAt: string; lastSeq: number;
-  vendorId: string | null;
+  vendorId: string | null; vendorName: string | null;
   email?: { from: { name?: string; address: string }; subject: string; body: string; receivedAt: string; source: string; replyTo: { name?: string; address: string }[] };
   signals: Signal[]; spans: Span[]; extraction: Extraction | null; llmMs?: number; decision?: DetectDecision;
   payments: HeldBill[]; vendorHold?: string; rampMode?: string; rampCalls: { method: string; path: string; status: number; ms: number; seq: number }[];
@@ -38,7 +38,7 @@ export interface State { cases: Record<string, CaseView>; order: string[]; lastS
 export const initial: State = { cases: {}, order: [], lastSeq: 0 };
 
 const blank = (id: string, ts: string): CaseView => ({
-  id, state: 'scanning', createdAt: ts, updatedAt: ts, lastSeq: 0, vendorId: null, signals: [], spans: [], extraction: null, payments: [], rampCalls: [], call: null, tasks: [], timeline: [],
+  id, state: 'scanning', createdAt: ts, updatedAt: ts, lastSeq: 0, vendorId: null, vendorName: null, signals: [], spans: [], extraction: null, payments: [], rampCalls: [], call: null, tasks: [], timeline: [],
 });
 const blankCall = (id: string, ts: string): CallView => ({ id, mode: 'phone', status: 'dialing', startedAt: ts, turns: [], transcriptFinal: false, tools: [] });
 const caseNumber = (id: string) => Number(id.replace(/\D/g, '')) || 0;
@@ -51,7 +51,7 @@ function reduceCase(c: CaseView, e: Ev): CaseView {
   const ts = e.ts;
   switch (e.type) {
     case 'email.received': { const p = e.payload as unknown as P<'email.received'>;
-      return { ...c, vendorId: p.vendorId, signals: p.signals, spans: mergeSpans(c.spans, p.spans),
+      return { ...c, vendorId: p.vendorId, vendorName: p.vendorName ?? c.vendorName, signals: p.signals, spans: mergeSpans(c.spans, p.spans),
         email: { from: p.email.from, subject: p.email.subject, body: p.email.body, receivedAt: p.email.receivedAt, source: p.email.source, replyTo: p.email.replyTo } }; }
     case 'email.classified': { const p = e.payload as unknown as P<'email.classified'>;
       return { ...c, extraction: p.extraction, llmMs: p.llmMs, spans: mergeSpans(c.spans, p.spans) }; }
