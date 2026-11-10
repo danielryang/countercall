@@ -1,0 +1,31 @@
+name: CI
+
+# Runs on every push and pull request. Deploys are handled by the Vercel Git integration (push to main); this workflow only gates quality.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # typecheck, unit + flow + hold tests, eval (replay), eval unit + smoke, db invariants on PGlite. No secrets or network needed.
+      - run: npm run verify
+      - run: npm run lint:ui
+      # `next build` imports every route module: it must succeed with no API keys in the environment (CLAUDE.md invariant 11).
+      - run: npm run build
