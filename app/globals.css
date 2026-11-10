@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+/* Fonts (both SIL OFL 1.1). Tested path: import the fontsource CSS once in app/layout.tsx
+     import "@fontsource-variable/mona-sans/wdth.css";   // family "Mona Sans Variable" (wght 200-900, wdth 75-125)
+     import "@fontsource/ibm-plex-mono/400.css"; import "@fontsource/ibm-plex-mono/500.css"; import "@fontsource/ibm-plex-mono/600.css";
+   Lower-CLS path: next/font/local with --font-mona / --font-plex variables (see report section 4); the var() fallbacks below cover both. */
+
+@theme {
+  /* Wipe Tailwind defaults that produce generic output. bg-indigo-500 / rounded-xl / shadow-lg will not compile. */
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --font-*: initial;
+
+  /* Raw palette: warm safety-paper, cool near-black ink, one cobalt */
+  --color-paper: #E9E6DE;
+  --color-paper-raised: #F4F2EC;
+  --color-paper-sunk: #DCD8CE;
+  --color-ink: #14161D;
+  --color-ink-2: #2B2F3B;
+  --color-ink-muted: #5C6170;
+  --color-night: #12141A;
+  --color-night-raised: #1B1E27;
+  --color-night-sunk: #0C0D12;
+  --color-chalk: #ECE9E1;
+  --color-chalk-muted: #A9A79F;
+  --color-signal: #1B4DFF;       /* brand accent AND the CALLING status. Flat only. Never a gradient. */
+  --color-signal-ink: #1743E0;   /* signal as small text on paper (5.8:1) */
+  --color-signal-soft: #7C9BFF;  /* signal as text on night (6.9:1) */
+  --color-hilite: #F7E26B;       /* marker-pen label highlight, marketing only */
+
+  /* Role aliases requested by agent 05 (research/05-app-ui.md Hand-offs). Same hexes as above, app-facing names. */
+  --color-ink-faint: #8A8E9C;          /* decorative only (3.2:1 on paper), never for text a user must read */
+  --color-accent: #1B4DFF;             /* = signal: live / primary action. Verified is separate (--color-verified). */
+  --color-accent-ink: #1743E0;
+  --color-evidence: #F7E26B;           /* = hilite: highlighter for "what they ask" */
+  --color-evidence-strong: color-mix(in oklab, var(--color-signal) 28%, white); /* PLAN 7.4 #4: cobalt tint, not review pink */
+  --color-danger: #D42A14;             /* = blocked */
+  --color-warn: #FFB81C;               /* = held amber: unverified, voicemail, no answer */
+  --color-inverse-bg: #12141A;         /* the one dark surface in the app: the live call card */
+  --color-inverse-ink: #ECE9E1;
+  --color-inverse-muted: #A9A79F;
+
+  /* Status roles (fills and dots; ink text on held/verified/review, paper text on blocked/calling) */
+  --color-held: #FFB81C;
+  --color-calling: #1B4DFF;
+  --color-verified: #22B866;
+  --color-blocked: #D42A14;
+  --color-review: #EE6DB8;
+
+  /* Type */
+  --font-display: var(--font-mona, "Mona Sans Variable"), "Mona Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-mona, "Mona Sans Variable"), "Mona Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex, "IBM Plex Mono"), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --text-micro: 0.6875rem;               /* 11px mono labels */
+  --text-micro--line-height: 1rem;
+  --text-display-xl: clamp(3.5rem, 9.5vw, 8.5rem);
+  --text-display-xl--line-height: 0.88;
+  --text-display-lg: clamp(2.5rem, 5.5vw, 4.75rem);
+  --text-display-lg--line-height: 0.95;
+  --text-display-md: clamp(1.75rem, 3vw, 2.5rem);
+  --text-display-md--line-height: 1;
+  --tracking-label: 0.14em;
+  --tracking-display: -0.035em;
+
+  /* Motion: strong ease-out for entrances, steps() for machine readouts. No springs, no bounce. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.64, 0, 0.78, 0);   /* exits only; never for entrances */
+  --animate-rise: rise 600ms var(--ease-out) both;
+  --animate-blink: blink 1s steps(1) infinite;
+  --animate-ping-dot: ping-dot 1.6s var(--ease-out) infinite;
+  --animate-marquee: marquee 120s linear infinite;
+  --animate-draw: draw 900ms var(--ease-out) both;
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes ping-dot { 0% { transform: scale(1); opacity: .7; } 80%, 100% { transform: scale(2.6); opacity: 0; } }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+  --breakpoint-3xl: 100rem;
+}
+
+/* Semantic roles. `inline` makes utilities read var(--surface) at the element, so a .night ancestor flips the subtree. */
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-rule: var(--rule);
+  --color-link: var(--link);
+  --color-hairline: var(--rule);        /* agent 05: dashed frame border */
+  --color-rule-strong: var(--fg);       /* agent 05: solid 1px for selected / active */
+  --color-focus-ring: var(--color-signal);
+}
+
+:root {
+  --surface: #E9E6DE;
+  --surface-raised: #F4F2EC;
+  --surface-sunk: #DCD8CE;
+  --fg: #14161D;
+  --fg-muted: #5C6170;
+  --rule: rgb(20 22 29 / 0.28);
+  --link: #1743E0;
+  --rail: 2rem;                  /* inset of the dashed side rails */
+  --cut: 10px;                   /* chamfer size for buttons and tags */
+  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 55%, transparent) 0 1px, transparent 1px 6px);  /* "frozen": a pattern, so it survives greyscale and video compression */
+  /* motion tokens in agent 05's names (durations); easings are --ease-* in @theme */
+  --d-instant: 80ms; --d-fast: 120ms; --d-base: 200ms; --d-slow: 400ms; --d-stamp: 220ms; --d-settle: 600ms; --beat-gap: 700ms;
+}
+/* Recording / projector mode: <html data-scale="video"> lifts the 11px micro size to 13px (agent 06 records with a 13px minimum). */
+[data-scale="video"] { --text-micro: 0.8125rem; --text-micro--line-height: 1.125rem; }
+.night {
+  --surface: #12141A;
+  --surface-raised: #1B1E27;
+  --surface-sunk: #0C0D12;
+  --fg: #ECE9E1;
+  --fg-muted: #A9A79F;
+  --rule: rgb(236 233 225 / 0.28);
+  --link: #7C9BFF;
+}
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-size-adjust: 100%; }
+  body { background: var(--surface); color: var(--fg); font-family: var(--font-sans); font-size: 1.0625rem; line-height: 1.5; font-stretch: 100%; }
+  ::selection { background: var(--color-signal); color: var(--color-paper-raised); }
+  :focus-visible { outline: 2px solid var(--color-signal); outline-offset: 2px; }
+  h1, h2, h3 { text-wrap: balance; }
+  p { text-wrap: pretty; }
+  table, .tnum { font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+}
+
+/* ---------- Typography utilities ---------- */
+@utility display {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-weight: 800;
+  letter-spacing: var(--tracking-display);
+  line-height: 0.9;
+}
+@utility label {  /* mono micro-label: the single most Greptile-like detail */
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* ---------- Grid furniture ---------- */
+/* .shell: a full-bleed section with dashed top rule, dashed side rails and + registration marks at the rail/rule crossings */
+@utility shell {
+  position: relative;
+  border-top: 1px dashed var(--rule);
+  &::before {   /* side rails */
+    content: ""; position: absolute; inset: 0 var(--rail); pointer-events: none;
+    border-inline: 1px dashed var(--rule);
+  }
+  &::after {    /* + marks, 11px, centred on the rail/top-rule crossings */
+    content: ""; position: absolute; left: 0; right: 0; top: -6px; height: 11px; pointer-events: none; color: var(--fg);
+    background:
+      linear-gradient(currentColor, currentColor) left calc(var(--rail) - 0.5px) top 0 / 1px 11px no-repeat,
+      linear-gradient(currentColor, currentColor) left calc(var(--rail) - 5px) top 5px / 11px 1px no-repeat,
+      linear-gradient(currentColor, currentColor) right calc(var(--rail) - 0.5px) top 0 / 1px 11px no-repeat,
+      linear-gradient(currentColor, currentColor) right calc(var(--rail) - 5px) top 5px / 11px 1px no-repeat;
+  }
+  @media (max-width: 767px) { &::before, &::after { display: none; } }   /* rails are desktop furniture */
+}
+@utility rule-b { border-bottom: 1px dashed var(--rule); }
+@utility rule-t { border-top: 1px dashed var(--rule); }
+@utility rule-r { border-right: 1px dashed var(--rule); }
+@utility cell { border: 1px solid var(--rule); }       /* solid hairline cells for stat / logo grids */
+@utility dot-grid {
+  background-image: radial-gradient(circle, color-mix(in oklab, var(--fg) 18%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+@utility hatch {     /* diagonal hatching for frozen / inactive fills (token --hatch, agent 05's 45deg 1px / 6px pitch) */
+  background-image: var(--hatch);
+}
+@utility microprint { /* check-security rule: put tiny repeated text inside, e.g. "CALL THE NUMBER ON FILE · " */
+  font-family: var(--font-mono); font-size: 6px; line-height: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; color: var(--fg-muted);
+}
+/* ---------- Chamfer buttons and tags ---------- */
+/* chamfers top-left and bottom-right; the outline variant fakes a 1px border with an inset ::after (clip-path kills real borders) */
+@utility cut {
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+@layer components {
+  .btn {
+    --cut: 10px;
+    position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: .625rem;
+    padding: .75rem 1.5rem; min-height: 2.75rem;
+    font-family: var(--font-sans); font-size: .9375rem; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap; cursor: pointer;
+    background: var(--color-ink); color: var(--color-paper-raised);
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+    transition-property: background-color, color, transform;
+    transition-duration: 120ms; transition-timing-function: var(--ease-out);
+  }
+  .btn > .arrow { transition: transform 160ms var(--ease-out); }
+  .btn:hover > .arrow { transform: translateX(4px); }
+  .btn:active { transform: translateY(1px); }
+  .btn-signal { background: var(--color-signal); color: #fff; }
+  .btn-signal:hover { background: var(--color-ink); }
+  .btn:not(.btn-signal):not(.btn-outline):hover { background: var(--color-signal); }
+  .night .btn:not(.btn-signal):not(.btn-outline) { background: var(--color-chalk); color: var(--color-night); }
+  .btn-outline { background: var(--fg); color: var(--fg); }
+  .btn-outline::after {
+    content: ""; position: absolute; inset: 1px; z-index: -1; background: var(--surface);
+    clip-path: polygon(calc(var(--cut) - .586px) 0, 100% 0, 100% calc(100% - var(--cut) + .586px), calc(100% - var(--cut) + .586px) 100%, 0 100%, 0 calc(var(--cut) - .586px));
+    transition: background-color 120ms var(--ease-out);
+  }
+  .btn-outline:hover::after { background: var(--surface-raised); }
+  .btn-sm { --cut: 7px; padding: .375rem 1rem; min-height: 2rem; font-size: .8125rem; }
+
+  /* Status chip: solid fill + glyph, so colour is never the only signal (WCAG 1.4.1). Contrast of each pair is >= 4.5:1. */
+  .chip {
+    --cut: 5px;
+    display: inline-flex; align-items: center; gap: .5rem; padding: .125rem .625rem .125rem .5rem; height: 1.5rem;
+    font-family: var(--font-mono); font-size: var(--text-micro); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+    background: var(--c, var(--color-paper-sunk)); color: var(--on, var(--color-ink));
+  }
+  .chip::before { content: ""; width: .5rem; height: .5rem; background: currentColor; flex: none; }   /* glyph: square by default */
+  .chip[data-status="HELD"]         { --c: var(--color-held);     --on: var(--color-ink); }
+  .chip[data-status="HELD"]::before { background: linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px, currentColor 5px 8px); }   /* pause bars */
+  .chip[data-status="CALLING"]      { --c: var(--color-calling);  --on: #fff; }
+  .chip[data-status="CALLING"]::before { animation: ping-dot 1.6s var(--ease-out) infinite; }
+  .chip[data-status="VERIFIED"]     { --c: var(--color-verified); --on: var(--color-ink); }
+  .chip[data-status="VERIFIED"]::before { clip-path: polygon(0 55%, 18% 40%, 40% 62%, 82% 12%, 100% 28%, 40% 100%); }   /* check */
+  .chip[data-status="BLOCKED"]      { --c: var(--color-blocked);  --on: var(--color-paper-raised); }
+  .chip[data-status="BLOCKED"]::before { clip-path: polygon(15% 0, 50% 35%, 85% 0, 100% 15%, 65% 50%, 100% 85%, 85% 100%, 50% 65%, 15% 100%, 0 85%, 35% 50%, 0 15%); }  /* x */
+  .chip[data-status="NEEDS_REVIEW"] { --c: var(--color-review);   --on: var(--color-ink); }
+  .chip[data-status="NEEDS_REVIEW"]::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); }   /* triangle */
+}
+
+/* PLAN 7.4 #2: dense app label tracking */
+[data-app] { --tracking-label: 0.08em; }
