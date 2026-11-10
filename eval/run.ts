@@ -3,7 +3,8 @@
 //   npx tsx eval/run.ts --det-only      LLM "down": extraction=null (what do the deterministic rules catch alone?)
 //   npx tsx eval/run.ts --live          real Claude calls (needs ANTHROPIC_API_KEY); prints latency, tokens, $ per email
 //   npx tsx eval/run.ts --live --model claude-sonnet-5-5 --only 13
-import { readFileSync } from 'node:fs';
+//   npx tsx eval/run.ts --json video/public/eval.json   also writes per-fixture results + totals as JSON (the video's eval card)
+import { readFileSync, writeFileSync } from 'node:fs';
 import { analyze } from '../lib/detect/ingest';
 import { extract, MODEL, type ExtractResult } from '../lib/detect/extract';
 import { replayExtract } from '../lib/detect/fixtures';
@@ -24,6 +25,7 @@ const cost = (u?: ExtractResult['usage']) => { const p = PRICE[model]; if (!u ||
 const pad = (s: unknown, n: number) => String(s).padEnd(n).slice(0, n);
 
 let pass = 0, totalCost = 0, mustCatch = 0, caught = 0, shouldPass = 0, falsePos = 0; const lat: number[] = [];
+const rows: { id: string; expected: string[]; got: string[]; risk: Risk; ok: boolean }[] = [];
 console.log(`mode=${live ? 'live ' + model : detOnly ? 'deterministic-only' : 'replay (mock_extraction)'}\n`);
 console.log(pad('fixture', 34), pad('expected', 24), pad('got', 24), pad('risk', 9), pad('llm', 5), pad('ms', 6), 'ok');
 for (const f of fixtures) {
@@ -45,7 +47,7 @@ for (const f of fixtures) {
     !call || (call.type === 'START_CALLBACK' && call.phone === vendor?.trustedPhone && !a.facts.phones.some((p) => p.e164 === call.phone && !p.matchesOnFile)), // INVARIANT: only ever the on-file number
     !f.after_call || JSON.stringify(Object.entries(postCallDecision(f.after_call.outcome, vendor!)).filter(([k]) => k in f.after_call.expect).map(([k, v]) => [k, v])) === JSON.stringify(Object.entries(f.after_call.expect)),
   ];
-  const ok = checks.every(Boolean); if (ok) pass++;
+  const ok = checks.every(Boolean); if (ok) pass++; rows.push({ id: f.id, expected: want, got, risk: a.decision.risk, ok });
   if (want.includes('HOLD_VENDOR_PAYMENTS')) { mustCatch++; if (got.includes('HOLD_VENDOR_PAYMENTS')) caught++; }
   if (!want.length) { shouldPass++; if (got.length) falsePos++; }
   totalCost += cost(a.ex.usage); if (live) lat.push(a.ex.ms);
@@ -55,4 +57,7 @@ for (const f of fixtures) {
 const p50 = lat.sort((x, y) => x - y)[Math.floor(lat.length / 2)];
 console.log(`\n${pass}/${fixtures.length} fixtures correct | bank-change recall (HOLD on must-catch): ${caught}/${mustCatch} | false positives: ${falsePos}/${shouldPass}` +
   (live ? ` | LLM p50 ${p50}ms max ${Math.max(...lat)}ms | $${totalCost.toFixed(5)} total, $${(totalCost / fixtures.length).toFixed(5)}/email` : ''));
+const jsonOut = arg('--json');
+if (jsonOut) writeFileSync(jsonOut, JSON.stringify({ mode: live ? 'live' : detOnly ? 'deterministic-only' : 'replay', model: live ? model : null, generatedAt: new Date().toISOString(),
+  n: fixtures.length, pass, recall: { caught, of: mustCatch }, falsePositives: { count: falsePos, of: shouldPass }, ...(live ? { llmMs: { p50, max: Math.max(...lat) }, costUsd: totalCost } : {}), rows }, null, 2) + '\n');
 process.exit(pass === fixtures.length || detOnly ? 0 : 1);
