@@ -157,6 +157,8 @@ export const SCENARIO_COPY: Record<'confirmed' | 'denied' | 'voicemail' | 'vague
 /** Stands in for the challenge answer on the cheat-card. The real digits are never sent to the browser. */
 export const CHEAT_DIGITS = '(the four digits, looked up off-screen)';
 export const STAGE_OK = 'Stage 1280×720 OK';
+/** Second click on a test email while calls may be on: the flagged email will make a real phone ring. */
+export const INJECT_CONFIRM = 'Click again: a phone will ring';
 export const stageOff = (w: number, h: number) => `Stage ${w}×${h} · needs 1280×720`;
 
 // ---------------------------------------------------------------------------------------------------------------------------------

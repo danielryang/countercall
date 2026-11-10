@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { PresentMode } from '@/components/ui/PresentMode';
 import { cheatCards } from '@/lib/cheat';
-import { STAGE_OK, stageOff } from '@/lib/copy';
+import { INJECT_CONFIRM, STAGE_OK, stageOff } from '@/lib/copy';
 import type { Check } from '@/lib/preflight';
 
 const EMAILS = [
@@ -56,6 +56,9 @@ export function DemoPanel() {
   const [name, setName] = useState(''); const [passcode, setPasscode] = useState(''); const [authErr, setAuthErr] = useState<string | null>(null);
   const [pre, setPre] = useState<Pre | null>(null); const [busy, setBusy] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false); const [log, setLog] = useState<Line[]>([]);
+  // A test email that gets flagged really rings the callee's phone when calls are on (it did once: CC-0110). Unless preflight says calls are
+  // off, the first click only arms the send and says so; the second click sends. Fail closed: an unknown calls state also asks first.
+  const [armed, setArmed] = useState<string | null>(null);
   const cards = useMemo(() => cheatCards(), []);
   const [pick, setPick] = useState<(typeof cards)[number]['name']>('denied');   // the hero take first
   const card = cards.find((c) => c.name === pick) ?? cards[0];
@@ -78,7 +81,8 @@ export function DemoPanel() {
     if (r?.ok) { setMe(name); setPasscode(''); } else setAuthErr(r?.status === 429 ? 'Too many attempts. Try again in a few minutes.' : 'That passcode or name was not accepted.');
   };
   const inject = async (id: string, title: string) => {
-    setBusy(id); say(`Sending "${title}"…`);
+    if (pre?.callsEnabled !== false && armed !== id) { setArmed(id); return; }
+    setArmed(null); setBusy(id); say(`Sending "${title}"…`);
     const r = await post('/api/demo/inject', { fixtureId: id }).catch(() => null);
     const j = r ? ((await r.json().catch(() => null)) as { caseId?: string | null; error?: string } | null) : null;
     setBusy(null);
@@ -194,7 +198,8 @@ export function DemoPanel() {
                 {EMAILS.map((m) => (
                   <li key={m.id} className="flex items-center gap-3 py-2">
                     <span className="min-w-0 flex-1"><span className="block text-[13px] font-medium">{m.title}</span><span className="block text-[12px] leading-4 text-fg-muted">{m.note}</span></span>
-                    <button type="button" disabled={busy !== null} onClick={() => void inject(m.id, m.title)} className={btn}>{busy === m.id ? 'Sending…' : 'Send'}</button>
+                    <button type="button" disabled={busy !== null} onClick={() => void inject(m.id, m.title)} className={btn}>{busy === m.id ? 'Sending…' : armed === m.id ? INJECT_CONFIRM : 'Send'}</button>
+                    {armed === m.id && <button type="button" onClick={() => setArmed(null)} className="text-[13px] text-fg-muted hover:text-fg">Cancel</button>}
                   </li>
                 ))}
               </ul>
