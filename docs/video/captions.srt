@@ -1,0 +1,176 @@
+1
+00:00:00,500 --> 00:00:03,600
+Your vendor emails:
+"We have changed banks.
+
+2
+00:00:03,600 --> 00:00:06,600
+Please send this month's payment
+to our new account."
+
+3
+00:00:06,800 --> 00:00:09,800
+Same name, same invoice. Pay it, and
+the money goes to whoever sent it.
+
+4
+00:00:10,300 --> 00:00:14,300
+Business email compromise hit about
+three in four organizations in 2025.
+
+5
+00:00:14,500 --> 00:00:18,800
+Of the companies hit by payments fraud,
+only three in ten got most of it back.
+
+6
+00:00:19,000 --> 00:00:22,800
+One in five got nothing. Losses reported
+to the FBI: over three billion dollars.
+
+7
+00:00:23,300 --> 00:00:27,000
+The old fix still works: call the vendor
+back on the number you already have.
+
+8
+00:00:27,200 --> 00:00:30,800
+The scammer controls the email.
+Not the vendor's phone.
+
+9
+00:00:31,400 --> 00:00:34,600
+So we automated the call.
+
+10
+00:00:35,400 --> 00:00:39,600
+This is Rice Robotics' accounts payable.
+I'm sending the scam email now,
+
+11
+00:00:39,600 --> 00:00:44,600
+through the same code path
+a real email takes.
+
+12
+00:00:45,400 --> 00:00:49,600
+Claude reads it and flags the bank change,
+and the rules flag it too.
+
+13
+00:00:49,800 --> 00:00:55,000
+Both Acme bills, twenty-four thousand
+eight hundred dollars, go on hold.
+
+14
+00:00:55,200 --> 00:01:00,600
+Ramp is a mock here,
+built against Ramp's Developer API.
+
+15
+00:01:01,300 --> 00:01:05,400
+It never dials a number from the email.
+
+16
+00:01:05,500 --> 00:01:09,800
+It calls the one on Acme's W-9 from
+March 2025, the number we already had.
+
+17
+00:02:12,400 --> 00:02:19,600
+Acme says no. The case is blocked,
+and the twenty-four eight stays on hold.
+
+18
+00:02:20,300 --> 00:02:26,600
+Only a signed-in person can release money,
+by holding this button. Never the model.
+
+19
+00:02:27,300 --> 00:02:33,600
+Every step lands in one append-only log, and
+the audit page rebuilds every case from it.
+
+20
+00:02:34,300 --> 00:02:40,600
+Voicemail: the agent says nothing about
+the request, and a person gets a task.
+
+21
+00:02:41,200 --> 00:02:46,600
+"I think so?" isn't a yes.
+Still held, and a person follows up.
+
+22
+00:02:47,300 --> 00:02:54,600
+Someone says yes, but can't give the right
+digits? Held, and sent to a person.
+
+23
+00:02:55,300 --> 00:03:01,600
+And when every check passes,
+the money still waits for a person.
+
+24
+00:03:02,300 --> 00:03:06,600
+One Next.js app.
+Email arrives by a signed webhook,
+
+25
+00:03:06,600 --> 00:03:10,600
+Claude returns typed JSON,
+and Retell places the call.
+
+26
+00:03:10,800 --> 00:03:14,600
+The number in the email
+never reaches the dialer.
+
+27
+00:03:15,300 --> 00:03:19,800
+The models only report. Plain TypeScript
+decides: an unhandled outcome won't compile.
+
+28
+00:03:20,200 --> 00:03:24,800
+"Confirmed" needs the right digits, no red
+flags, and a second reader that agrees.
+
+29
+00:03:25,200 --> 00:03:29,600
+Even then, only a signed-in person
+releases the money.
+
+30
+00:03:30,300 --> 00:03:35,600
+On our twenty hand-built emails, the live model
+got twenty of twenty, with no false alarms.
+
+31
+00:03:35,800 --> 00:03:40,600
+With the model switched off, the rules
+alone still hold every bank change.
+
+32
+00:03:41,300 --> 00:03:46,000
+We check the policy exhaustively: almost
+twenty-one million cases, zero unsafe releases.
+
+33
+00:03:46,200 --> 00:03:51,600
+A seeded simulator loses, repeats and
+forges webhooks. It has found two real bugs.
+
+34
+00:03:51,800 --> 00:03:56,600
+And the audit log is sealed, entry by entry,
+so a changed record shows up.
+
+35
+00:03:57,300 --> 00:04:00,800
+The old way depends on someone
+remembering to make a phone call.
+
+36
+00:04:01,000 --> 00:04:03,800
+CounterCall makes it, every time.
