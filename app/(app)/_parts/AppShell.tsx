@@ -1,10 +1,12 @@
 'use client';
 // The app frame. A slim top bar (brand, org, the frozen-money total), the screen, and a quiet footer for connection state, replay controls and key hints.
+// Present mode (P, Esc, ?present=1) hides the footer and scales the frame: components/ui/PresentMode.tsx.
 // `?replay=<run>` swaps the live API for a recorded run (keyless, offline-safe, labelled REPLAY).
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
 import { EventsProvider, useStream } from '@/components/EventsProvider';
+import { PresentMode } from '@/components/ui/PresentMode';
 import { fmtCents, heldCents } from '@/lib/selectors';
 
 const STATUS_TEXT = { connecting: 'Connecting', live: 'Live', reconnecting: 'Reconnecting', paused: 'Paused · click to resume', replay: 'Replay' } as const;
@@ -35,7 +37,7 @@ function Foot({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void 
   const live = status === 'live';
   const link = 'hover:text-fg hover:underline underline-offset-4';
   return (
-    <footer className="relative flex h-9 shrink-0 items-center gap-5 border-t border-rule px-5 text-[12px] text-fg-muted">
+    <footer data-present-hide className="relative flex h-9 shrink-0 items-center gap-5 border-t border-rule px-5 text-[12px] text-fg-muted">
       {replay && <i aria-hidden className="absolute -top-px left-0 h-px bg-fg/60 transition-[width] duration-[var(--d-base)]" style={{ width: `${(replay.position / Math.max(1, replay.total)) * 100}%` }} />}
       <button type="button" onClick={resume} className="flex items-center gap-2" aria-live="polite">
         <i aria-hidden className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-verified' : status === 'replay' ? 'bg-live' : 'bg-held'}`} />
@@ -67,6 +69,7 @@ function Providers({ children }: { children: ReactNode }) {
   return (
     <EventsProvider replay={replay} at={atRaw ? Number(atRaw) : null}>
       <div data-app data-theme={theme} className="flex h-screen min-h-[720px] flex-col bg-surface text-fg"><Top /><div className="min-h-0 flex-1">{children}</div><Foot theme={theme} setTheme={setTheme} /></div>
+      <PresentMode theme={theme} />
     </EventsProvider>
   );
 }

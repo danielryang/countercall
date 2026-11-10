@@ -332,3 +332,21 @@ body:has([data-theme="cloud"]) { background: #F3F5F8; }
   .cap { font-size: 12px; line-height: 16px; color: var(--fg-muted); }
   .caret::after { content: ""; display: inline-block; width: .5ch; height: 1em; margin-left: 2px; vertical-align: text-bottom; background: currentColor; animation: blink 1s steps(1) infinite; }
 }
+
+/* ---------- Present mode (P): html[data-present], set by components/ui/PresentMode.tsx ----------
+   The whole frame is scaled to 125% (type, spacing and hit areas together, so layouts keep their proportions) and shrunk back to fit the
+   viewport; dev affordances (footer, replay controls, theme switch) and toasts are hidden; a ring marks the pointer for the room. */
+html[data-present] [data-app] { zoom: 1.25; min-height: 0; }
+html[data-present] [data-app].h-screen { height: 80vh; }
+html[data-present] [data-app]:not(.h-screen) { min-height: 80vh; }
+html[data-present] [data-present-hide], html[data-present] [data-sonner-toaster] { display: none !important; }
+html[data-present] [data-present-solo] { grid-template-columns: minmax(0, 1fr); }   /* /demo: only the cheat-card stays, full width, for the teammate on the phone */
+/* The ring: where the presenter is pointing. Glides with the pointer (transform only); a press fills it. Reduced motion: it jumps, no glide. */
+.cursor-ring {
+  position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; width: 40px; height: 40px; margin: -20px 0 0 -20px; opacity: 0;
+  border-radius: 9999px; border: 2px solid color-mix(in oklab, var(--live) 75%, transparent); background: color-mix(in oklab, var(--live) 6%, transparent);
+  transition: transform var(--d-instant) var(--ease-out), opacity var(--d-fast) var(--ease-out), background-color var(--d-instant) var(--ease-out);
+}
+.cursor-ring[data-shown] { opacity: 1; }
+.cursor-ring[data-down] { background: color-mix(in oklab, var(--live) 28%, transparent); }
+@media (prefers-reduced-motion: reduce) { .cursor-ring { transition: opacity var(--d-fast) linear; } }
