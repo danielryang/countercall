@@ -29,7 +29,8 @@
     "preflight": "tsx --env-file-if-exists=.env.local scripts/preflight.ts",
     "provision:agent": "tsx --env-file-if-exists=.env.local scripts/provision-agent.ts",
     "setup:agentmail": "tsx --env-file-if-exists=.env.local scripts/setup-agentmail.ts",
-    "verify:policy": "tsx scripts/verify-policy.ts"
+    "verify:policy": "tsx scripts/verify-policy.ts",
+    "sim": "tsx scripts/sim.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

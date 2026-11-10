@@ -17,9 +17,10 @@ export async function reapStaleCalls(d: ReapDeps, olderThanMs: number = STALE_CA
   const lost = await d.q<{ id: string; case_id: string }>(
     `update calls set ended_at = now(), disconnection_reason = 'dial_unknown' where ended_at is null and retell_call_id is null and started_at <= now() - make_interval(secs => $1) returning id, case_id`, [secs]);
   for (const c of lost) await d.createTask(c.case_id, 'verify_manually', 'Verify the bank change by phone', 'a call attempt never reported back; no outcome recorded');
-  // 2) a real call whose analysis webhook never arrived: settle by policy.
+  // 2) a real call that is still undecided long after it started: settle by policy. Do NOT require ended_at to be null: call_ended may have
+  //    arrived while call_analyzed was lost (found by the simulator), which leaves ended_at set and the call undecided.
   const stale = await d.q<{ retell_call_id: string; case_id: string }>(
-    `select retell_call_id, case_id from calls where ended_at is null and outcome is null and retell_call_id is not null and started_at <= now() - make_interval(secs => $1)`, [secs]);
+    `select retell_call_id, case_id from calls where outcome is null and retell_call_id is not null and started_at <= now() - make_interval(secs => $1)`, [secs]);
   for (const c of stale) {
     await d.ctx.markEnded(c.retell_call_id, 'max_duration_reached');
     await finalizeCall(d.ctx.store, c.case_id, c.retell_call_id, { disconnection_reason: 'max_duration_reached' }, d.ctx.emit);

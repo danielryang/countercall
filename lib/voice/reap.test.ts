@@ -59,3 +59,15 @@ test('a call row that never got a Retell id is closed and the case is handed to 
   const [c] = await t.q<{ ended_at: string | null; disconnection_reason: string }>(`select ended_at, disconnection_reason from calls where case_id = $1`, [caseId]);
   assert.ok(c.ended_at); assert.equal(c.disconnection_reason, 'dial_unknown');
 });
+
+// Found by the simulator (seed 11 and 7 others): call_ended arrived, call_analyzed was lost. ended_at is set, but the call was never decided.
+test('regression: a call that ENDED but whose analysis was lost is still settled', async () => {
+  const callId = `reap_d_${n++}`; const caseId = await open(callId);
+  const ctx = makeVoiceCtx(t.q, (e) => t.emit(e));
+  await processRetellWebhook(ctx, { event: 'call_ended', call: { call_id: callId, metadata: { case_id: caseId, attempt: 1 }, disconnection_reason: 'agent_hangup', transcript_object: [] } });
+  const [c] = await t.q<{ ended_at: string | null; outcome: string | null }>(`select ended_at, outcome from calls where retell_call_id = $1`, [callId]);
+  assert.ok(c.ended_at && !c.outcome, 'precondition: ended but undecided');
+  assert.equal(await t.stateOf(caseId), 'calling');
+  assert.equal(await reap(0), 1);
+  assert.equal(await t.stateOf(caseId), 'needs_human');
+});

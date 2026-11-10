@@ -86,9 +86,14 @@ create table bills (                    -- mirrors a Ramp Bill subset; in RAMP_M
 
 -- ---------- case lifecycle ----------
 create sequence case_seq start 100;                              -- seeded history takes CC-0100..; live demo cases follow
+-- lpad() TRUNCATES when the number is longer than the pad width (case 10000 would become 'CC-1000' and collide with an existing id).
+-- Found by the simulator at ~9,900 cases. Pad only below 10000. A DEFAULT cannot hold a subquery, hence the function.
+create function next_case_id() returns text language sql as $$
+  select 'CC-' || case when n < 10000 then lpad(n::text, 4, '0') else n::text end from (select nextval('case_seq')::bigint as n) s
+$$;
 
 create table cases (
-  id                       text primary key default ('CC-' || lpad(nextval('case_seq')::text, 4, '0')),
+  id                       text primary key default next_case_id(),
   source                   text not null check (source in ('email','ramp_webhook','demo_replay','seed')),
   state                    case_state not null default 'scanning',
   vendor_id                text references vendors(id),
