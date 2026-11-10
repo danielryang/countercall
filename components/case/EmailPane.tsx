@@ -28,7 +28,8 @@ export function EmailPane({ c }: { c: CaseView }) {
   const ids = new Set(c.signals.map((s) => s.id));
   const [local, domain] = c.email.from.address.split('@');
   const senderHot = [...ids].some((i) => SENDER.has(i)); const replyHot = [...ids].some((i) => REPLY.has(i));
-  const spans: SegSpan[] = c.spans.map((s, i) => ({ id: String(i), start: s.start, end: s.end, kind: s.label }));
+  const MAX_MODEL_QUOTE = 40;   // live model quotes can be whole sentences; only short ones read as evidence. Rule spans (exact matches) always show.
+  const spans: SegSpan[] = c.spans.filter((s) => s.source === 'rule' || s.end - s.start <= MAX_MODEL_QUOTE).map((s, i) => ({ id: String(i), start: s.start, end: s.end, kind: s.label }));
   const segs = segment(c.email.body, spans);
   const flagged = c.spans.length > 0 || senderHot;
   let n = 0;

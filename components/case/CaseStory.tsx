@@ -3,7 +3,7 @@
 // top to bottom and understand the whole product: flag the email, hold the money, phone the vendor on the number we already had, and show the result.
 import { useState, type ReactNode } from 'react';
 import { CallTranscript, answerTurn } from '@/components/call/CallPanel';
-import { plainReasons, REASON_TEXT, SOURCE_LABEL, STAMP } from '@/lib/copy';
+import { plainReasons, plainTask, REASON_TEXT, SOURCE_LABEL, STAMP } from '@/lib/copy';
 import type { CaseView } from '@/lib/reducer';
 import { fmtCents } from '@/lib/selectors';
 
@@ -63,11 +63,13 @@ export function CaseStory({ c }: { c: CaseView }) {
     ),
   });
 
-  const callExpected = !cleared && (c.call || c.trusted || c.state === 'held' || c.state === 'calling');
+  const openTask = c.tasks.find((t) => t.status === 'open');
+  const skipped = !cleared && !c.call && c.state === 'needs_human' && !!openTask;   // the phone check never ran (calls off, unapproved sender, ...)
+  const callExpected = !cleared && (c.call || c.trusted || c.state === 'held' || c.state === 'calling' || skipped);
   if (callExpected) steps.push({
-    key: 'call', st: o ? 'done' : c.call ? 'active' : 'pending',
-    title: c.call ? `Called ${v} on the number we already had` : `Call ${v} on the number we already had`,
-    summary: phone ? `${phone}${ct ? ` · from ${SOURCE_LABEL[ct.source] ?? ct.source}` : ''}` : 'Finding the number on file',
+    key: 'call', st: o ? 'done' : c.call ? 'active' : skipped ? 'warn' : 'pending',
+    title: skipped ? 'Phone check did not run' : c.call ? `Called ${v} on the number we already had` : `Call ${v} on the number we already had`,
+    summary: skipped ? plainTask(openTask!.reason) : phone ? `${phone}${ct ? ` · from ${SOURCE_LABEL[ct.source] ?? ct.source}` : ''}` : 'Finding the number on file',
     body: (
       <div className="space-y-3">
         <p className="text-[13px] leading-5 text-fg-muted" title={ct?.sourceDoc ?? undefined}>{phone ? <><span className="font-mono text-fg">{phone}</span> {'\u00b7'} from {ct ? `${SOURCE_LABEL[ct.source] ?? ct.source}, added ${ct.firstSeenAt.slice(0, 10)}` : 'the vendor record'} {'\u00b7'} <b className="font-medium text-fg">not</b> from the email</> : 'Looking up the verified number.'}</p>
@@ -76,11 +78,11 @@ export function CaseStory({ c }: { c: CaseView }) {
     ),
   });
 
-  const resultTitle = o ? STAMP[o.decision.outcome].word : cleared ? 'Nothing to do' : 'Result';
+  const resultTitle = o ? STAMP[o.decision.outcome].word : cleared ? 'Nothing to do' : c.state === 'needs_human' ? 'Needs a person' : 'Waiting';
   steps.push({
     key: 'result', st: o || cleared ? (c.state === 'needs_human' ? 'warn' : 'done') : c.state === 'needs_human' ? 'warn' : 'pending',
     title: o || cleared || c.state === 'needs_human' ? `Result: ${resultTitle}` : 'Result',
-    summary: o ? REASON_TEXT[o.decision.reason].rule : cleared ? 'Cleared' : c.state === 'needs_human' ? (c.tasks.find((t) => t.status === 'open')?.reason ?? 'Needs a person') : 'Waiting for the call',
+    summary: o ? REASON_TEXT[o.decision.reason].rule : cleared ? 'Cleared' : c.state === 'needs_human' ? plainTask(c.tasks.find((t) => t.status === 'open')?.reason ?? 'Needs a person') : 'Waiting for the call',
     body: (
       <div className="space-y-3 text-[14px] leading-5">
         {ans && <p className="rounded-lg border border-rule bg-surface px-3 py-2"><span className="cap block">{v} said</span><span className="ev">{ans}</span></p>}
@@ -96,7 +98,7 @@ export function CaseStory({ c }: { c: CaseView }) {
     ),
   });
 
-  const current = steps.find((s) => s.st === 'active' || s.st === 'warn')?.key ?? (o ? 'result' : steps[steps.length - 1].key);
+  const current = [...steps].reverse().find((s) => s.st === 'active' || s.st === 'warn')?.key ?? (o ? 'result' : steps[steps.length - 1].key);   // the latest step that needs attention
   return (
     <ol className="space-y-0.5" aria-label="What CounterCall did">
       {steps.map((s, i) => {

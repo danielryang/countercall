@@ -129,8 +129,24 @@ export function headline(c: CaseView): Headline {
     case 'calling': return { tone: 'progress', title: `Calling ${v}`, sub: 'Asking them directly: did you send this request? The call is automated and says so at the start.' };
     case 'fraud_blocked': return { tone: 'danger', title: `Blocked. ${v} says they did not send this.`, sub: `The bank change was rejected and ${money} stays on hold. Only a person can release it.` };
     case 'awaiting_approval': return { tone: 'ok', title: 'Verified by phone. Waiting for approval.', sub: `${v} confirmed the request and answered the security question. No money moves until a person approves.` };
-    case 'needs_human': return { tone: 'warn', title: 'Could not verify. A person needs to follow up.', sub: `${o ? REASON_TEXT[o.decision.reason].rule : (c.tasks.find((t) => t.status === 'open')?.reason ?? 'Verification did not complete')}. ${cents(c) ? `${money} stays on hold.` : ''}`.trim() };
+    case 'needs_human': return { tone: 'warn', title: 'Could not verify. A person needs to follow up.', sub: `${o ? REASON_TEXT[o.decision.reason].rule : plainTask(c.tasks.find((t) => t.status === 'open')?.reason ?? 'Verification did not complete')}. ${cents(c) ? `${money} stays on hold.` : ''}`.trim() };
     case 'released': return { tone: 'ok', title: 'Payment released', sub: c.release ? `Approved by ${c.release.approvedBy}.` : 'A person approved the release.' };
     case 'closed': return { tone: 'neutral', title: 'Case closed', sub: c.closed?.note ?? '' };
   }
+}
+
+/** Task reasons are written for operators (they can name settings). The UI shows everyday words instead. */
+export function plainTask(reason: string): string {
+  const r = reason.toLowerCase();
+  if (r.includes('calls disabled')) return 'Phone verification is switched off right now, so nobody was called';
+  if (r.includes('calls not wired')) return 'Phone verification is not set up yet';
+  if (r.includes('allowlist')) return 'This sender is not on the approved list, so nothing was held and nobody was called';
+  if (r.includes('duplicate') || r.includes('already open')) return 'A check for this same bank change is already open';
+  if (r.includes('no trusted')) return 'There is no verified phone number on file for this vendor';
+  if (r.includes('hourly') || r.includes('more than')) return 'Too many calls to this vendor recently, so none was placed';
+  if (r.includes('in flight')) return 'Another verification call is in progress';
+  if (r.includes('dial failed')) return 'The call could not be placed';
+  if (r.includes('hold') && r.includes('fail')) return 'The payment hold did not fully apply';
+  if (r.includes('never reported back')) return 'A call attempt never reported back';
+  return reason.replace(/\(?[A-Z_]{4,}=?\d?\)?/g, '').replace(/\s+/g, ' ').trim();
 }
