@@ -1,0 +1,734 @@
+{
+ "name": "confirmed",
+ "description": "vendor says yes and gives the right digits; second reader agrees",
+ "recordedAt": "2026-11-10T18:00:00.000Z",
+ "source": "generated",
+ "events": [
+  {
+   "seq": 1,
+   "id": "6f7fe741-c901-40a7-aef0-2f772e86d176",
+   "ts": "2026-11-10T18:00:00.000Z",
+   "case_id": "CC-0100",
+   "type": "email.received",
+   "actor": "detector",
+   "payload": {
+    "email": {
+     "to": [
+      "ap@ricerobotics.com"
+     ],
+     "auth": {
+      "spf": "pass",
+      "dkim": "pass",
+      "dmarc": "pass"
+     },
+     "body": "Hello Accounts Payable,\n\nWe have changed banks. Please send this month's payment for invoice 4471 ($12,400.00) to our new account:\n\nBank: Bluebird Neobank\nRouting number: 071003913\nAccount number: 000987654321\n\nPlease confirm once your records are updated.\n\nThanks,\nAcme Corp Accounts Receivable",
+     "from": {
+      "name": "Acme Corp Billing",
+      "address": "acme.billing.dept@gmail.com"
+     },
+     "source": "injector",
+     "replyTo": [],
+     "subject": "Important: Change of bank details",
+     "bodyFull": "Hello Accounts Payable,\n\nWe have changed banks. Please send this month's payment for invoice 4471 ($12,400.00) to our new account:\n\nBank: Bluebird Neobank\nRouting number: 071003913\nAccount number: 000987654321\n\nPlease confirm once your records are updated.\n\nThanks,\nAcme Corp Accounts Receivable",
+     "htmlOnly": false,
+     "messageId": "<c8c02fba-8f60-43e4-8d33-4948f154009a@injector.local>",
+     "receivedAt": "2026-11-10T05:31:09.588Z",
+     "attachments": [],
+     "hiddenChars": 0,
+     "providerEventId": "inj-c8c02fba-8f60-43e4-8d33-4948f154009a",
+     "unauthenticatedLabel": false
+    },
+    "spans": [
+     {
+      "end": 180,
+      "label": "routing number",
+      "start": 171,
+      "source": "rule"
+     },
+     {
+      "end": 209,
+      "label": "account number",
+      "start": 197,
+      "source": "rule"
+     },
+     {
+      "end": 180,
+      "label": "routing number",
+      "start": 171,
+      "source": "rule"
+     },
+     {
+      "end": 209,
+      "label": "account number",
+      "start": 197,
+      "source": "rule"
+     },
+     {
+      "end": 46,
+      "label": "bank-change wording",
+      "start": 25,
+      "source": "rule"
+     }
+    ],
+    "signals": [
+     {
+      "id": "sender_domain_not_on_file",
+      "spans": [],
+      "detail": "gmail.com is not a domain on file for Acme Corp (acmecorp.com).",
+      "severity": "high"
+     },
+     {
+      "id": "freemail_sender",
+      "spans": [],
+      "detail": "Sender uses free mail provider gmail.com but is writing about Acme Corp.",
+      "severity": "high"
+     },
+     {
+      "id": "sender_not_known_contact",
+      "spans": [],
+      "detail": "acme.billing.dept@gmail.com has never corresponded for Acme Corp (first-time sender).",
+      "severity": "low"
+     },
+     {
+      "id": "display_name_impersonation",
+      "spans": [],
+      "detail": "Display name \"Acme Corp Billing\" claims Acme Corp but domain is gmail.com.",
+      "severity": "high"
+     },
+     {
+      "id": "bank_details_present",
+      "spans": [
+       {
+        "end": 180,
+        "label": "routing number",
+        "start": 171,
+        "source": "rule"
+       },
+       {
+        "end": 209,
+        "label": "account number",
+        "start": 197,
+        "source": "rule"
+       }
+      ],
+      "detail": "Bank details in email: routing 071003913, acct ****4321.",
+      "severity": "medium"
+     },
+     {
+      "id": "bank_details_differ",
+      "spans": [
+       {
+        "end": 180,
+        "label": "routing number",
+        "start": 171,
+        "source": "rule"
+       },
+       {
+        "end": 209,
+        "label": "account number",
+        "start": 197,
+        "source": "rule"
+       }
+      ],
+      "detail": "Bank details differ from on file (Embarcadero Community Bank ****4417).",
+      "severity": "high"
+     },
+     {
+      "id": "bank_change_language",
+      "spans": [
+       {
+        "end": 46,
+        "label": "bank-change wording",
+        "start": 25,
+        "source": "rule"
+       }
+      ],
+      "detail": "Wording typical of a payment-instruction change.",
+      "severity": "medium"
+     }
+    ],
+    "vendorId": "v_acme"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 2,
+   "id": "0adcf1a2-3f80-4c04-87e8-76d88925d9ea",
+   "ts": "2026-11-10T18:00:01.100Z",
+   "case_id": "CC-0100",
+   "type": "email.classified",
+   "actor": "detector",
+   "payload": {
+    "llmMs": 0,
+    "spans": [
+     {
+      "end": 47,
+      "label": "announces bank change",
+      "start": 25,
+      "reason": "announces bank change",
+      "source": "llm"
+     },
+     {
+      "end": 180,
+      "label": "new routing number",
+      "start": 155,
+      "reason": "new routing number",
+      "source": "llm"
+     }
+    ],
+    "extraction": {
+     "summary": "Sender says Acme changed banks and asks that invoice 4471 be paid to a new account.",
+     "urgency": "none",
+     "category": "bank_change",
+     "evidence": [
+      {
+       "quote": "We have changed banks.",
+       "reason": "announces bank change"
+      },
+      {
+       "quote": "Routing number: 071003913",
+       "reason": "new routing number"
+      }
+     ],
+     "new_bank": {
+      "bank_name": "Bluebird Neobank",
+      "iban_present": false,
+      "account_last4": "4321",
+      "routing_number": "071003913",
+      "details_in_attachment": false
+     },
+     "change_type": "new_bank_account",
+     "claimed_vendor": "Acme Corp",
+     "invoice_numbers": [
+      "4471"
+     ],
+     "pressure_not_to_call": false,
+     "callback_number_in_email": null,
+     "contains_instructions_to_ai": false,
+     "is_payment_instruction_change": true
+    }
+   },
+   "delay_ms": 1100
+  },
+  {
+   "seq": 3,
+   "id": "3713a394-bfae-4457-895c-4317c6c35c5c",
+   "ts": "2026-11-10T18:00:01.750Z",
+   "case_id": "CC-0100",
+   "type": "case.flagged",
+   "actor": "policy",
+   "payload": {
+    "spans": [
+     {
+      "end": 180,
+      "label": "routing number",
+      "start": 171,
+      "source": "rule"
+     },
+     {
+      "end": 209,
+      "label": "account number",
+      "start": 197,
+      "source": "rule"
+     },
+     {
+      "end": 46,
+      "label": "bank-change wording",
+      "start": 25,
+      "source": "rule"
+     },
+     {
+      "end": 47,
+      "label": "announces bank change",
+      "start": 25,
+      "reason": "announces bank change",
+      "source": "llm"
+     },
+     {
+      "end": 180,
+      "label": "new routing number",
+      "start": 155,
+      "reason": "new routing number",
+      "source": "llm"
+     }
+    ],
+    "decision": {
+     "risk": "critical",
+     "score": 10,
+     "actions": [
+      {
+       "type": "HOLD_VENDOR_PAYMENTS",
+       "vendorId": "v_acme",
+       "paymentIds": [
+        "pay_8101",
+        "pay_8102"
+       ]
+      },
+      {
+       "type": "START_CALLBACK",
+       "phone": "+1••••••••42",
+       "vendorId": "v_acme"
+      },
+      {
+       "type": "FLAG_PHISHING"
+      }
+     ],
+     "reasons": [
+      {
+       "code": "BANK_DETAILS_DIFFER",
+       "text": "Bank details differ from on file (Embarcadero Community Bank ****4417)."
+      },
+      {
+       "code": "BANK_CHANGE_WORDING",
+       "text": "Email uses payment-instruction-change wording."
+      },
+      {
+       "code": "SENDER_DOMAIN_NOT_ON_FILE",
+       "text": "gmail.com is not a domain on file for Acme Corp (acmecorp.com)."
+      },
+      {
+       "code": "FREEMAIL_SENDER",
+       "text": "Sender uses free mail provider gmail.com but is writing about Acme Corp."
+      },
+      {
+       "code": "SENDER_NOT_KNOWN_CONTACT",
+       "text": "acme.billing.dept@gmail.com has never corresponded for Acme Corp (first-time sender)."
+      },
+      {
+       "code": "DISPLAY_NAME_IMPERSONATION",
+       "text": "Display name \"Acme Corp Billing\" claims Acme Corp but domain is gmail.com."
+      }
+     ],
+     "category": "bank_change",
+     "vendorId": "v_acme",
+     "llmStatus": "ok",
+     "bankChange": true
+    }
+   },
+   "delay_ms": 650
+  },
+  {
+   "seq": 4,
+   "id": "f78b31ca-c0ac-479b-a3ad-a4dc8d3e86da",
+   "ts": "2026-11-10T18:00:01.750Z",
+   "case_id": "CC-0100",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "flagged",
+    "from": "scanning",
+    "cause": "case.flagged"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 5,
+   "id": "d868e7ca-fabc-41ba-bdf2-5e101001dbbc",
+   "ts": "2026-11-10T18:00:02.200Z",
+   "case_id": "CC-0100",
+   "type": "ramp.call",
+   "actor": "policy",
+   "payload": {
+    "ms": 0,
+    "mode": "mock",
+    "path": "/developer/v1/bills/pay_8101/hold",
+    "method": "POST",
+    "status": 200
+   },
+   "delay_ms": 450
+  },
+  {
+   "seq": 6,
+   "id": "0769dff5-c283-43fb-87bd-ed37e3ade689",
+   "ts": "2026-11-10T18:00:02.650Z",
+   "case_id": "CC-0100",
+   "type": "ramp.call",
+   "actor": "policy",
+   "payload": {
+    "ms": 0,
+    "mode": "mock",
+    "path": "/developer/v1/bills/pay_8102/hold",
+    "method": "POST",
+    "status": 200
+   },
+   "delay_ms": 450
+  },
+  {
+   "seq": 7,
+   "id": "f29d30d5-dfc2-4a9e-90a8-0d2acb29a700",
+   "ts": "2026-11-10T18:00:03.100Z",
+   "case_id": "CC-0100",
+   "type": "ramp.call",
+   "actor": "policy",
+   "payload": {
+    "ms": 0,
+    "mode": "mock",
+    "path": "/developer/v1/vendors/v_acme/hold",
+    "method": "POST",
+    "status": 204
+   },
+   "delay_ms": 450
+  },
+  {
+   "seq": 8,
+   "id": "bad00c01-d1d6-4fc6-af81-db3601a0fe98",
+   "ts": "2026-11-10T18:00:04.050Z",
+   "case_id": "CC-0100",
+   "type": "payment.held",
+   "actor": "policy",
+   "payload": {
+    "bills": [
+     {
+      "rail": "ACH",
+      "state": "applied",
+      "dueDate": "2026-11-13",
+      "currency": "USD",
+      "paymentId": "pay_8101",
+      "rampBillId": null,
+      "amountCents": 1240000,
+      "invoiceNumber": "4471"
+     },
+     {
+      "rail": "ACH",
+      "state": "applied",
+      "dueDate": "2026-12-05",
+      "currency": "USD",
+      "paymentId": "pay_8102",
+      "rampBillId": null,
+      "amountCents": 1240000,
+      "invoiceNumber": "4472"
+     }
+    ],
+    "rampMode": "mock",
+    "vendorId": "v_acme",
+    "paymentIds": [
+     "pay_8101",
+     "pay_8102"
+    ],
+    "vendorHold": "applied"
+   },
+   "delay_ms": 950
+  },
+  {
+   "seq": 9,
+   "id": "88a93771-a566-496d-bd47-4aa97fcb2687",
+   "ts": "2026-11-10T18:00:04.050Z",
+   "case_id": "CC-0100",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "held",
+    "from": "flagged",
+    "cause": "payment.held"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 10,
+   "id": "82535ad2-c89c-4e89-bba4-adfa68699b52",
+   "ts": "2026-11-10T18:00:04.750Z",
+   "case_id": "CC-0100",
+   "type": "call.requested",
+   "actor": "policy",
+   "payload": {
+    "context": {
+     "requestSummary": "The request arrived by email on Monday, November 9.",
+     "emailReceivedAt": "2026-11-10T05:31:09.588Z"
+    },
+    "vendorId": "v_acme",
+    "phoneMasked": "+1 (415) ••• ••42"
+   },
+   "delay_ms": 700
+  },
+  {
+   "seq": 11,
+   "id": "bd5f6e5d-9ffa-41ce-9369-c65a93a5e825",
+   "ts": "2026-11-10T18:00:05.650Z",
+   "case_id": "CC-0100",
+   "type": "call.created",
+   "actor": "voice_agent",
+   "payload": {
+    "mode": "phone",
+    "callId": "call_cc0100"
+   },
+   "delay_ms": 900
+  },
+  {
+   "seq": 12,
+   "id": "b0ee1697-c6c5-482e-a273-f6af20e0d8e7",
+   "ts": "2026-11-10T18:00:05.650Z",
+   "case_id": "CC-0100",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "calling",
+    "from": "held",
+    "cause": "call.created"
+   },
+   "delay_ms": 0
+  },
+  {
+   "seq": 13,
+   "id": "3fc37bf7-f9ce-4460-81ab-015e58a70797",
+   "ts": "2026-11-10T18:00:09.250Z",
+   "case_id": "CC-0100",
+   "type": "call.status",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_cc0100",
+    "status": "connected"
+   },
+   "delay_ms": 3600
+  },
+  {
+   "seq": 14,
+   "id": "a77d08fb-fb42-4b97-9d12-18a5c62ea485",
+   "ts": "2026-11-10T18:00:11.150Z",
+   "case_id": "CC-0100",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "final": false,
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "tSec": 0,
+      "text": "Acme AR."
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "tSec": 1,
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme?"
+     }
+    ],
+    "callId": "call_cc0100"
+   },
+   "delay_ms": 1900
+  },
+  {
+   "seq": 15,
+   "id": "96957319-08c8-4986-828e-cd05c1204cf2",
+   "ts": "2026-11-10T18:00:11.600Z",
+   "case_id": "CC-0100",
+   "type": "call.tool",
+   "actor": "voice_agent",
+   "payload": {
+    "args": {
+     "answer": "yes",
+     "speaker_role": "ar_or_finance"
+    },
+    "name": "report_answer",
+    "callId": "call_cc0100"
+   },
+   "delay_ms": 450
+  },
+  {
+   "seq": 16,
+   "id": "1da3675a-2f33-4ceb-a632-b2f2fa278155",
+   "ts": "2026-11-10T18:00:12.050Z",
+   "case_id": "CC-0100",
+   "type": "call.tool",
+   "actor": "voice_agent",
+   "payload": {
+    "args": {
+     "digits": "4388",
+     "heard_text": "4 3 8 8"
+    },
+    "name": "report_challenge",
+    "callId": "call_cc0100"
+   },
+   "delay_ms": 450
+  },
+  {
+   "seq": 17,
+   "id": "4eb124b2-4e05-41f0-8ff6-fd049e32ba07",
+   "ts": "2026-11-10T18:00:13.950Z",
+   "case_id": "CC-0100",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "final": false,
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "tSec": 0,
+      "text": "Acme AR."
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "tSec": 1,
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme?"
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "tSec": 2,
+      "text": "Yes, speaking."
+     },
+     {
+      "id": "agent_3",
+      "role": "agent",
+      "tSec": 3,
+      "text": "Rice Robotics received a request to change Acme's bank account for payments. Did someone at Acme send that request?"
+     },
+     {
+      "id": "user_4",
+      "role": "user",
+      "tSec": 4,
+      "text": "Yes, that was us."
+     },
+     {
+      "id": "agent_5",
+      "role": "agent",
+      "tSec": 5,
+      "text": "Please say the last four digits."
+     },
+     {
+      "id": "user_6",
+      "role": "user",
+      "tSec": 6,
+      "text": "4388"
+     },
+     {
+      "id": "agent_7",
+      "role": "agent",
+      "tSec": 7,
+      "text": "Thank you. Goodbye."
+     }
+    ],
+    "callId": "call_cc0100"
+   },
+   "delay_ms": 1900
+  },
+  {
+   "seq": 18,
+   "id": "e6d4baed-ecf7-40f6-a21f-0dbdd33aa6ca",
+   "ts": "2026-11-10T18:00:15.850Z",
+   "case_id": "CC-0100",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "final": true,
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "tSec": 0,
+      "text": "Acme AR."
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "tSec": 1,
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme?"
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "tSec": 2,
+      "text": "Yes, speaking."
+     },
+     {
+      "id": "agent_3",
+      "role": "agent",
+      "tSec": 3,
+      "text": "Rice Robotics received a request to change Acme's bank account for payments. Did someone at Acme send that request?"
+     },
+     {
+      "id": "user_4",
+      "role": "user",
+      "tSec": 4,
+      "text": "Yes, that was us."
+     },
+     {
+      "id": "agent_5",
+      "role": "agent",
+      "tSec": 5,
+      "text": "Please say the last four digits."
+     },
+     {
+      "id": "user_6",
+      "role": "user",
+      "tSec": 6,
+      "text": "4388"
+     },
+     {
+      "id": "agent_7",
+      "role": "agent",
+      "tSec": 7,
+      "text": "Thank you. Goodbye."
+     }
+    ],
+    "callId": "call_cc0100"
+   },
+   "delay_ms": 1900
+  },
+  {
+   "seq": 19,
+   "id": "7d202f5f-50b0-469a-bf87-1a843f6ca50a",
+   "ts": "2026-11-10T18:00:17.250Z",
+   "case_id": "CC-0100",
+   "type": "call.status",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_cc0100",
+    "status": "ended",
+    "disconnectionReason": "agent_hangup"
+   },
+   "delay_ms": 1400
+  },
+  {
+   "seq": 20,
+   "id": "7a74eeb3-4522-4c78-97a2-7c6edbcf4fbc",
+   "ts": "2026-11-10T18:00:17.850Z",
+   "case_id": "CC-0100",
+   "type": "call.recording",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_cc0100",
+    "monoUrl": "https://example.invalid/mono.wav",
+    "stereoUrl": "https://example.invalid/stereo.wav"
+   },
+   "delay_ms": 600
+  },
+  {
+   "seq": 21,
+   "id": "e33be533-c377-4869-9680-305798aed7d8",
+   "ts": "2026-11-10T18:00:18.750Z",
+   "case_id": "CC-0100",
+   "type": "call.outcome",
+   "actor": "policy",
+   "payload": {
+    "callId": "call_cc0100",
+    "summary": "(scripted)",
+    "decision": {
+     "flags": [],
+     "reason": "CHALLENGE_MATCHED",
+     "outcome": "CONFIRMED_LEGIT",
+     "severity": "low",
+     "paymentState": "HELD_AWAITING_HUMAN_APPROVAL",
+     "challengeMatched": true
+    }
+   },
+   "delay_ms": 900
+  },
+  {
+   "seq": 22,
+   "id": "88689d9b-c6a7-4c15-941c-cfaa26225bc1",
+   "ts": "2026-11-10T18:00:18.750Z",
+   "case_id": "CC-0100",
+   "type": "case.state",
+   "actor": "policy",
+   "payload": {
+    "to": "awaiting_approval",
+    "from": "calling",
+    "cause": "call.outcome"
+   },
+   "delay_ms": 0
+  }
+ ]
+}

@@ -1,25 +1,91 @@
-import { apply, initial, type Ev } from './reducer.ts';
 import assert from 'node:assert/strict';
-const ev = (seq: number, type: string, payload: any = {}, case_id = 'CC-1'): Ev => ({ seq, type, case_id, ts: '', payload });
-const log: Ev[] = [
-  ev(1, 'case.flagged'),
-  ev(2, 'payment.held', { payment_id: 'p1', amount_cents: 4820000 }),
-  ev(3, 'call.status', { status: 'connected' }),
-  ev(4, 'call.transcript.delta', { turn_id: 't1', speaker: 'callee', text: 'No, we', mode: 'append', final: false }),
-  ev(5, 'call.transcript.delta', { turn_id: 't1', speaker: 'callee', text: ' haven\'t', mode: 'append', final: false }),
-  ev(6, 'call.transcript.delta', { turn_id: 't1', speaker: 'callee', text: 'No, we haven\'t changed banks.', mode: 'replace', final: true }),
-  ev(7, 'call.outcome', { outcome: 'FRAUD' }),
-];
-const s = log.reduce(apply, initial);
-assert.equal(s.cases['CC-1'].status, 'fraud');
-assert.equal(s.cases['CC-1'].payments.p1.state, 'held', 'FRAUD outcome must NOT release money');
-assert.equal(s.cases['CC-1'].call!.turns[0].text, "No, we haven't changed banks.");
-assert.equal(s.cases['CC-1'].call!.turns.length, 1);
-// idempotent: replaying the whole log (e.g. snapshot + stream overlap) changes nothing
-assert.deepEqual(log.reduce(apply, s), s);
-// immutability: earlier state untouched
-const s2 = apply(s, ev(8, 'payment.released', { payment_id: 'p1' }));
-assert.equal(s.cases['CC-1'].payments.p1.state, 'held');
-assert.equal(s2.cases['CC-1'].payments.p1.state, 'released');
-const r = apply(s2, ev(9, 'system.reset')); assert.deepEqual(r.cases, {}); assert.equal(apply(r, ev(8, 'case.flagged')).cases['CC-1'], undefined, 'pre-reset stragglers are ignored');
-console.log('reducer ok');
+import { readFileSync } from 'node:fs';
+import { test } from 'node:test';
+import { apply, initial, reduce, type Ev } from './reducer';
+import type { Run } from './runs';
+import { fmtCents, GROUP_OF, heldCents, queue } from './selectors';
+
+const run = (name: string): Run => JSON.parse(readFileSync(new URL(`../public/runs/${name}.json`, import.meta.url), 'utf8'));
+const FINAL: Record<string, string> = { fraud: 'fraud_blocked', confirmed: 'awaiting_approval', voicemail: 'needs_human', vague: 'needs_human', impostor: 'needs_human' };
+const only = (r: Run) => r.events[0].case_id!;
+
+test('every recorded run replays to the expected terminal state, with the money still held', () => {
+  for (const [name, state] of Object.entries(FINAL)) {
+    const r = run(name); const s = reduce(r.events); const c = s.cases[only(r)];
+    assert.equal(c.state, state, name);
+    assert.equal(c.payments.length, 2, `${name}: two Acme bills`);
+    assert.equal(heldCents(s), 2_480_000, `${name}: $24,800 frozen, nothing released`);
+    assert.equal(c.release, undefined, `${name}: no release without payment.released`);
+  }
+});
+
+test('the fraud run tells the story in order: scanning -> flagged -> held -> calling -> fraud_blocked', () => {
+  const r = run('fraud'); const seen: string[] = [];
+  let s = initial;
+  for (const e of r.events) { s = apply(s, e); const st = s.cases[only(r)].state; if (seen.at(-1) !== st) seen.push(st); }
+  assert.deepEqual(seen, ['scanning', 'flagged', 'held', 'calling', 'fraud_blocked']);
+  const c = s.cases[only(r)];
+  assert.equal(c.call?.status, 'ended');
+  assert.equal(c.call?.outcome?.decision.outcome, 'DENIED_FRAUD');
+  assert.ok(c.trusted?.phoneMasked.includes('•'), 'only the masked number reaches the UI');
+  assert.ok(c.email && c.spans.length > 0 && c.signals.length > 0, 'email, evidence spans and signals are present for the sweep');
+  assert.ok(c.rampCalls.some((x) => x.path.endsWith('/hold')), 'Ramp calls are recorded for the API chip');
+});
+
+test('status comes only from case.state: without those events a case stays scanning even after an outcome', () => {
+  const r = run('fraud'); const s = reduce(r.events.filter((e) => e.type !== 'case.state'));
+  assert.equal(s.cases[only(r)].state, 'scanning');
+  assert.equal(s.cases[only(r)].call?.outcome?.decision.outcome, 'DENIED_FRAUD', 'the outcome is data; it does not move the status');
+});
+
+test('idempotent: every event applied twice, or the whole run applied twice, equals once', () => {
+  const r = run('confirmed'); const once = reduce(r.events);
+  assert.deepEqual(reduce(r.events.flatMap((e) => [e, e])), once);
+  assert.deepEqual(reduce(r.events, once), once);
+});
+
+test('snapshot + stream equals the full replay at every cut point', () => {
+  const r = run('impostor'); const full = reduce(r.events);
+  for (let k = 0; k <= r.events.length; k++) assert.deepEqual(reduce(r.events.slice(k), reduce(r.events.slice(0, k))), full, `cut at ${k}`);
+});
+
+test('the transcript is REPLACED by each snapshot, never appended', () => {
+  const r = run('confirmed'); const deltas = r.events.filter((e) => e.type === 'call.transcript.delta');
+  const s = reduce(r.events.slice(0, r.events.indexOf(deltas[1]) + 1));
+  const items = (deltas[1].payload as { items: unknown[] }).items;
+  assert.equal(s.cases[only(r)].call?.turns.length, items.length);
+});
+
+test('late events from a different call never overwrite the current call', () => {
+  const r = run('fraud'); const s = reduce(r.events); const c = s.cases[only(r)];
+  const stale: Ev = { seq: s.lastSeq + 1, id: 'x', ts: '2026-11-10T19:00:00.000Z', case_id: only(r), type: 'call.status', actor: 'voice_agent', payload: { callId: 'some_other_call', status: 'connected' } };
+  const after = apply(s, stale);
+  assert.equal(after.cases[only(r)].call?.id, c.call?.id);
+  assert.equal(after.cases[only(r)].call?.status, 'ended');
+});
+
+test('unknown event types advance lastSeq and change nothing else', () => {
+  const s = reduce(run('fraud').events);
+  const e: Ev = { seq: s.lastSeq + 5, id: 'u', ts: '2026-11-10T19:00:00.000Z', case_id: only(run('fraud')), type: 'future.event', actor: 'system', payload: {} };
+  const after = apply(s, e);
+  assert.equal(after.lastSeq, e.seq);
+  assert.deepEqual(after.cases[only(run('fraud'))].state, s.cases[only(run('fraud'))].state);
+});
+
+test('system.reset drops cases above keepThrough, keeps seeded ones, and ignores late pre-reset events', () => {
+  const r = run('fraud'); const s = reduce(r.events);                       // case CC-0100
+  const reset: Ev = { seq: s.lastSeq + 1, id: 'r', ts: '2026-11-10T19:00:00.000Z', case_id: null, type: 'system.reset', actor: 'system', payload: { keepThrough: 99 } };
+  const cleared = apply(s, reset);
+  assert.deepEqual(Object.keys(cleared.cases), []);
+  assert.equal(heldCents(cleared), 0);
+  assert.equal(apply(cleared, r.events[0]).order.length, 0, 'a replayed pre-reset event is ignored');
+  const kept = apply(s, { ...reset, payload: { keepThrough: 100 } });
+  assert.deepEqual(Object.keys(kept.cases), [only(r)]);
+});
+
+test('queue groups follow the state mapping and money formats as dollars', () => {
+  const r = run('voicemail'); const s = reduce(r.events); const q = queue(s);
+  assert.equal(q['NEEDS ACTION'].length, 1);
+  assert.equal(GROUP_OF.calling, 'IN PROGRESS'); assert.equal(GROUP_OF.cleared, 'RESOLVED');
+  assert.equal(fmtCents(heldCents(s)), '$24,800.00');
+});
