@@ -13,7 +13,9 @@ export async function GET(req: Request) {
   const after = Math.max(0, Number.parseInt(u.searchParams.get('after') ?? '0', 10) || 0);
   const limit = Math.min(MAX_LIMIT, Math.max(1, Number.parseInt(u.searchParams.get('limit') ?? String(MAX_LIMIT), 10) || MAX_LIMIT));
   const caseId = u.searchParams.get('case');
-  const rows = await sql`
+  let rows;
+  try {
+    rows = await sql`
     with r as (select coalesce(max(seq), 0) as seq from events where type = 'system.reset')
     select e.seq, e.id, e.ts, e.case_id, e.type, e.actor, e.payload
     from events e, r
@@ -21,6 +23,10 @@ export async function GET(req: Request) {
       and (e.seq > r.seq or e.case_id in (select id from cases where source = 'seed'))
       and (${caseId}::text is null or e.case_id = ${caseId})
     order by e.seq limit ${limit}`;
+  } catch (err) {
+    console.error('events query failed', err);
+    return Response.json({ error: 'unavailable' }, { status: 503, headers: NO_STORE });   // e.g. the database is not configured or reachable yet
+  }
   const events = rows.map((e) => ({ seq: Number(e.seq), id: e.id, ts: e.ts, case_id: e.case_id, type: e.type, actor: e.actor, payload: e.payload }));
   return Response.json({ events, lastSeq: events.length ? events[events.length - 1].seq : after, serverTime: new Date().toISOString() }, { headers: NO_STORE });
 }
