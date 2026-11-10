@@ -1,4 +1,4 @@
-// usage: node slop-lint.js <url> [outDir]
+// usage: node slop-lint.cjs <url> [outDir]
 // Taste lint: screenshots at 3 widths + computed-style heuristics for the "AI-generated" tells. Exit code 1 if any FAIL.
 const { chromium } = require(process.env.PW_PATH || 'playwright');
 const fs = require('fs');

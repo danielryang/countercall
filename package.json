@@ -19,7 +19,7 @@
     "db:check": "tsx scripts/db-check.ts",
     "verify": "npm run typecheck && npm test && npm run eval && npm run eval:unit && npm run eval:smoke && npm run db:check",
     "lint:ui": "bash scripts/check-ui.sh app components lib",
-    "lint:slop": "node tools/slop-lint.js http://localhost:3000",
+    "lint:slop": "node tools/slop-lint.cjs http://localhost:3000",
     "shoot": "node scripts/shoot.mjs",
     "replay:webhooks": "tsx --env-file-if-exists=.env.local scripts/replay-webhooks.ts",
     "export-run": "tsx --env-file-if-exists=.env.local scripts/export-run.ts",
