@@ -45,7 +45,10 @@ test('vendor directory: held amount and open cases come from real holds; the out
   assert.ok(!out.includes('4321'), 'claimed digits absent');
   const phones = (await t.q<{ p: string }>(`select phone_e164 p from trusted_contacts`)).map((r) => digitsOf(r.p));
   const routing = (await t.q<{ r: string }>(`select routing_number r from bank_accounts`)).map((r) => r.r);
-  for (const run of out.match(/\d{4,}/g) ?? []) {
+  // Ids are not data: case ids (CC-0002) are public by design, and random uuids contain digit runs that can collide with a seeded
+  // routing number or phone by chance (021000021 contains 0002). Strip both, then scan everything else.
+  const scanned = out.replace(/CC-\d+/g, 'CC-id').replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, 'uuid');
+  for (const run of scanned.match(/\d{4,}/g) ?? []) {
     for (let i = 0; i + 4 <= run.length; i++) {
       const g = run.slice(i, i + 4);
       assert.ok(!phones.some((p) => p.includes(g)), `digit run ${run} overlaps a phone number`);
