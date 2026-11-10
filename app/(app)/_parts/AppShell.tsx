@@ -3,7 +3,7 @@
 // Present mode (P, Esc, ?present=1) hides the footer and scales the frame: components/ui/PresentMode.tsx.
 // `?replay=<run>` swaps the live API for a recorded run (keyless, offline-safe, labelled REPLAY).
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
 import { EventsProvider, useStream } from '@/components/EventsProvider';
 import { HeldTicker } from '@/components/ui/HeldTicker';
@@ -15,6 +15,12 @@ const SPEEDS = [1, 2, 4, 0.5];
 const THEMES = ['graphite', 'paper', 'cloud'] as const;
 type Theme = (typeof THEMES)[number];
 
+const NAV = [['/cases', 'Cases'], ['/vendors', 'Vendors']] as const;
+function Nav() {   // section links keep the query (?replay=, ?theme=) so a replay stays a replay
+  const path = usePathname(); const qs = useSearchParams().toString();
+  return <nav aria-label="Sections" className="flex items-center gap-1 text-[13px]">{NAV.map(([h, l]) => <Link key={h} href={qs ? `${h}?${qs}` : h} aria-current={path.startsWith(h) ? 'page' : undefined} className={`rounded-md px-2 py-1 ${path.startsWith(h) ? 'bg-surface-raised text-fg' : 'text-fg-muted hover:text-fg'}`}>{l}</Link>)}</nav>;
+}
+
 function Top() {
   const { state } = useStream();
   const held = heldCents(state);
@@ -25,6 +31,7 @@ function Top() {
         <span className="display text-[14px] uppercase">CounterCall</span>
       </Link>
       <span className="cap hidden md:inline">Rice Robotics</span>
+      <Nav />
       <div className="ml-auto flex items-baseline gap-2.5">
         <span className="cap">Payments on hold</span>
         <HeldTicker cents={held} />

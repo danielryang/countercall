@@ -196,3 +196,46 @@ export const TIMING = {
   measured: 'Times come from the event log.',
   paced: 'This replay was generated for viewing, so its times are paced, not measured.',
 };
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Vendors page. The point a first-time viewer must get: these are the only numbers CounterCall will ever call, and each was on file before any email.
+// ---------------------------------------------------------------------------------------------------------------------------------
+export const VENDORS = {
+  title: 'Vendors',
+  intro: 'The only phone numbers CounterCall will call. Each was on file before any email arrived. A number in an email is never used.',
+  seeded: 'sample vendors',
+  cols: { vendor: 'Vendor', number: 'Number we call', source: 'Where it came from', bank: 'Bank on file', cases: 'Open', held: 'On hold' },
+  numbers: 'Numbers on file',
+  bank: 'Bank account on file',
+  money: 'Payments',
+  noBank: 'No bank account on file',
+  noNumber: 'No verified number on file. CounterCall will not call this vendor; a person checks by hand.',
+  readOnly: 'Read-only. Phone numbers are added from signed paperwork, never from an email.',
+  loading: 'Loading vendors',
+  error: 'Could not load the vendor list right now. Nothing has changed.',
+  unauthorized: 'Sign in to see the vendor list.',
+  empty: 'No vendors on file yet. The demo reset loads the sample vendors.',
+  replayNote: 'Vendor records are read from the live database. A replay only plays back recorded cases, so it has no vendor list.',
+  replayLink: 'Open the live vendor list',
+} as const;
+
+/** The badge on a number: which one we call, and why the others are not called. */
+export const CONTACT_BADGE: Record<'primary' | 'trusted' | 'quarantined' | 'revoked', { label: string; tone: 'ok' | 'quiet' | 'danger' }> = {
+  primary: { label: 'We call this number', tone: 'ok' },
+  trusted: { label: 'Backup', tone: 'quiet' },
+  quarantined: { label: 'Never called', tone: 'danger' },
+  revoked: { label: 'Removed', tone: 'quiet' },
+};
+const verifier = (by: string) => (by.startsWith('human:') ? by.slice(6) : by.startsWith('call:') ? 'a verified call' : by);
+/** "From signed W-9, added 2025-03-14 by A. Patel" */
+export const provenanceText = (c: { source: string; addedAt: string; addedBy: string }) =>
+  `From ${SOURCE_LABEL[c.source] ?? c.source}, added ${c.addedAt.slice(0, 10)}${c.addedBy === 'system' ? ' automatically' : ` by ${c.addedBy}`}`;
+export const verifiedText = (c: { lastVerifiedAt: string | null; lastVerifiedBy: string | null }) =>
+  c.lastVerifiedAt ? `Last confirmed ${c.lastVerifiedAt.slice(0, 10)}${c.lastVerifiedBy ? ` by ${verifier(c.lastVerifiedBy)}` : ''}` : 'Not re-confirmed since it was added';
+/** "1 year, 7 months on file" */
+export function ageText(days: number): string {
+  if (days < 31) return `${Math.max(0, days)} day${days === 1 ? '' : 's'} on file`;
+  const months = Math.floor(days / 30.44); const y = Math.floor(months / 12); const m = months % 12;
+  const part = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  return `${[y ? part(y, 'year') : '', m ? part(m, 'month') : ''].filter(Boolean).join(', ')} on file`;
+}
