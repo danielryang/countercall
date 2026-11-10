@@ -33,7 +33,7 @@ CounterCall reads AP email, detects vendor bank-change requests, freezes the pay
 
 ## Remaining work (ordered; update as items land)
 1. ~~Verify S7 live~~ DONE. Next: `needs_human` note path and the `awaiting_approval` -> new-account option, live (after the happy-path call).
-2. **Production env (user/friend, Vercel):** `AGENTMAIL_WEBHOOK_SECRET`, `AGENTMAIL_INBOX_ID`, `RETELL_AGENT_ID`, `PUBLIC_BASE_URL`; redeploy; then a real inbound email through AgentMail.
+2. **Production env (checked 2026-11-09 from outside):** `AGENTMAIL_WEBHOOK_SECRET` is set and matches (a correctly signed event is accepted, 204). `AGENTMAIL_INBOX_ID` and `PUBLIC_BASE_URL` are not read by app code (setup script only), so they do not block anything. `RETELL_AGENT_ID` is read only when a call is placed (`lib/voice/retell.ts`), and production has `CALLS_ENABLED=0`; it cannot be checked remotely, so set it in Vercel before any shoot that dials from production (or shoot from local, where it is set). Still to do: a real inbound email through AgentMail.
 3. **Happy-path call:** callee gives the right digits -> VERIFIED -> `awaiting_approval` -> release from the dialog (the one outcome not yet recorded live; BLOCKED, Unverified and Verified-by-No are recorded).
 4. **S8 demo panel:** `/demo` (inject, reset, replay, preflight), present mode `P`; session + `DEMO_ENABLED`.
 5. **Assurance items 3-5:** hash-chained audit log + `/api/audit/verify`, event-sourcing replay check, latency waterfall.
