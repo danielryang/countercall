@@ -1,13 +1,16 @@
 // Scene 5, detector eval. Every number comes from public/eval.json, written by `npx tsx eval/run.ts --json video/public/eval.json`.
 // That file is a REPLAY run (each fixture's recorded extraction, no network) unless it says mode "live"; the label follows the file.
-// The one live result shown is the README's, always with its date, model and N.
+// The live result and the rules-only result come from ../facts.ts (each names the command that printed it), always with date, model and N.
 import { useCurrentFrame } from 'remotion';
 import { Card } from '@/components/ui/Card';
 import result from '../../public/eval.json';
 import { Frame } from '../components/Frame';
 import { progress, useRise } from '../motion';
+import { FACTS } from '../facts';
 
-const LIVE_README = { date: '2026-11-10', model: 'claude-haiku-5-5', n: 20, line: '20/20 correct · recall 12/12 · false positives 0/4' } as const;
+const L = FACTS.evalLive, D = FACTS.evalRulesOnly;
+const LIVE_LINE = `${L.pass}/${L.n} correct · recall ${L.recall[0]}/${L.recall[1]} · false positives ${L.falsePositives[0]}/${L.falsePositives[1]} · p50 ${L.p50s} s`;
+const RULES_LINE = `Model off, rules only: ${D.pass}/${D.n}, every bank change still held (${D.recall[0]}/${D.recall[1]}); the ${D.benignToHuman} misses are normal emails sent to a person.`;
 const modeLabel = result.mode === 'live' ? `LIVE · ${result.model}` : result.mode === 'replay' ? 'REPLAY · recorded extractions' : result.mode.toUpperCase();
 
 function Big({ at, value, label }: { at: number; value: string; label: string }) {
@@ -22,18 +25,19 @@ function Big({ at, value, label }: { at: number; value: string; label: string })
 export function EvalCard() {
   const frame = useCurrentFrame();
   return (
-    <Frame label="Detector eval" truth={`eval/run.ts --json · ${modeLabel}`}>
+    <Frame label="Detector eval" truth={`${L.source} · list: ${modeLabel}`}>
       <div className="grid h-full grid-cols-[1.2fr_1fr] gap-[48px] pb-[24px]">
         <Card className="justify-between px-[48px] py-[44px]">
           <div className="flex flex-col gap-[44px]">
-            <Big at={6} value={`${result.pass}/${result.n}`} label="fixtures correct" />
-            <Big at={18} value={`${result.recall.caught}/${result.recall.of}`} label="bank changes held" />
-            <Big at={30} value={`${result.falsePositives.count}/${result.falsePositives.of}`} label="false alarms on normal mail" />
+            <Big at={6} value={`${L.pass}/${L.n}`} label="fixtures correct, live" />
+            <Big at={18} value={`${L.recall[0]}/${L.recall[1]}`} label="bank changes held" />
+            <Big at={30} value={`${L.falsePositives[0]}/${L.falsePositives[1]}`} label="false alarms on normal mail" />
           </div>
           <div style={useRise(50)} className="flex flex-col gap-[14px] border-t border-rule pt-[28px]">
-            <div className="font-mono text-[20px] uppercase tracking-[0.08em] text-fg-muted">Live run · {LIVE_README.date} · {LIVE_README.model}, N={LIVE_README.n}</div>
-            <div className="text-[30px]">{LIVE_README.line}</div>
-            <div className="text-[22px] text-fg-muted">N={result.n} hand-built emails. Not a general accuracy claim.</div>
+            <div className="font-mono text-[20px] uppercase tracking-[0.08em] text-fg-muted">Live · {L.date} · {L.model} · N={L.n}</div>
+            <div className="text-[30px]">{LIVE_LINE}</div>
+            <div className="text-[22px] text-fg-muted">{RULES_LINE}</div>
+            <div className="text-[22px] text-fg-muted">N={L.n} hand-built emails. Not a general accuracy claim.</div>
           </div>
         </Card>
         <Card className="px-[8px] py-[8px]">

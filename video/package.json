@@ -10,6 +10,7 @@
     "studio": "remotion studio src/index.ts",
     "typecheck": "tsc --noEmit",
     "render": "remotion render src/index.ts Draft out/draft.mp4 --color-space=bt709",
+    "render:technical": "remotion render src/index.ts Technical out/technical.mp4 --color-space=bt709",
     "still": "remotion still src/index.ts"
   },
   "dependencies": {
