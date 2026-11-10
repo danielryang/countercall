@@ -2,7 +2,7 @@
 import { Stamp } from '@/components/call/Stamp';
 import { headline, type Tone } from '@/lib/copy';
 import type { CaseView } from '@/lib/reducer';
-import { elapsedAt, mmss } from '@/lib/selectors';
+import { clockRunning, elapsedAt, mmss } from '@/lib/selectors';
 
 const TONE: Record<Tone, { box: string; icon: string; glyph: string }> = {
   danger: { box: 'border-blocked/50 bg-blocked/15', icon: 'bg-blocked text-paper-raised', glyph: '\u2715' },
@@ -15,7 +15,7 @@ const TONE: Record<Tone, { box: string; icon: string; glyph: string }> = {
 export function StatusBanner({ c, nowMs }: { c: CaseView; /** wall clock, live view only: the case clock ticks while the case is still working */ nowMs?: number }) {
   const h = headline(c);
   const t = TONE[h.tone];
-  const done = !!c.call?.outcome || c.state === 'cleared';
+  const done = !clockRunning(c);   // finished: an outcome, cleared, or handed to a person (same rule as the clock and the timing view)
   return (
     <div className={`flex items-center gap-5 rounded-xl border px-6 py-3.5 ${t.box}`}>
       <span aria-hidden className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[16px] font-semibold ${t.icon}`}>{t.glyph}</span>

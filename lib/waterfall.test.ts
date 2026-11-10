@@ -11,11 +11,14 @@ import { fmtDur, waterfall } from './waterfall';
 const DIR = new URL('../public/runs/', import.meta.url);
 const load = (f: string) => JSON.parse(readFileSync(new URL(f, DIR), 'utf8')) as Run;
 const runs = readdirSync(DIR).filter((f) => f.endsWith('.json'));
+/** Runs that contain a placed call (every generated run and the live call; not the recorded email with calls switched off). */
+const callRuns = runs.filter((f) => load(f).events.some((e) => e.type === 'call.created'));
 const hero = (r: Run): CaseView => Object.values(reduce(r.events).cases).find((c) => c.call)!;
 const upTo = (r: Run, n: number): CaseView | undefined => Object.values(reduce(r.events.slice(0, n)).cases).find((c) => c.email && c.state !== 'cleared');
 
-test('every run: laps are in order, touch end to end, and add up to the email-to-outcome time the header shows', () => {
-  for (const f of runs) {
+test('every call run: laps are in order, touch end to end, and add up to the email-to-outcome time the header shows', () => {
+  assert.ok(callRuns.length >= 6);
+  for (const f of callRuns) {
     const c = hero(load(f));
     const w = waterfall(c)!;
     assert.deepEqual(w.laps.map((l) => l.key), ['detect', 'hold', 'dial', 'call'], f);
@@ -89,4 +92,14 @@ test('evidence links: the routing number span points at both bank signals; sende
   assert.ok(!hasEvidence(m, 'sender_not_known_contact'), 'a signal with nothing to point at is not linkable');
   assert.ok(overlaps(['a', 'b'], ['b']));
   assert.ok(!overlaps(['a'], null));
+});
+
+test('a case handed to a person without a call: the dial and call steps never happened, and the timing is finished at the hand-off', () => {
+  const r = load('email-live.json');
+  const c = reduce(r.events).cases['CC-0111'];
+  const w = waterfall(c)!;
+  assert.equal(w.done, true);
+  assert.deepEqual(w.laps.map((l) => [l.key, l.startMs === null]), [['detect', false], ['hold', false], ['dial', true], ['call', true]]);
+  assert.equal(w.totalMs, Date.parse(c.updatedAt) - Date.parse(c.timeline.find((t) => t.type === 'email.received')!.ts));
+  assert.equal(w.totalMs, elapsedMs(c), 'same number as the case header');
 });
