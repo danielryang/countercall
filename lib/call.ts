@@ -37,7 +37,7 @@ export async function startCall(d: CallDeps, caseId: string, vendorId: string, c
   if (!c) return refuse('case not found', false);
   if (!CALLABLE_STATES.includes(c.state)) return refuse(`case is ${c.state}; not callable`, false);
   if (c.call_attempts >= MAX_ATTEMPTS) return refuse(`maximum ${MAX_ATTEMPTS} call attempts reached`);
-  if ((await d.q(`select 1 from calls where case_id = $1 and ended_at is null limit 1`, [caseId])).length) return refuse('a call for this case is already in progress', false);
+  if ((await d.q(`select 1 from calls where case_id = $1 and ended_at is null and started_at > now() - make_interval(mins => $2) limit 1`, [caseId, IN_FLIGHT_MINUTES])).length) return refuse('a call for this case is already in progress', false);
 
   // Limits. Counters are fixed-window SQL (rate_limit_hit); a refused hit still counts, which is the safe direction.
   const hit = async (bucket: string) => Number((await d.q<{ n: number }>(`select rate_limit_hit($1, 3600) as n`, [bucket]))[0].n);
