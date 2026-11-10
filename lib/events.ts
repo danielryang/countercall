@@ -86,6 +86,19 @@ export function scrubPhones<T>(v: T): T {
   return v;
 }
 
+const WORDS = '(?:zero|oh|one|two|three|four|five|six|seven|eight|nine)';
+const SPOKEN_DIGITS = new RegExp(`\\b${WORDS}(?:[\\s,.-]+${WORDS}\\b){2,}`, 'gi');            // "four, seven, one, one"
+const DIGIT_RUN = /\d(?:[\s.,-]*\d){2,}/g;                                                          // 4711, 4 7 1 1, 47-11
+/** Masks anything that could be the verification detail a vendor SPOKE (digits, or digits as words). The decision reads the real digits from the
+ *  database (call_tool_calls), never from events, so events are free to be redacted. Without this the public feed would reveal the challenge answer. */
+export const maskSpokenDigits = (t: string) => t.replace(SPOKEN_DIGITS, (m) => '\u2022'.repeat(Math.max(3, m.split(/[\s,.-]+/).length))).replace(DIGIT_RUN, (m) => m.replace(/\d/g, '\u2022'));
+function scrubCall(e: EmittedEvent, payload: Record<string, unknown>): Record<string, unknown> {
+  if (e.type === 'call.transcript.delta') return { ...payload, items: e.items.map((i) => ({ ...i, text: maskSpokenDigits(i.text) })) };
+  if (e.type === 'call.tool') return { ...payload, args: Object.fromEntries(Object.entries(e.args).map(([k, v]) => [k, typeof v === 'string' ? maskSpokenDigits(v) : v])) };
+  if (e.type === 'call.outcome' && e.summary) return { ...payload, summary: maskSpokenDigits(e.summary) };
+  return payload;
+}
+
 /** Payload as STORED. Redaction lives here, at the single choke point: no full phone numbers, no challenge secrets, ever. */
 export function toRow(e: EmittedEvent, humanName?: string) {
   const { type, caseId, at: _at, ...rest } = e as EmittedEvent & { at?: number };
@@ -93,7 +106,7 @@ export function toRow(e: EmittedEvent, humanName?: string) {
   if (e.type === 'call.requested') {
     payload = { vendorId: e.vendorId, phoneMasked: mask(e.phone), context: { requestSummary: requestSummary(e.context.emailReceivedAt), emailReceivedAt: e.context.emailReceivedAt } };
   }
-  return { case_id: caseId, type, actor: actorOf(e, humanName), idem_key: idemKeyOf(e), payload: scrubPhones(payload) };   // every payload, every event type
+  return { case_id: caseId, type, actor: actorOf(e, humanName), idem_key: idemKeyOf(e), payload: scrubPhones(scrubCall(e, payload)) };   // every payload, every event type
 }
 
 export type { CallDecision };

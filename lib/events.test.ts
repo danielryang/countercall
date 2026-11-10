@@ -19,3 +19,15 @@ test('toRow masks the on-file number inside a case.flagged decision (found by th
   assert.ok(!JSON.stringify(row.payload).includes('4155550142'));
   assert.match(JSON.stringify(row.payload), /\+1•+42/);
 });
+
+test('spoken verification digits are masked in transcripts, tool arguments and summaries (they would otherwise reveal the challenge in the public feed)', async () => {
+  const { maskSpokenDigits } = await import('./events');
+  assert.equal(maskSpokenDigits('Four seven one one.'), '••••.');
+  assert.equal(maskSpokenDigits('I heard four, seven, one, one. Is that right?'), 'I heard ••••. Is that right?');
+  assert.equal(maskSpokenDigits('it is 4388'), 'it is ••••');
+  assert.equal(maskSpokenDigits('4 3 8 8'), '• • • •');
+  assert.equal(maskSpokenDigits('one moment please'), 'one moment please', 'ordinary words are untouched');
+  const row = toRow({ type: 'call.tool', caseId: 'CC-0100', callId: 'c', name: 'report_challenge', args: { digits: '4388', heard_text: 'four three eight eight' } } as unknown as EmittedEvent);
+  assert.ok(!JSON.stringify(row.payload).match(/4388|four three/i), 'no digits, no digit words');
+  assert.equal((row.payload.args as { digits: string }).digits.length, 4, 'the count survives so the UI can fill its slots');
+});

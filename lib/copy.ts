@@ -51,10 +51,18 @@ export const STAMP: Record<'CONFIRMED_LEGIT' | 'DENIED_FRAUD' | 'UNVERIFIED', { 
   UNVERIFIED: { word: 'Unverified', status: 'NEEDS_REVIEW', sub: 'Held · task created' },
 };
 export const SIGNAL_LABEL: Record<string, string> = {
-  sender_domain_not_on_file: 'Domain', freemail_sender: 'Freemail', sender_not_known_contact: 'Sender', display_name_impersonation: 'Display name',
+  sender_domain_not_on_file: 'Domain', freemail_sender: 'Freemail', sender_not_known_contact: 'Sender', display_name_impersonation: 'Display',
   lookalike_domain: 'Lookalike', reply_to_mismatch: 'Reply-To', reply_to_freemail: 'Reply-To', executive_impersonation: 'Executive',
   auth_dmarc_fail: 'DMARC', auth_spf_fail: 'SPF', auth_dkim_fail: 'DKIM', auth_unauthenticated: 'Auth', auth_unknown: 'Auth',
-  bank_details_present: 'Bank details', bank_details_differ: 'Bank diff', bank_details_match_on_file: 'Bank match', routing_checksum_invalid: 'Routing',
+  bank_details_present: 'Bank info', bank_details_differ: 'Bank diff', bank_details_match_on_file: 'Bank match', routing_checksum_invalid: 'Routing',
   bank_change_language: 'Wording', urgency_language: 'Urgency', secrecy_no_callback: 'Secrecy', injection_markers: 'AI injection', phone_in_email: 'Phone',
   attachment_may_hold_details: 'Attachment', amount_outlier: 'Amount', amount_mismatch_invoice: 'Invoice', hidden_text: 'Hidden text',
 };
+
+export const CATEGORY_LABEL: Record<string, string> = {
+  bank_change: 'Bank change request', urgent_wire_request: 'Urgent wire request', executive_impersonation: 'Executive impersonation', gift_card_scam: 'Gift card request',
+  invoice_normal: 'Invoice', vendor_info_request: 'Vendor information request', newsletter_marketing: 'Newsletter', prompt_injection_attempt: 'Prompt injection attempt', other: 'Email',
+};
+export const PHASE_LABEL = { DETECT: 'Detect', FREEZE: 'Freeze', VERIFY: 'Verify', DECIDE: 'Decide' } as const;
+
+export const SOURCE_LABEL: Record<string, string> = { onboarding_w9: 'signed W-9', contract: 'contract', ramp_contact_at_import: 'Ramp record', vendor_website: 'vendor website', prior_verified_call: 'prior verified call', human_entered: 'entered by a person' };

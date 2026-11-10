@@ -287,7 +287,7 @@
   @keyframes sweep { to { background-size: 100% 100%; } }
 
   /* Frozen money: hatching over the amount. A pattern, so it survives greyscale and video compression. */
-  .frozen { background-image: var(--hatch); }
+  .frozen { background-image: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 28%, transparent) 0 1px, transparent 1px 8px); }
   .tick { position: absolute; width: 11px; height: 11px; pointer-events: none; color: var(--fg); }
   .tick::before, .tick::after { content: ""; position: absolute; background: currentColor; }
   .tick::before { left: 5px; top: 0; width: 1px; height: 11px; }

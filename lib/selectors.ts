@@ -20,3 +20,14 @@ export const heldCents = (s: State): number =>
   Object.values(s.cases).filter((c) => c.payments.length && !c.release && c.state !== 'closed' && c.state !== 'cleared').reduce((n, c) => n + c.payments.reduce((m, b) => m + b.amountCents, 0), 0);
 export const callingCase = (s: State): CaseView | undefined => Object.values(s.cases).find((c) => c.state === 'calling');
 export const fmtCents = (cents: number) => '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// ---- case-level derivations (pure) ----
+export type Phase = 'DETECT' | 'FREEZE' | 'VERIFY' | 'DECIDE';
+export const PHASES: Phase[] = ['DETECT', 'FREEZE', 'VERIFY', 'DECIDE'];
+export const phasesReached = (c: CaseView): Record<Phase, boolean> => ({
+  DETECT: !!c.email, FREEZE: c.payments.length > 0, VERIFY: !!c.call, DECIDE: !!c.call?.outcome || c.state === 'cleared',
+});
+export const mmss = (ms: number) => { const s = Math.max(0, Math.round(ms / 1000)); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
+/** Email -> outcome, from the events' own timestamps. Freezes at call.outcome, which is what makes the "in minutes" claim honest. */
+export const elapsedMs = (c: CaseView) => Date.parse(c.call?.outcome?.at ?? c.updatedAt) - Date.parse(c.timeline[0]?.ts ?? c.createdAt);
+export const SEVERITY_RANK: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1, info: 0 };

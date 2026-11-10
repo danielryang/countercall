@@ -80,3 +80,12 @@ test('Retell signatures: valid passes; tampered, missing and wrong-key fail', as
   assert.equal(await verifyRetell(body, req(body)), false, 'missing header');
   assert.equal(await verifyRetell(body, req(body, await Retell.sign(body, 'key_other_0123456789abcdef'))), false, 'wrong key');
 });
+
+test('the challenge answer the vendor speaks never reaches a stored event, yet the decision still matches it', async () => {
+  const { caseId } = await play('confirmed', 'normal');
+  const [{ challenge_expected }] = await t.q<{ challenge_expected: string }>(`select challenge_expected from cases where id = $1`, [caseId]);
+  const blob = JSON.stringify(await t.events(caseId));
+  assert.ok(!blob.includes(challenge_expected), `expected digits ${challenge_expected} must not appear in any event`);
+  const [o] = (await t.events(caseId)).filter((e) => e.type === 'call.outcome');
+  assert.equal((o.payload.decision as { outcome: string }).outcome, 'CONFIRMED_LEGIT', 'the policy used the real digits from the database');
+});

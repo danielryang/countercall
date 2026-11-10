@@ -2,6 +2,7 @@
 // The cases screen: queue (360) + detail (rest). Selection follows the newest active case until the user picks one.
 import { useEffect, useMemo, useState } from 'react';
 import { QueuePanel } from '@/components/queue/QueuePanel';
+import { CaseDetail } from './CaseDetail';
 import { useStream } from '@/components/EventsProvider';
 import { queue, GROUPS } from '@/lib/selectors';
 
@@ -23,9 +24,9 @@ export function CasesView() {
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey);
   }, [flat, selectedId]);
   return (
-    <div className="grid h-full grid-cols-[360px_1fr]">
+    <div className="grid h-full grid-cols-[360px_minmax(0,1fr)]">
       <div className="min-h-0 border-r border-rule p-2"><QueuePanel groups={groups} selectedId={selectedId} onSelect={setPicked} listening="rice-ap@agentmail.to" /></div>
-      <div className="min-h-0 p-2"><div className="label p-4 text-fg-muted">{selectedId ? `Selected ${selectedId}` : 'Select a case'}</div></div>
+      <div className="min-h-0 p-2">{selectedId && state.cases[selectedId] ? <CaseDetail c={state.cases[selectedId]} /> : <div className="label p-4 text-fg-muted">Select a case</div>}</div>
     </div>
   );
 }
