@@ -75,6 +75,17 @@ export function idemKeyOf(e: EmittedEvent): string | null {
   }
 }
 
+const E164 = /\+[1-9]\d{7,14}/g;
+/** Length-PRESERVING mask (+14155550142 -> +1•••••••••42): evidence spans index into email text by offset, so the text length must not change. */
+export const maskPhone = (m: string) => m.slice(0, 2) + '\u2022'.repeat(Math.max(0, m.length - 4)) + m.slice(-2);
+/** Deep copy with every E.164 number masked. Found by the pipeline test: case.flagged carried the full on-file number in its START_CALLBACK action, and /api/events is public. */
+export function scrubPhones<T>(v: T): T {
+  if (typeof v === 'string') return v.replace(E164, maskPhone) as T;
+  if (Array.isArray(v)) return v.map(scrubPhones) as T;
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, scrubPhones(x)])) as T;
+  return v;
+}
+
 /** Payload as STORED. Redaction lives here, at the single choke point: no full phone numbers, no challenge secrets, ever. */
 export function toRow(e: EmittedEvent, humanName?: string) {
   const { type, caseId, at: _at, ...rest } = e as EmittedEvent & { at?: number };
@@ -82,7 +93,7 @@ export function toRow(e: EmittedEvent, humanName?: string) {
   if (e.type === 'call.requested') {
     payload = { vendorId: e.vendorId, phoneMasked: mask(e.phone), context: { requestSummary: requestSummary(e.context.emailReceivedAt), emailReceivedAt: e.context.emailReceivedAt } };
   }
-  return { case_id: caseId, type, actor: actorOf(e, humanName), idem_key: idemKeyOf(e), payload };
+  return { case_id: caseId, type, actor: actorOf(e, humanName), idem_key: idemKeyOf(e), payload: scrubPhones(payload) };   // every payload, every event type
 }
 
 export type { CallDecision };

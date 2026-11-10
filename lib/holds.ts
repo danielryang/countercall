@@ -28,7 +28,7 @@ async function timed<T>(d: HoldDeps, caseId: string, method: string, path: strin
 export async function applyHolds(d: HoldDeps, caseId: string, vendorId: string, paymentIds: string[]): Promise<HoldReport> {
   const reason = d.reason ?? REASON;
   const rows = paymentIds.length
-    ? await d.q<BillRow>(`select id, ramp_bill_id, invoice_number, amount_cents, currency, due_date, payment_method from bills where id = any($1) and vendor_id = $2 and paid_at is null order by due_date`, [paymentIds, vendorId])
+    ? await d.q<BillRow>(`select id, ramp_bill_id, invoice_number, amount_cents, currency, due_date, payment_method from bills where id in (select jsonb_array_elements_text($1::jsonb)) and vendor_id = $2 and paid_at is null order by due_date`, [JSON.stringify(paymentIds), vendorId])
     : [];
   const bills: HeldBill[] = [];
 
