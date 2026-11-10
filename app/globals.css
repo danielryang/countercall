@@ -155,9 +155,9 @@
 /* ---------- App themes: ?theme=graphite|paper|cloud on the app shell ---------- */
 [data-theme="graphite"] {
   color-scheme: dark;
-  --surface: #16130F; --surface-raised: #211D17; --surface-sunk: #100E0B;
-  --fg: #F6F1E7; --fg-muted: #B9B0A0; --rule: rgb(246 241 231 / 0.13); --link: #F6F1E7;
-  --live: #F6F1E7; --chip-mix: 100%;
+  --surface: #0A0A0A; --surface-raised: #141414; --surface-sunk: #050505;
+  --fg: #EDEDED; --fg-muted: #A1A1A1; --rule: rgb(255 255 255 / 0.10); --link: #EDEDED;
+  --live: #EDEDED; --chip-mix: 100%;
   --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 40%, transparent) 0 1.5px, transparent 1.5px 6px);
 }
 [data-theme="paper"] {
@@ -172,7 +172,7 @@
   --fg: #101828; --fg-muted: #667085; --rule: rgb(16 24 40 / 0.09); --link: #101828;
   --live: #101828; --chip-mix: 55%;
 }
-body:has([data-theme="graphite"]) { background: #16130F; }
+body:has([data-theme="graphite"]) { background: #0A0A0A; }
 body:has([data-theme="paper"]) { background: #F3EDE0; }
 body:has([data-theme="cloud"]) { background: #F3F5F8; }
 
