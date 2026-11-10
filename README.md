@@ -199,7 +199,7 @@ The same endpoint replays the whole log through the pure reducer and `nextState(
 
 While building this, the design review found a latent race: Postgres hands out `seq` before the insert trigger runs, so two concurrent writers could commit out of `seq` order and the `?after=` poll cursor could skip a row. The trigger now takes the case row lock, then a chain lock, and re-draws `seq` when needed, so `seq` order equals commit order equals chain order.
 
-**Other tests.** `npm test` runs 154 tests (including the verifier and simulator tests), all on PGlite. `npm run db:check` runs 12 groups of database invariants (append-only events, illegal transitions refused, trusted-number guard, row-level security, lifecycle table equals code, redaction, and the audit seal).
+**Other tests.** `npm test` runs 195 tests (including the verifier and simulator tests), all on PGlite. `npm run db:check` runs 12 groups of database invariants (append-only events, illegal transitions refused, trusted-number guard, row-level security, lifecycle table equals code, redaction, and the audit seal).
 
 Live runs also found bugs the unit tests could not see: jsonb double-encoding in postgres.js, `'\\D'` inside a JS template literal, case ids past 9999, and an import cycle that left the Ramp client undefined in the release route. A review found the public event feed leaked the full on-file phone number in one event; `toRow()` now masks every phone number before it is stored.
 
