@@ -1,10 +1,9 @@
 // app/api/demo/replay/route.ts: "dry-run" mode: same events, same decide(), zero telephony. Session + DEMO_ENABLED=1, else 404 (PLAN s13 B1).
-import { requireDemo } from "../../../../lib/auth";
-import { decideOutcome } from "../../../../lib/voice/decide";
-import { emit } from "../../../../lib/voice/events";
-import { FIXTURES } from "../../../../lib/voice/fixtures";
+import { requireDemo } from "@/lib/auth";
+import { decideOutcome } from "@/lib/voice/decide";
+import { emit } from "@/lib/voice/events";
+import { FIXTURES } from "@/lib/voice/fixtures";
 
-export const runtime = "nodejs";
 export const maxDuration = 60;                    // keep fixtures under ~40 s of event time, or pass speed=1.5
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

@@ -4,7 +4,6 @@ import { Webhook } from 'svix';
 import { handleAgentMailEvent } from '@/lib/detect/agentmail';
 import { getDeps } from '@/lib/detect/deps';
 
-export const runtime = 'nodejs';
 export const maxDuration = 60; // LLM call + hold + emits; AgentMail only waits 15 s for our 2xx, so we answer first and work in after()
 
 export async function POST(req: NextRequest) {

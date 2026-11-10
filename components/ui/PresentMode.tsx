@@ -1,6 +1,6 @@
 'use client';
 // Present mode: P toggles it (never while typing), Esc leaves it, ?present=1 / ?present=0 force it. It hides dev affordances, scales the whole
-// screen to 125%, suppresses toasts and draws a ring around the cursor so a room can follow the pointer. The styling lives in globals.css under
+// screen to 115%, suppresses toasts and draws a ring around the cursor so a room can follow the pointer. The styling lives in globals.css under
 // html[data-present]; this file only flips that attribute and moves the ring. Presentational: no next/*, no data.
 import { useEffect, useRef, useState } from 'react';
 

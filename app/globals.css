@@ -334,11 +334,11 @@ body:has([data-theme="cloud"]) { background: #F3F5F8; }
 }
 
 /* ---------- Present mode (P): html[data-present], set by components/ui/PresentMode.tsx ----------
-   The whole frame is scaled to 125% (type, spacing and hit areas together, so layouts keep their proportions) and shrunk back to fit the
+   The whole frame is scaled to 115% (type, spacing and hit areas together, so layouts keep their proportions) and shrunk back to fit the
    viewport; dev affordances (footer, replay controls, theme switch) and toasts are hidden; a ring marks the pointer for the room. */
-html[data-present] [data-app] { zoom: 1.25; min-height: 0; }
-html[data-present] [data-app].h-screen { height: 80vh; }
-html[data-present] [data-app]:not(.h-screen) { min-height: 80vh; }
+html[data-present] [data-app] { zoom: 1.15; min-height: 0; }   /* 05 §2.7: 1.15 keeps the case view readable on a 1280×720 stage */
+html[data-present] [data-app].h-screen { height: 86.96vh; }
+html[data-present] [data-app]:not(.h-screen) { min-height: 86.96vh; }
 html[data-present] [data-present-hide], html[data-present] [data-sonner-toaster] { display: none !important; }
 html[data-present] [data-present-solo] { grid-template-columns: minmax(0, 1fr); }   /* /demo: only the cheat-card stays, full width, for the teammate on the phone */
 /* The ring: where the presenter is pointing. Glides with the pointer (transform only); a press fills it. Reduced motion: it jumps, no glide. */

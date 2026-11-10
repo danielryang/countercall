@@ -5,7 +5,6 @@ import { getDeps } from '@/lib/detect/deps';
 import { ingestEmail } from '@/lib/detect/ingest';
 import { normalizeResend } from '@/lib/detect/resend';
 
-export const runtime = 'nodejs';
 export const maxDuration = 60;
 let client: Resend | undefined;
 const resend = () => (client ??= new Resend(process.env.RESEND_API_KEY));   // lazy: see 08 section 0.5
