@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source not "../video";   /* the Remotion project in video/ has its own Tailwind build; keep its classes out of the app CSS */
 @import "tw-animate-css";      /* keyframes used by the shadcn dialog/sheet/command */
 @import "shadcn/tailwind.css";  /* data-open / data-closed variants used by the generated components */
 
