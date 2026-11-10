@@ -135,14 +135,18 @@
 /* Recording / projector mode: <html data-scale="video"> lifts the 11px micro size to 13px (agent 06 records with a 13px minimum). */
 [data-scale="video"] { --text-micro: 0.8125rem; --text-micro--line-height: 1.125rem; }
 .night {
-  --surface: #12141A;
-  --surface-raised: #1B1E27;
-  --surface-sunk: #0C0D12;
-  --fg: #ECE9E1;
-  --fg-muted: #A9A79F;
-  --rule: rgb(236 233 225 / 0.28);
-  --link: #7C9BFF;
+  --surface: #0F1115;
+  --surface-raised: #161920;
+  --surface-sunk: #0B0C10;
+  --fg: #E9E7E1;
+  --fg-muted: #8D91A0;
+  --rule: rgb(233 231 225 / 0.11);     /* solid, low-contrast hairlines: the dark theme separates by tone, not by dashed frames */
+  --link: #8FA8FF;
+  --hl-strong: color-mix(in oklab, var(--color-signal) 62%, #0F1115);
+  --hl-strong-ink: #fff;
+  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 30%, transparent) 0 1px, transparent 1px 7px);
 }
+body:has(.night) { background: #0F1115; }
 
 @layer base {
   html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-size-adjust: 100%; }
@@ -278,21 +282,20 @@
   .scan-dots::after { content: "..."; animation: blink 1s steps(1) infinite; }
 
   /* Evidence highlights: marker-pen sweeps, not fades. --sweep-delay staggers them in reading order. */
+  :root { --hl-strong: var(--color-evidence-strong); --hl-strong-ink: var(--color-ink); }
   .ev, .ev-strong { background-repeat: no-repeat; background-size: 0% 100%; animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms); }
-  .ev { background-image: linear-gradient(var(--color-evidence), var(--color-evidence)); }
-  .ev-strong { background-image: linear-gradient(var(--color-evidence-strong), var(--color-evidence-strong)); }
+  .ev { background-image: linear-gradient(var(--color-evidence), var(--color-evidence)); color: var(--color-ink); }
+  .ev-strong { background-image: linear-gradient(var(--hl-strong), var(--hl-strong)); color: var(--hl-strong-ink); }
   .ev-quiet { text-decoration: underline dashed; text-underline-offset: 3px; }
   .ev-quiet[data-struck="true"] { text-decoration: line-through; color: var(--fg-muted); }
   [data-hot="true"] { outline: 1px solid var(--fg); outline-offset: 1px; }
   @keyframes sweep { to { background-size: 100% 100%; } }
 
   /* Frozen money: hatching over the amount. A pattern, so it survives greyscale and video compression. */
-  .frozen { background-image: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 28%, transparent) 0 1px, transparent 1px 8px); }
-  .tick { position: absolute; width: 11px; height: 11px; pointer-events: none; color: var(--fg); }
-  .tick::before, .tick::after { content: ""; position: absolute; background: currentColor; }
-  .tick::before { left: 5px; top: 0; width: 1px; height: 11px; }
-  .tick::after { left: 0; top: 5px; width: 11px; height: 1px; }
-  .stamp { transform: rotate(-4deg); animation: stamp var(--d-stamp) var(--ease-snap) both; }
-  @keyframes stamp { from { opacity: 0; transform: rotate(-4deg) scale(1.18); } to { opacity: 1; transform: rotate(-4deg) scale(1); } }
+  .frozen { background-image: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 55%, transparent) 0 1.5px, transparent 1.5px 6px); }
+  .stamp { transform: rotate(-3deg); animation: stamp var(--d-stamp) var(--ease-snap) both; }
+  @keyframes stamp { from { opacity: 0; transform: rotate(-3deg) scale(1.16); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
+  /* quiet caption: small sans, muted, sentence case. Uppercase mono is reserved for chips, keycaps and the stamp. */
+  .cap { font-size: 12px; line-height: 16px; color: var(--fg-muted); }
   .caret::after { content: ""; display: inline-block; width: .5ch; height: 1em; margin-left: 2px; vertical-align: text-bottom; background: currentColor; animation: blink 1s steps(1) infinite; }
 }

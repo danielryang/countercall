@@ -1,12 +1,11 @@
-// A dashed hairline panel with + registration ticks at the corners and an optional mono caption. Flat by construction: the theme has no radius or elevation tokens.
+// A panel: one solid hairline, tone-on-tone surface. No corner furniture, no radius or elevation (the theme has none). Optional quiet caption.
 import type { ReactNode } from 'react';
 
-export function Frame({ label, aside, children, className = '', ticks = true }: { label?: string; aside?: ReactNode; children: ReactNode; className?: string; ticks?: boolean }) {
+export function Frame({ label, aside, children, className = '' }: { label?: string; aside?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`relative border border-dashed border-rule ${className}`}>
-      {ticks && (<><i className="tick -left-[5px] -top-[5px]" /><i className="tick -right-[5px] -top-[5px]" /><i className="tick -bottom-[5px] -left-[5px]" /><i className="tick -bottom-[5px] -right-[5px]" /></>)}
+    <section className={`relative border border-rule ${className}`}>
       {label && (
-        <header className="label flex items-center justify-between border-b border-dashed border-rule px-3 py-1.5 text-fg-muted">
+        <header className="cap flex items-center justify-between px-3 py-2">
           <span>{label}</span>{aside ? <span>{aside}</span> : null}
         </header>
       )}
