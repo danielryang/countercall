@@ -2,6 +2,18 @@
 // Taste lint: screenshots at 3 widths + computed-style heuristics for the "AI-generated" tells. Exit code 1 if any FAIL.
 const { chromium } = require(process.env.PW_PATH || 'playwright');
 const fs = require('fs');
+const path = require('path');
+
+// Radius: CLAUDE.md now asks for rounded corners FROM THE TOKEN SCALE ONLY (rounded-sm/md/lg/xl), so the old "<=3% of elements may be rounded"
+// square-corner check is gone. Instead every computed corner radius must be 0, a --radius-* token from app/globals.css, or a full circle/pill
+// (rounded-full: Tailwind's calc(infinity*1px) computes to a huge px value, or 50%). scripts/check-ui.sh lints the source for arbitrary radii;
+// this checks what actually renders (shadcn, inline styles, globals.css rules).
+const RADII = (() => {
+  try {
+    const css = fs.readFileSync(path.join(__dirname, '..', 'app', 'globals.css'), 'utf8');
+    return [...css.matchAll(/--radius-[a-z0-9]+:\s*([\d.]+)px/g)].map((m) => +m[1]);
+  } catch { return []; }
+})();
 
 const BANNED = ['supercharge', 'seamless', 'unlock', 'revolutioni', 'elevate', 'empower', 'next-gen', 'cutting-edge', 'ai-powered', 'streamline', 'leverage', 'game-chang', 'effortless', 'in today', 'harness the power', 'take your', 'transform your', 'reimagine', 'delve', 'robust', 'all-in-one', 'ship faster', 'build faster'];
 const SLOP_FONTS = ['inter', 'roboto', 'arial', 'helvetica', 'system-ui', '-apple-system', 'poppins', 'space grotesk', 'sf pro', 'segoe ui'];
@@ -24,7 +36,7 @@ const SLOP_FONTS = ['inter', 'roboto', 'arial', 'helvetica', 'system-ui', '-appl
     add(`no-horizontal-overflow@${w}`, overflow <= 1 ? 'PASS' : 'FAIL', `scrollWidth-innerWidth=${overflow}`);
     if (w !== 1440) { await page.close(); continue; }
 
-    const m = await page.evaluate(({ BANNED, SLOP_FONTS }) => {
+    const m = await page.evaluate(({ BANNED, SLOP_FONTS, RADII }) => {
       const out = {}; const els = [...document.querySelectorAll('body *')].filter(e => { const s = getComputedStyle(e); const r = e.getBoundingClientRect(); return s.display !== 'none' && s.visibility !== 'hidden' && r.width > 0 && r.height > 0; });
       out.n = els.length;
       const hsl = (c) => { const m = c.match(/rgba?\(([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)(?:[ ,/]+([\d.]+))?/); if (!m) return null; let [r, g, b] = [m[1], m[2], m[3]].map(x => +x / 255); const a = m[4] === undefined ? 1 : +m[4]; const mx = Math.max(r, g, b), mn = Math.min(r, g, b); const l = (mx + mn) / 2; const d = mx - mn; let hh = 0, s = 0; if (d) { s = d / (1 - Math.abs(2 * l - 1)); hh = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; hh = (hh * 60 + 360) % 360; } return { h: hh, s, l, a }; };
@@ -34,10 +46,14 @@ const SLOP_FONTS = ['inter', 'roboto', 'arial', 'helvetica', 'system-ui', '-appl
       out.fonts = fonts; out.textEls = textEls;
       out.slopFontShare = Object.entries(fonts).filter(([f]) => SLOP_FONTS.includes(f)).reduce((a, [, c]) => a + c, 0) / Math.max(textEls, 1);
       // radii / shadows / gradients / blur / transition-all
-      let radius = 0, shadow = 0, backdrop = 0, transAll = 0, colorGrad = 0, dashed = 0, purple = 0; const purpleSamples = new Set();
+      let offRadius = 0; const offSamples = new Set(); let shadow = 0, backdrop = 0, transAll = 0, colorGrad = 0, dashed = 0, purple = 0; const purpleSamples = new Set();
       for (const e of els) {
         const s = getComputedStyle(e);
-        const br = parseFloat(s.borderTopLeftRadius); if (br > 0 && !(e.getBoundingClientRect().width <= 14 && e.getBoundingClientRect().height <= 14)) radius++;
+        for (const corner of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius']) {
+          const v = s[corner]; if (!v || v === '0px') continue;
+          const ok = v.split(' ').every((part) => (part.endsWith('%') ? parseFloat(part) === 0 || parseFloat(part) >= 50 : (() => { const px = parseFloat(part); return px === 0 || px >= 9999 || RADII.some((t) => Math.abs(t - px) < 0.01); })()));
+          if (!ok) { offRadius++; if (offSamples.size < 6) offSamples.add(`${e.tagName.toLowerCase()}${e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/).slice(0, 3).join('.') : ''} ${v}`); break; }
+        }
         if (s.boxShadow !== 'none' && !/inset/.test(s.boxShadow.slice(0, 5))) shadow++;
         if (s.backdropFilter !== 'none' && s.backdropFilter) backdrop++;
         if (/\ball\b/.test(s.transitionProperty) && parseFloat(s.transitionDuration) > 0) transAll++;
@@ -46,8 +62,7 @@ const SLOP_FONTS = ['inter', 'roboto', 'arial', 'helvetica', 'system-ui', '-appl
         if (/gradient/.test(bi)) { const cols = (bi.match(/rgba?\([^)]*\)/g) || []).filter(c => { const p = hsl(c); return p && p.a > 0.05; }); if (new Set(cols.map(c => c.replace(/\s/g, '').replace(/,[\d.]+\)$/, ')'))).size >= 2 && !/repeating/.test(bi)) colorGrad++; }
         for (const prop of ['color', 'backgroundColor', 'borderTopColor']) { const p = hsl(s[prop]); if (p && p.a > 0.3 && p.s > 0.25 && p.l > 0.2 && p.l < 0.85 && p.h >= 250 && p.h <= 295) { purple++; purpleSamples.add(s[prop]); } }
       }
-      Object.assign(out, { radius, shadow, backdrop, transAll, colorGrad, dashed, purple, purpleSamples: [...purpleSamples].slice(0, 5) });
-      out.radiusShare = radius / els.length;
+      Object.assign(out, { offRadius, offSamples: [...offSamples], shadow, backdrop, transAll, colorGrad, dashed, purple, purpleSamples: [...purpleSamples].slice(0, 5) });
       // icons
       const svgs = [...document.querySelectorAll('svg')].filter(s => s.getBoundingClientRect().width <= 28);
       out.lucide = document.querySelectorAll('svg[class*="lucide"]').length; out.smallSvgs = svgs.length;
@@ -61,10 +76,10 @@ const SLOP_FONTS = ['inter', 'roboto', 'arial', 'helvetica', 'system-ui', '-appl
       out.monoLabels = els.filter(e => { const s = getComputedStyle(e); return /mono|courier|menlo/i.test(s.fontFamily) && s.textTransform === 'uppercase' && parseFloat(s.fontSize) <= 13 && e.childElementCount === 0 && e.textContent.trim(); }).length;
       out.canvases = document.querySelectorAll('canvas').length;
       return out;
-    }, { BANNED, SLOP_FONTS });
+    }, { BANNED, SLOP_FONTS, RADII });
 
     add('no-slop-primary-font', m.slopFontShare < 0.1 ? 'PASS' : 'FAIL', `${(m.slopFontShare * 100).toFixed(0)}% of text elements in a slop font; fonts=${JSON.stringify(m.fonts)}`);
-    add('radius<=3%-of-elements', m.radiusShare <= 0.03 ? 'PASS' : 'FAIL', `${m.radius} rounded elements (${(m.radiusShare * 100).toFixed(1)}%)`);
+    add('radius-on-token-scale', !RADII.length ? 'WARN' : m.offRadius === 0 ? 'PASS' : 'FAIL', !RADII.length ? 'no --radius-* tokens found in app/globals.css' : `${m.offRadius} elements with a radius off the scale [0, ${RADII.join(', ')}px, full]${m.offSamples.length ? ': ' + m.offSamples.join(' | ') : ''}`);
     add('no-box-shadows', m.shadow === 0 ? 'PASS' : 'FAIL', `${m.shadow} elements with outer box-shadow`);
     add('no-glassmorphism', m.backdrop === 0 ? 'PASS' : 'FAIL', `${m.backdrop} backdrop-filter`);
     add('no-colour-gradients', m.colorGrad === 0 ? 'PASS' : 'FAIL', `${m.colorGrad} multi-colour non-repeating gradients`);
@@ -76,8 +91,12 @@ const SLOP_FONTS = ['inter', 'roboto', 'arial', 'helvetica', 'system-ui', '-appl
     add('h1-not-centered', m.h1Center === false ? 'PASS' : 'WARN', `h1 text-align center = ${m.h1Center}`);
     add('no-banned-phrases', m.banned.length === 0 ? 'PASS' : 'FAIL', m.banned.join(', ') || 'none');
     add('no-emoji', m.emoji === 0 ? 'PASS' : 'FAIL', `${m.emoji} emoji`);
-    add('mono-micro-labels>=8', m.monoLabels >= 8 ? 'PASS' : 'WARN', `${m.monoLabels} uppercase mono labels (positive signal)`);
-    add('dashed-hairlines>=6', m.dashed >= 6 ? 'PASS' : 'WARN', `${m.dashed} dashed-border elements (positive signal)`);
+    // Both checks below used to REWARD the old blueprint look (>=8 uppercase mono micro-labels, >=6 dashed hairlines). CLAUDE.md's current rules
+    // contradict the first: mono is for ids, money and the stamp, everything else is sans in sentence case, so small uppercase mono labels are now a
+    // warning, not a goal. Dashed lines are no longer asked for (one hairline per surface, no decoration added to fix a layout), so the dashed count
+    // is reported for information only and never warns or fails.
+    add('no-uppercase-mono-labels', m.monoLabels === 0 ? 'PASS' : 'WARN', `${m.monoLabels} small uppercase mono labels (rule: mono only for ids, money and the stamp; sentence case)`);
+    add('dashed-hairlines(info)', 'PASS', `${m.dashed} dashed-border elements (informational)`);
     await page.close();
   }
   await browser.close();
