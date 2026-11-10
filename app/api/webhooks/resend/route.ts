@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   after(async () => {
     const { data, error } = await resend().emails.receiving.get(event.data.email_id); // webhook has metadata only
     if (error || !data) return console.error('resend fetch failed', error);
-    await ingestEmail(normalizeResend(data as any), getDeps());
+    await ingestEmail(normalizeResend(data as any), await getDeps({ provider: 'resend', payload: event }));
   });
   return new Response(null, { status: 204 });
 }

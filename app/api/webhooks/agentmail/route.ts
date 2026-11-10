@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     return new Response('invalid signature', { status: 400 });
   }
   after(async () => {
-    try { await handleAgentMailEvent(evt, getDeps()); }
+    try { await handleAgentMailEvent(evt, await getDeps({ provider: 'agentmail', payload: evt })); }
     catch (err) { console.error('ingest failed', evt.event_id, err); } // AgentMail retries only on non-2xx; a failure here is logged, not retried. Alert on it.
   });
   return new Response(null, { status: 204 });

@@ -7,9 +7,10 @@ export function memoryDeps(vendors: Vendor[], org: OrgConfig, extract?: Deps['ex
   let n = 100; const deps: Deps = {
     newCaseId: async () => `CC-${String(n++).padStart(4, '0')}`,
     seen: async (id) => (seen.has(id) ? true : (seen.add(id), false)),
-    claimCallback: async (v, k) => (calls.has(v + k) ? false : (calls.add(v + k), true)),
+    claimCallback: async (_c, v, k) => (calls.has(v + k) ? false : (calls.add(v + k), true)),
     emit: async (e) => void events.push(e),
     holdPayments: async (vendorId, paymentIds) => void holds.push({ vendorId, paymentIds }),
+    createTask: async () => {}, startCall: async () => {},
     vendors: async () => vendors, org, extract,
   };
   return { deps, events, holds };

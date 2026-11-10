@@ -23,7 +23,7 @@ test('holds both Acme bills and the vendor, records holds, flips the mock bills 
   const r = await applyHolds(deps(new DbMockRampClient(q), events), caseId, 'v_acme', ['pay_8101', 'pay_8102']);
   assert.deepEqual(r.bills.map((b) => [b.paymentId, b.state, b.amountCents]), [['pay_8101', 'applied', 1240000], ['pay_8102', 'applied', 1240000]]);
   assert.equal(r.vendorHold, 'applied');
-  assert.equal(holdProblem(r), false);
+  assert.equal(holdProblem(r, 2), false);
   assert.equal(await statusOf('pay_8101'), 'ON_HOLD');
   assert.equal(await statusOf('pay_7001'), 'PAYMENT_COMPLETED', 'paid history is untouched');
   assert.equal(events.filter((e) => e.type === 'ramp.call').length, 3);
@@ -50,7 +50,7 @@ test('a failing Ramp is recorded as failed and flagged as a problem (fail closed
   const caseId = await newCase(); const events: EmittedEvent[] = [];
   const broken: HoldClient = { holdBill: async () => { throw new Error('boom'); }, holdVendor: async () => { throw new Error('boom'); }, releaseBill: async () => { throw new Error('x'); }, releaseVendor: async () => { throw new Error('x'); } };
   const r = await applyHolds(deps(broken, events), caseId, 'v_kestrel', ['pay_8501']);
-  assert.equal(r.bills[0].state, 'failed'); assert.equal(r.vendorHold, 'failed'); assert.equal(holdProblem(r), true);
+  assert.equal(r.bills[0].state, 'failed'); assert.equal(r.vendorHold, 'failed'); assert.equal(holdProblem(r, 1), true);
   assert.ok(events.every((e) => e.type !== 'ramp.call' || e.status === 599));
   const [h] = await q<{ state: string }>(`select state from holds where case_id = $1 and scope = 'bill'`, [caseId]);
   assert.equal(h.state, 'failed');

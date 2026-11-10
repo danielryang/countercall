@@ -55,5 +55,6 @@ export async function applyHolds(d: HoldDeps, caseId: string, vendorId: string, 
   return { bills, vendorHold, rampMode: d.mode };
 }
 
-/** Anything that is not a clean hold must reach a human (fail closed). */
-export const holdProblem = (r: HoldReport) => r.bills.some((b) => b.state === 'failed') || r.vendorHold === 'failed' || r.bills.length === 0;
+/** Anything that is not a clean hold must reach a human (fail closed). `expected` = how many scheduled bills the policy asked us to hold. */
+export const holdProblem = (r: HoldReport, expected: number) =>
+  r.bills.some((b) => b.state === 'failed') || r.vendorHold === 'failed' || r.bills.length < expected;
