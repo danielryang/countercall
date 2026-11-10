@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "tw-animate-css";      /* keyframes used by the shadcn dialog/sheet/command */
+@import "shadcn/tailwind.css";  /* data-open / data-closed variants used by the generated components */
 
 /* Fonts (both SIL OFL 1.1). Tested path: import the fontsource CSS once in app/layout.tsx
      import "@fontsource-variable/mona-sans/wdth.css";   // family "Mona Sans Variable" (wght 200-900, wdth 75-125)
@@ -95,6 +97,25 @@
   --color-hairline: var(--rule);        /* agent 05: dashed frame border */
   --color-rule-strong: var(--fg);       /* agent 05: solid 1px for selected / active */
   --color-focus-ring: var(--color-signal);
+  /* shadcn token map (04 section 7): the generated components use these semantic names. Radius stays wiped (0). */
+  --color-background: var(--surface);
+  --color-foreground: var(--fg);
+  --color-card: var(--surface-raised);
+  --color-card-foreground: var(--fg);
+  --color-popover: var(--surface-raised);
+  --color-popover-foreground: var(--fg);
+  --color-primary: var(--fg);
+  --color-primary-foreground: var(--color-paper-raised);
+  --color-secondary: var(--surface-sunk);
+  --color-secondary-foreground: var(--fg);
+  --color-muted: var(--surface-sunk);
+  --color-muted-foreground: var(--fg-muted);
+  --color-accent: var(--surface-sunk);          /* shadcn uses accent for hover backgrounds, so map it to sunk, not signal */
+  --color-accent-foreground: var(--fg);
+  --color-destructive: var(--color-blocked);
+  --color-border: var(--rule);
+  --color-input: var(--fg);
+  --color-ring: var(--color-signal);
 }
 
 :root {
