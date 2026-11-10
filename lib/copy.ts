@@ -179,6 +179,8 @@ export function plainReasonGroups(c: CaseView): { text: string; ids: string[] }[
   return out;
 }
 export const EVIDENCE_HINT = 'Point at a reason to see it in the email.';
+/** The quiet disclosure under the top reasons in the case file. */
+export const REASONS = { more: (n: number) => `+${n} more`, fewer: 'Show fewer' };
 
 export const LAP_LABEL: Record<LapKey, string> = {
   detect: 'Read and checked the email',

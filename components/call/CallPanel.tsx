@@ -1,6 +1,7 @@
 'use client';
 // The call transcript. Agent text is revealed at speaking pace ONLY for turns that arrive while the viewer is watching; a reload or a paused frame shows everything.
 import { useEffect, useRef, useState } from 'react';
+import { useStickToBottom } from 'use-stick-to-bottom';
 import { CPS } from '@/lib/level';
 import type { CaseView } from '@/lib/reducer';
 import { mmss } from '@/lib/selectors';
@@ -32,8 +33,9 @@ export function CallTranscript({ c }: { c: CaseView }) {
   const ended = call?.status === 'ended' || call?.status === 'failed';
   const turns = call?.turns ?? [];
   const show = useReveal(turns, !!call && !ended);
-  const box = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (box.current) box.current.scrollTop = box.current.scrollHeight; }, [turns.length]);   // scroll the transcript itself, never an ancestor
+  // The transcript scrolls inside its own box and stays pinned to the newest words while they are revealed (new turns AND growing text), unless the viewer
+  // scrolls up to reread. Instant, not the library's spring: the motion rules allow no springs, and an instant jump is also the reduced-motion behaviour.
+  const { scrollRef, contentRef } = useStickToBottom({ initial: 'instant', resize: 'instant' });
   if (!call) return null;
   const answers = call.tools.filter((t) => t.name === 'report_answer');
   const last = answers.at(-1)?.args.answer as keyof typeof ANSWER | undefined;
@@ -42,13 +44,15 @@ export function CallTranscript({ c }: { c: CaseView }) {
   const ai = turns.find((t) => t.role === 'agent')?.text.match(/automated/i);
   const ai_i = answerTurn(turns);
   return (
-    <div className="overflow-hidden rounded-lg border border-rule bg-surface">
-      <div className="flex items-center gap-2 border-b border-rule px-4 py-2 text-[12px] text-fg-muted">
+    <div className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-rule bg-surface">
+      <div className="flex shrink-0 items-center gap-2 border-b border-rule px-4 py-2 text-[12px] text-fg-muted">
         <i aria-hidden className={`h-1.5 w-1.5 rounded-full ${call.status === 'failed' ? 'bg-blocked' : ended ? 'bg-fg-muted' : 'bg-live animate-blink'}`} />
         <span>{call.status === 'dialing' ? 'Dialing' : call.status === 'connected' ? `On the call · ${mmss(elapsed)}` : call.status === 'failed' ? 'Call failed' : `Call ended · ${mmss(elapsed)}`}</span>
         {ai && <span className="ml-auto">The caller said it is an automated assistant</span>}
       </div>
-      <div ref={box} className="max-h-[176px] overflow-y-auto px-4 py-1.5" aria-live="polite">
+      {/* Height: at most 176px, and less when the case column is short (it is a shrinking flex item, see CaseStory), so the Result step stays on the stage. */}
+      <div ref={scrollRef} className="max-h-[176px] min-h-[66px] overflow-y-auto" aria-live="polite">
+      <div ref={contentRef} className="px-4 py-1.5">
         {turns.length === 0 && <div className="cap py-2">{call.status === 'dialing' ? 'Dialing the number on file' : 'Waiting for someone to speak'}<span className="scan-dots" /></div>}
         {turns.map((t, i) => {
           const text = show(t); const live = i === turns.length - 1 && !ended;
@@ -60,7 +64,8 @@ export function CallTranscript({ c }: { c: CaseView }) {
           );
         })}
       </div>
-      <div className="flex gap-6 border-t border-rule px-4 py-2 text-[12px] text-fg-muted">
+      </div>
+      <div className="flex shrink-0 gap-6 border-t border-rule px-4 py-2 text-[12px] text-fg-muted">
         <span>Their answer: <b className="font-medium text-fg">{last ? ANSWER[last] ?? 'Unclear' : 'listening'}</b></span>
         <span>Security question: <b className="font-medium text-fg">{digits ? 'answered' : 'not answered'}</b></span>
       </div>
