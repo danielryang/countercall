@@ -1,352 +1,127 @@
 @import "tailwindcss";
-@import "tw-animate-css";      /* keyframes used by the shadcn dialog/sheet/command */
-@import "shadcn/tailwind.css";  /* data-open / data-closed variants used by the generated components */
-
-/* Fonts (both SIL OFL 1.1). Tested path: import the fontsource CSS once in app/layout.tsx
-     import "@fontsource-variable/mona-sans/wdth.css";   // family "Mona Sans Variable" (wght 200-900, wdth 75-125)
-     import "@fontsource/ibm-plex-mono/400.css"; import "@fontsource/ibm-plex-mono/500.css"; import "@fontsource/ibm-plex-mono/600.css";
-   Lower-CLS path: next/font/local with --font-mona / --font-plex variables (see report section 4); the var() fallbacks below cover both. */
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @theme {
-  /* Wipe Tailwind defaults that produce generic output. bg-indigo-500 / rounded-xl / shadow-lg will not compile. */
   --color-*: initial;
   --radius-*: initial;
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 6px;
-  --radius-xl: 8px;
-  --shadow-*: initial;
-  --inset-shadow-*: initial;
-  --drop-shadow-*: initial;
-  --font-*: initial;
-
-  /* Raw palette: warm safety-paper, cool near-black ink, one cobalt */
-  --color-paper: #E9E6DE;
-  --color-paper-raised: #F4F2EC;
-  --color-paper-sunk: #DCD8CE;
-  --color-ink: #14161D;
-  --color-ink-2: #2B2F3B;
-  --color-ink-muted: #5C6170;
-  --color-night: #12141A;
-  --color-night-raised: #1B1E27;
-  --color-night-sunk: #0C0D12;
-  --color-chalk: #ECE9E1;
-  --color-chalk-muted: #A9A79F;
-  --color-signal: #1B4DFF;       /* brand accent AND the CALLING status. Flat only. Never a gradient. */
-  --color-signal-ink: #1743E0;   /* signal as small text on paper (5.8:1) */
-  --color-signal-soft: #7C9BFF;  /* signal as text on night (6.9:1) */
-  --color-hilite: #F7E26B;       /* marker-pen label highlight, marketing only */
-
-  /* Role aliases requested by agent 05 (research/05-app-ui.md Hand-offs). Same hexes as above, app-facing names. */
-  --color-ink-faint: #8A8E9C;          /* decorative only (3.2:1 on paper), never for text a user must read */
-  --color-accent: #1B4DFF;             /* = signal: live / primary action. Verified is separate (--color-verified). */
-  --color-accent-ink: #1743E0;
-  --color-evidence: #F7E26B;           /* = hilite: highlighter for "what they ask" */
-  --color-evidence-strong: color-mix(in oklab, var(--color-signal) 28%, white); /* PLAN 7.4 #4: cobalt tint, not review pink */
-  --color-danger: #D42A14;             /* = blocked */
-  --color-warn: #FFB81C;               /* = held amber: unverified, voicemail, no answer */
-  --color-inverse-bg: #12141A;         /* the one dark surface in the app: the live call card */
-  --color-inverse-ink: #ECE9E1;
-  --color-inverse-muted: #A9A79F;
-
-  /* Status roles (fills and dots; ink text on held/verified/review, paper text on blocked/calling) */
-  --color-held: #FFB81C;
-  --color-calling: #1B4DFF;
-  --color-verified: #22B866;
-  --color-blocked: #D42A14;
-  --color-review: #EE6DB8;
-
-  /* Type */
-  --font-display: var(--font-mona, "Mona Sans Variable"), "Mona Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-mona, "Mona Sans Variable"), "Mona Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex, "IBM Plex Mono"), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --text-micro: 0.6875rem;               /* 11px mono labels */
-  --text-micro--line-height: 1rem;
-  --text-display-xl: clamp(3.5rem, 9.5vw, 8.5rem);
-  --text-display-xl--line-height: 0.88;
-  --text-display-lg: clamp(2.5rem, 5.5vw, 4.75rem);
-  --text-display-lg--line-height: 0.95;
-  --text-display-md: clamp(1.75rem, 3vw, 2.5rem);
-  --text-display-md--line-height: 1;
-  --tracking-label: 0.14em;
-  --tracking-display: -0.035em;
-
-  /* Motion: strong ease-out for entrances, steps() for machine readouts. No springs, no bounce. */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
-  --ease-in: cubic-bezier(0.64, 0, 0.78, 0);   /* exits only; never for entrances */
-  --animate-rise: rise 600ms var(--ease-out) both;
-  --animate-blink: blink 1s steps(1) infinite;
-  --animate-ping-dot: ping-dot 1.6s var(--ease-out) infinite;
-  --animate-marquee: marquee 120s linear infinite;
-  --animate-draw: draw 900ms var(--ease-out) both;
-  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-  @keyframes blink { 50% { opacity: 0; } }
-  @keyframes ping-dot { 0% { transform: scale(1); opacity: .7; } 80%, 100% { transform: scale(2.6); opacity: 0; } }
-  @keyframes marquee { to { transform: translateX(-50%); } }
-  @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-
-  --breakpoint-3xl: 100rem;
-}
-
-/* Semantic roles. `inline` makes utilities read var(--surface) at the element, so a .night ancestor flips the subtree. */
-@theme inline {
-  --color-surface: var(--surface);
-  --color-surface-raised: var(--surface-raised);
-  --color-surface-sunk: var(--surface-sunk);
-  --color-fg: var(--fg);
-  --color-fg-muted: var(--fg-muted);
-  --color-rule: var(--rule);
-  --color-link: var(--link);
-  --color-hairline: var(--rule);        /* agent 05: dashed frame border */
-  --color-rule-strong: var(--fg);       /* agent 05: solid 1px for selected / active */
-  --color-focus-ring: var(--color-signal);
-  --color-live: var(--live);
-  /* shadcn token map (04 section 7): the generated components use these semantic names. Radius stays wiped (0). */
-  --color-background: var(--surface);
-  --color-foreground: var(--fg);
-  --color-card: var(--surface-raised);
-  --color-card-foreground: var(--fg);
-  --color-popover: var(--surface-raised);
-  --color-popover-foreground: var(--fg);
-  --color-primary: var(--fg);
-  --color-primary-foreground: var(--color-paper-raised);
-  --color-secondary: var(--surface-sunk);
-  --color-secondary-foreground: var(--fg);
-  --color-muted: var(--surface-sunk);
-  --color-muted-foreground: var(--fg-muted);
-  --color-accent: var(--surface-sunk);          /* shadcn uses accent for hover backgrounds, so map it to sunk, not signal */
-  --color-accent-foreground: var(--fg);
-  --color-destructive: var(--color-blocked);
-  --color-border: var(--rule);
-  --color-input: var(--fg);
-  --color-ring: var(--color-signal);
+  --radius-xl: 12px;
+  --color-page: #FFFFFF;
+  --color-warm: #F4F3EF;
+  --color-row: #EBE6E2;
+  --color-ink: #2E2E28;
+  --color-muted: #707063;
+  --color-hairline: #EAE8E5;
+  --color-control: #DBDACB;
+  --color-solar: #E4F222;
+  --color-blaze: #E96516;
+  --color-blaze-ink: #A3460D;
+  --color-blaze-soft: #FCE8DC;
+  --color-green: #1F833A;
+  --color-green-soft: #F7FFF9;
+  --color-mustard: #E7DAA0;
+  --color-mustard-soft: #FEFFE4;
+  --color-red: #C0522E;
+  --color-red-soft: #FEF8F4;
+  --color-dark: #1A1919;
+  --color-deep: #17332D;
+  --color-surface: var(--page);
+  --color-surface-raised: var(--page);
+  --color-surface-sunk: var(--warm);
+  --color-fg: var(--ink);
+  --color-fg-muted: var(--muted);
+  --color-rule: var(--hairline);
+  --color-border: var(--control);
+  --color-background: var(--page);
+  --color-foreground: var(--ink);
+  --color-card: var(--page);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--page);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--dark);
+  --color-primary-foreground: var(--page);
+  --color-secondary: var(--warm);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--warm);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--row);
+  --color-accent-foreground: var(--ink);
+  --color-destructive: var(--red);
+  --color-input: var(--control);
+  --color-ring: var(--dark);
+  --font-sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Switzer", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --d-fast: 180ms;
+  --d-base: 300ms;
+  --d-story: 600ms;
+  --ease-ramp: cubic-bezier(.4,0,.2,1);
 }
 
 :root {
-  --surface: #E9E6DE;
-  --surface-raised: #F4F2EC;
-  --surface-sunk: #DCD8CE;
-  --fg: #14161D;
-  --fg-muted: #5C6170;
-  --rule: rgb(20 22 29 / 0.28);
-  --link: #1B1B18;
-  --live: var(--color-signal);
-  --chip-mix: 55%;
-  --rail: 2rem;                  /* inset of the dashed side rails */
-  --cut: 10px;                   /* chamfer size for buttons and tags */
-  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 55%, transparent) 0 1px, transparent 1px 6px);  /* "frozen": a pattern, so it survives greyscale and video compression */
-  /* motion tokens in agent 05's names (durations); easings are --ease-* in @theme */
-  --d-instant: 120ms; --d-fast: 180ms; --d-base: 320ms; --d-slow: 800ms; --d-stamp: 450ms; --d-settle: 900ms; --beat-gap: 1200ms;
+  --page: #FFFFFF;
+  --warm: #F4F3EF;
+  --row: #EBE6E2;
+  --ink: #2E2E28;
+  --muted: #707063;
+  --hairline: #EAE8E5;
+  --control: #DBDACB;
+  --solar: #E4F222;
+  --blaze: #E96516;
+  --red: #C0522E;
+  --green: #1F833A;
+  --deep: #17332D;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --surface-sunk: #F4F3EF;
+  --fg: #2E2E28;
+  --fg-muted: #707063;
+  --rule: #EAE8E5;
+  --d-fast: 180ms;
+  --d-base: 300ms;
+  --d-story: 600ms;
 }
-/* Recording / projector mode: <html data-scale="video"> lifts the 11px micro size to 13px (agent 06 records with a 13px minimum). */
-[data-scale="video"] { --text-micro: 0.8125rem; --text-micro--line-height: 1.125rem; }
-.night {
-  --surface: #0F1115;
-  --surface-raised: #161920;
-  --surface-sunk: #0B0C10;
-  --fg: #E9E7E1;
-  --fg-muted: #8D91A0;
-  --rule: rgb(233 231 225 / 0.11);     /* solid, low-contrast hairlines: the dark theme separates by tone, not by dashed frames */
-  --link: #8FA8FF;
-  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 30%, transparent) 0 1px, transparent 1px 7px);
-}
-
-/* ---------- App themes: ?theme=graphite|paper|cloud on the app shell ---------- */
-[data-theme="graphite"] {
-  color-scheme: dark;
-  --surface: #0A0A0A; --surface-raised: #141414; --surface-sunk: #050505;
-  --fg: #EDEDED; --fg-muted: #A1A1A1; --rule: rgb(255 255 255 / 0.10); --link: #EDEDED;
-  --live: #EDEDED; --chip-mix: 100%;
-  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 40%, transparent) 0 1.5px, transparent 1.5px 6px);
-}
-[data-theme="paper"] {
-  color-scheme: light;
-  --surface: #F3EDE0; --surface-raised: #FFFCF5; --surface-sunk: #E8E0CF;
-  --fg: #1C1A15; --fg-muted: #5C574A; --rule: rgb(28 26 21 / 0.13); --link: #1B1B18;
-  --live: #1B1B18; --chip-mix: 55%;
-}
-[data-theme="cloud"] {
-  color-scheme: light;
-  --surface: #F3F5F8; --surface-raised: #FFFFFF; --surface-sunk: #E9EDF2;
-  --fg: #101828; --fg-muted: #667085; --rule: rgb(16 24 40 / 0.09); --link: #101828;
-  --live: #101828; --chip-mix: 55%;
-}
-body:has([data-theme="graphite"]) { background: #0A0A0A; }
-body:has([data-theme="paper"]) { background: #F3EDE0; }
-body:has([data-theme="cloud"]) { background: #F3F5F8; }
 
 @layer base {
-  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-size-adjust: 100%; }
-  body { background: var(--surface); color: var(--fg); font-family: var(--font-sans); font-size: 1.0625rem; line-height: 1.5; font-stretch: 100%; }
-  ::selection { background: color-mix(in oklab, var(--fg) 22%, transparent); color: inherit; }
-  :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
-  h1, h2, h3 { text-wrap: balance; }
-  p { text-wrap: pretty; }
+  html { color-scheme: light; -webkit-font-smoothing: antialiased; text-size-adjust: 100%; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--font-sans); font-feature-settings: "ss01"; font-size: 16px; line-height: 1.5; }
+  h1, h2, h3, p { text-wrap: pretty; }
   table, .tnum { font-variant-numeric: tabular-nums; }
-  @media (prefers-reduced-motion: reduce) {
-    *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-  }
+  button, a, input, textarea, select { font: inherit; }
+  :focus-visible { outline: 2px solid var(--dark); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
 }
 
-/* ---------- Typography utilities ---------- */
-@utility display {
-  font-family: var(--font-display);
-  font-stretch: 112%;
-  font-weight: 800;
-  letter-spacing: var(--tracking-display);
-  line-height: 0.9;
-}
-@utility label {  /* mono micro-label: the single most Greptile-like detail */
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  line-height: 1rem;
-  font-weight: 500;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-}
-
-/* ---------- Grid furniture ---------- */
-/* .shell: a full-bleed section with dashed top rule, dashed side rails and + registration marks at the rail/rule crossings */
-@utility shell {
-  position: relative;
-  border-top: 1px dashed var(--rule);
-  &::before {   /* side rails */
-    content: ""; position: absolute; inset: 0 var(--rail); pointer-events: none;
-    border-inline: 1px dashed var(--rule);
-  }
-  &::after {    /* + marks, 11px, centred on the rail/top-rule crossings */
-    content: ""; position: absolute; left: 0; right: 0; top: -6px; height: 11px; pointer-events: none; color: var(--fg);
-    background:
-      linear-gradient(currentColor, currentColor) left calc(var(--rail) - 0.5px) top 0 / 1px 11px no-repeat,
-      linear-gradient(currentColor, currentColor) left calc(var(--rail) - 5px) top 5px / 11px 1px no-repeat,
-      linear-gradient(currentColor, currentColor) right calc(var(--rail) - 0.5px) top 0 / 1px 11px no-repeat,
-      linear-gradient(currentColor, currentColor) right calc(var(--rail) - 5px) top 5px / 11px 1px no-repeat;
-  }
-  @media (max-width: 767px) { &::before, &::after { display: none; } }   /* rails are desktop furniture */
-}
-@utility rule-b { border-bottom: 1px dashed var(--rule); }
-@utility rule-t { border-top: 1px dashed var(--rule); }
-@utility rule-r { border-right: 1px dashed var(--rule); }
-@utility cell { border: 1px solid var(--rule); }       /* solid hairline cells for stat / logo grids */
-@utility dot-grid {
-  background-image: radial-gradient(circle, color-mix(in oklab, var(--fg) 18%, transparent) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-@utility hatch {     /* diagonal hatching for frozen / inactive fills (token --hatch, agent 05's 45deg 1px / 6px pitch) */
-  background-image: var(--hatch);
-}
-@utility microprint { /* check-security rule: put tiny repeated text inside, e.g. "CALL THE NUMBER ON FILE · " */
-  font-family: var(--font-mono); font-size: 6px; line-height: 8px; letter-spacing: 0.2em; text-transform: uppercase;
-  white-space: nowrap; overflow: hidden; color: var(--fg-muted);
-}
-/* ---------- Chamfer buttons and tags ---------- */
-/* chamfers top-left and bottom-right; the outline variant fakes a 1px border with an inset ::after (clip-path kills real borders) */
-@utility cut {
-  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
-}
 @layer components {
-  .btn {
-    --cut: 10px;
-    position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: .625rem;
-    padding: .75rem 1.5rem; min-height: 2.75rem;
-    font-family: var(--font-sans); font-size: .9375rem; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap; cursor: pointer;
-    background: var(--color-ink); color: var(--color-paper-raised);
-    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
-    transition-property: background-color, color, transform;
-    transition-duration: 120ms; transition-timing-function: var(--ease-out);
-  }
-  .btn > .arrow { transition: transform 160ms var(--ease-out); }
-  .btn:hover > .arrow { transform: translateX(4px); }
-  .btn:active { transform: translateY(1px); }
-  .btn-signal { background: var(--color-signal); color: #fff; }
-  .btn-signal:hover { background: var(--color-ink); }
-  .btn:not(.btn-signal):not(.btn-outline):hover { background: var(--color-signal); }
-  .night .btn:not(.btn-signal):not(.btn-outline) { background: var(--color-chalk); color: var(--color-night); }
-  .btn-outline { background: var(--fg); color: var(--fg); }
-  .btn-outline::after {
-    content: ""; position: absolute; inset: 1px; z-index: -1; background: var(--surface);
-    clip-path: polygon(calc(var(--cut) - .586px) 0, 100% 0, 100% calc(100% - var(--cut) + .586px), calc(100% - var(--cut) + .586px) 100%, 0 100%, 0 calc(var(--cut) - .586px));
-    transition: background-color 120ms var(--ease-out);
-  }
-  .btn-outline:hover::after { background: var(--surface-raised); }
-  .btn-sm { --cut: 7px; padding: .375rem 1rem; min-height: 2rem; font-size: .8125rem; }
-
-  /* Status chip: a soft tinted pill with a glyph, so colour is never the only signal. Text colour is the status colour mixed toward the text colour for contrast on any theme. */
-  .chip {
-    display: inline-flex; align-items: center; gap: .375rem; height: 1.5rem; padding: 0 .625rem 0 .5rem; white-space: nowrap;
-    font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0;
-    border-radius: var(--radius-md); border: 1px solid color-mix(in oklab, var(--c) 40%, transparent);
-    background: color-mix(in oklab, var(--c) 16%, transparent); color: color-mix(in oklab, var(--c) var(--chip-mix), var(--fg));
-  }
-  .chip::before { content: ""; width: .5rem; height: .5rem; background: currentColor; flex: none; }   /* glyph: square by default */
-  .chip[data-status="HELD"]         { --c: var(--color-held); }
-  .chip[data-status="HELD"]::before { background: linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px, currentColor 5px 8px); }   /* pause bars */
-  .chip[data-status="CALLING"]      { --c: var(--live); }
-  .chip[data-status="CALLING"]::before { border-radius: 9999px; animation: blink 1s steps(1) infinite; }
-  .chip[data-status="VERIFIED"]     { --c: var(--color-verified); }
-  .chip[data-status="VERIFIED"]::before { clip-path: polygon(0 55%, 18% 40%, 40% 62%, 82% 12%, 100% 28%, 40% 100%); }   /* check */
-  .chip[data-status="BLOCKED"]      { --c: var(--color-blocked); }
-  .chip[data-status="BLOCKED"]::before { clip-path: polygon(15% 0, 50% 35%, 85% 0, 100% 15%, 65% 50%, 100% 85%, 85% 100%, 50% 65%, 15% 100%, 0 85%, 35% 50%, 0 15%); }  /* x */
-  .chip[data-status="NEEDS_REVIEW"] { --c: var(--color-review); }
-  .chip[data-status="NEEDS_REVIEW"]::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); }   /* triangle */
-}
-
-/* PLAN 7.4 #2: dense app label tracking */
-[data-app] { --tracking-label: 0.08em; }
-
-/* ---------- App furniture (S4+) ---------- */
-@layer components {
-  /* Neutral status chips are hairline rectangles; only RISK states get the solid cut-corner chip. */
-  .chip-plain {
-    display: inline-flex; align-items: center; gap: .375rem; height: 1.5rem; padding: 0 .625rem; white-space: nowrap;
-    font-family: var(--font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0;
-    border-radius: var(--radius-md); border: 1px solid var(--rule); color: var(--fg);
-  }
+  .display { font-family: var(--font-display); font-weight: 450; letter-spacing: -0.03em; }
+  .cap { color: var(--fg-muted); font-size: 13px; line-height: 20px; }
+  .chip, .chip-plain { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border-radius: 9999px; font-size: 13px; line-height: 1; white-space: nowrap; }
+  .chip { background: var(--blaze-soft); border: 1px solid transparent; color: var(--blaze-ink); }
+  .chip[data-status="VERIFIED"] { background: var(--green-soft); border-color: #A3C1A8; color: var(--green); }
+  .chip[data-status="BLOCKED"] { background: var(--red-soft); color: var(--red); }
+  .chip[data-status="CALLING"], .chip[data-status="HELD"] { background: var(--blaze-soft); color: var(--blaze-ink); }
+  .chip[data-status="CALLING"]::before { content: ""; width: 7px; height: 7px; border-radius: 9999px; background: currentColor; animation: call-pulse 1.2s var(--ease-ramp) infinite; }
+  .chip-plain { border: 1px solid var(--control); color: var(--ink); background: var(--page); }
   .chip-plain[data-variant="dashed"] { border-style: dashed; }
-  .chip-plain[data-variant="danger"] { border-color: color-mix(in oklab, var(--color-blocked) 45%, transparent); color: color-mix(in oklab, var(--color-blocked) var(--chip-mix), var(--fg)); }
   .chip-plain[data-variant="quiet"] { color: var(--fg-muted); }
-  .scan-dots::after { content: "..."; animation: blink 1s steps(1) infinite; }
-
-  /* Evidence highlights: marker-pen sweeps, not fades. --sweep-delay staggers them in reading order. */
-  /* ONE quiet marker for everything that looks suspicious: a soft tint of the same amber used for 'needs attention', plus a thin underline. No second colour. */
-  .ev, .ev-strong { --ev: var(--color-held); }
-  .ev[data-verdict="no"] { --ev: var(--color-blocked); }
-  .ev[data-verdict="yes"] { --ev: var(--color-verified); }
-  .ev, .ev-strong {
-    border-radius: var(--radius-sm); box-decoration-break: clone; padding: 0 2px; color: inherit;
-    background-image: linear-gradient(color-mix(in oklab, var(--ev) 16%, transparent), color-mix(in oklab, var(--ev) 16%, transparent));
-    background-repeat: no-repeat; background-size: 0% 100%; border-bottom: 1px solid color-mix(in oklab, var(--ev) 55%, transparent);
-    animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms);
-  }
-  .ev-quiet { text-decoration: underline dashed; text-underline-offset: 3px; }
-  .ev-quiet[data-struck="true"] { text-decoration: line-through; color: var(--fg-muted); }
-  [data-hot="true"] { outline: 1px solid var(--fg); outline-offset: 1px; }
-  @keyframes sweep { to { background-size: 100% 100%; } }
-
-  /* Frozen money: hatching over the amount. A pattern, so it survives greyscale and video compression. */
-  .frozen { background-image: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 55%, transparent) 0 1.5px, transparent 1.5px 6px); }
-  .stamp { border-radius: var(--radius-lg); transform: rotate(-3deg); animation: stamp var(--d-stamp) var(--ease-snap) both; }
-  @keyframes stamp { from { opacity: 0; transform: rotate(-3deg) scale(1.16); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
-  /* quiet caption: small sans, muted, sentence case. Uppercase mono is reserved for chips, keycaps and the stamp. */
-  .cap { font-size: 12px; line-height: 16px; color: var(--fg-muted); }
-  .caret::after { content: ""; display: inline-block; width: .5ch; height: 1em; margin-left: 2px; vertical-align: text-bottom; background: currentColor; animation: blink 1s steps(1) infinite; }
+  .btn { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent; border-radius: 2px; padding: 0 18px; font-size: 15px; cursor: pointer; transition: background-color var(--d-fast) var(--ease-ramp), color var(--d-fast) var(--ease-ramp), border-color var(--d-fast) var(--ease-ramp); }
+  .btn-primary { background: var(--solar); color: var(--ink); }
+  .btn-primary:hover { background: #F5FF78; }
+  .btn-outline { border-color: var(--control); background: var(--page); color: var(--ink); }
+  .btn-outline:hover { border-color: var(--ink); }
+  .ev { background: var(--mustard-soft); border-bottom: 1px solid var(--mustard); padding: 0 2px; }
+  .frozen { background: var(--blaze-soft); color: var(--blaze-ink); }
+  .scan-dots::after { content: "..."; }
+  .cursor-ring { position: fixed; z-index: 50; top: -14px; left: -14px; width: 28px; height: 28px; border: 2px solid var(--solar); border-radius: 9999px; opacity: 0; pointer-events: none; transform: translate3d(0,0,0); transition: opacity var(--d-fast) var(--ease-ramp); }
+  .cursor-ring[data-shown] { opacity: 1; }
+  .cursor-ring[data-down] { background: color-mix(in srgb, var(--solar) 30%, transparent); }
+  @keyframes call-pulse { 50% { opacity: .35; transform: scale(.75); } }
 }
 
-/* ---------- Present mode (P): html[data-present], set by components/ui/PresentMode.tsx ----------
-   The whole frame is scaled to 115% (type, spacing and hit areas together, so layouts keep their proportions) and shrunk back to fit the
-   viewport; dev affordances (footer, replay controls, theme switch) and toasts are hidden; a ring marks the pointer for the room. */
-html[data-present] [data-app] { zoom: 1.15; min-height: 0; }   /* 05 §2.7: 1.15 keeps the case view readable on a 1280×720 stage */
+html[data-present] [data-app] { zoom: 1.15; min-height: 0; }
 html[data-present] [data-app].h-screen { height: 86.96vh; }
-html[data-present] [data-app]:not(.h-screen) { min-height: 86.96vh; }
 html[data-present] [data-present-hide], html[data-present] [data-sonner-toaster] { display: none !important; }
-html[data-present] [data-present-solo] { grid-template-columns: minmax(0, 1fr); }   /* /demo: only the cheat-card stays, full width, for the teammate on the phone */
-/* The ring: where the presenter is pointing. Glides with the pointer (transform only); a press fills it. Reduced motion: it jumps, no glide. */
-.cursor-ring {
-  position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; width: 40px; height: 40px; margin: -20px 0 0 -20px; opacity: 0;
-  border-radius: 9999px; border: 2px solid color-mix(in oklab, var(--live) 75%, transparent); background: color-mix(in oklab, var(--live) 6%, transparent);
-  transition: transform var(--d-instant) var(--ease-out), opacity var(--d-fast) var(--ease-out), background-color var(--d-instant) var(--ease-out);
-}
-.cursor-ring[data-shown] { opacity: 1; }
-.cursor-ring[data-down] { background: color-mix(in oklab, var(--live) 28%, transparent); }
-@media (prefers-reduced-motion: reduce) { .cursor-ring { transition: opacity var(--d-fast) linear; } }
+html[data-present] [data-present-solo] { grid-template-columns: minmax(0, 1fr); }
