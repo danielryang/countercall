@@ -1,13 +1,14 @@
-// scripts/db-check.ts  (npm run db:check): applies db/*.sql in an in-process Postgres (PGlite) and asserts the invariants.
+// scripts/db-check.ts  (npm run db:check): applies every numbered db/NNN_*.sql in order in an in-process Postgres (PGlite) and asserts the invariants.
 import { PGlite } from '@electric-sql/pglite';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import assert from 'node:assert/strict';
 
 const db = new PGlite();
 const sql = (f: string) => readFileSync(new URL(`../db/${f}`, import.meta.url), 'utf8');
 await db.exec(`create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;`); // Supabase roles (stub)
-await db.exec(sql('001_schema.sql'));
-await db.exec(sql('002_seed.sql'));
+const migrations = readdirSync(new URL('../db/', import.meta.url)).filter((f) => /^\d{3}_.+\.sql$/.test(f)).sort();
+assert.deepEqual(migrations.slice(0, 3), ['001_schema.sql', '002_seed.sql', '003_audit_chain.sql']);
+for (const f of migrations) await db.exec(sql(f));   // same order as npm run db:apply
 
 const q = async <T = any>(text: string, params: any[] = []) => (await db.query<T>(text, params)).rows;
 const rejects = async (text: string, re: RegExp, params: any[] = []) => {
@@ -95,10 +96,11 @@ ok('rate_limit_hit increments within a window');
 
 // 8. RLS on everywhere, no policies, anon cannot read
 const rls = await q(`select c.relname, c.relrowsecurity from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r'`);
-assert.ok(rls.length >= 14 && rls.every((r: any) => r.relrowsecurity), JSON.stringify(rls.filter((r: any) => !r.relrowsecurity)));
+assert.ok(rls.length >= 15 && rls.some((r: any) => r.relname === 'events_chain_anchor') && rls.every((r: any) => r.relrowsecurity), JSON.stringify(rls.filter((r: any) => !r.relrowsecurity)));
 assert.equal((await q(`select count(*)::int c from pg_policies`))[0].c, 0);
 await db.exec(`set role anon`);
 await rejects(`select * from events`, /permission denied/);
+await rejects(`select * from events_chain_anchor`, /permission denied/);
 await db.exec(`reset role`);
 ok(`RLS enabled on ${rls.length} tables, 0 policies, anon denied`);
 
@@ -142,4 +144,21 @@ const early = await mk(); await emitTx({ type: 'case.flagged', caseId: early, de
 await assert.rejects(() => emitTx({ type: 'payment.released', caseId: early, paymentIds: ['pay_8201'], rampBillIds: [null], approvedBy: 'A. Patel', note: null, destination: 'on_file' }, 'A. Patel'), /release refused/);
 assert.equal((await q(`select count(*)::int c from events where case_id = $1 and type = 'payment.released'`, [early]))[0].c, 0);   // rolled back: no ghost release row
 ok(`sink: ${trail.length} events, 5 transitions, duplicates ignored, redaction holds, a release on a non-releasable case is refused and rolled back`);
+
+// 12. the audit chain (db/003) sealed every row written by groups 1-11, and the replay check sees through out-of-band state moves
+const { verifyChain, replayCases } = await import('../lib/audit');
+const qa = async (t: string, p: unknown[] = []) => (await db.query(t, p as any[])).rows as any;
+const chain = await verifyChain(qa);
+const total = (await q(`select count(*)::int c from events`))[0].c;
+assert.ok(chain.installed && chain.intact && chain.checked === total && chain.preChain === 0, JSON.stringify(chain));
+const replay = await replayCases(qa);
+assert.ok(!replay.mismatches.some((m) => m.caseId === cid), `the sink-driven case ${cid} must replay: ${JSON.stringify(replay.mismatches)}`);
+assert.deepEqual(replay.mismatches.find((m) => m.caseId === id), { caseId: id, db: 'released', replayed: 'scanning', projected: 'scanning', reason: 'final_state', atSeq: null });
+const mid = (await q(`select seq from events order by seq offset $1 limit 1`, [Math.floor(total / 2)]))[0].seq;
+await db.exec(`alter table events disable trigger events_no_update_delete`);
+await q(`update events set payload = payload || '{"tampered":true}' where seq = $1`, [mid]);
+await db.exec(`alter table events enable trigger events_no_update_delete`);
+const broken = await verifyChain(qa);
+assert.ok(broken.installed && !broken.intact && broken.firstBreak?.seq === Number(mid) && broken.firstBreak.kind === 'hash_mismatch', JSON.stringify(broken));
+ok(`audit chain: ${total} rows sealed and intact; replay matches the sink case, flags the direct-UPDATE case; a tampered row #${mid} is found`);
 console.log(`db-check: ${n} groups passed`);

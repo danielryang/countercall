@@ -7,10 +7,16 @@ import { appendEvent, type Q } from '../sink';
 
 const file = (f: string) => readFileSync(new URL(`../../db/${f}`, import.meta.url), 'utf8');
 
-export async function testDb() {
+/** `chain` (default ON) applies db/003_audit_chain.sql, so every test that emits also proves emit() works under the audit-chain trigger.
+ *  PGlite is ONE connection: concurrent emits are serialized, so tests can cover the trigger's seq re-draw branch only deterministically
+ *  (insert overriding system value), never a real cross-connection race. */
+export async function testDb(opts: { chain?: boolean } = {}) {
   const db = new PGlite();
   await db.exec('create role anon nologin; create role authenticated nologin;');
   await db.exec(file('001_schema.sql')); await db.exec(file('002_seed.sql'));
+  /** Applies a later migration by file name (e.g. '003_audit_chain.sql'), the way db:apply would. */
+  const migrate = (f: string) => db.exec(file(f));
+  if (opts.chain !== false) await migrate('003_audit_chain.sql');
   const q: Q = async (text, params = []) => (await db.query(text, params as never)).rows as never;
   // Same atomicity as production (`sql.begin` in lib/store.ts): each event + its state change is one transaction, so concurrent deliveries interleave only BETWEEN emits.
   const txq = (tx: { query: PGlite['query'] }): Q => async (text, params = []) => (await tx.query(text, params as never)).rows as never;
@@ -30,5 +36,5 @@ export async function testDb() {
   /** One transaction on the in-process database (the same shape production gets from postgres.js sql.begin). */
   const tx = <T,>(fn: (q: Q) => Promise<T>): Promise<T> => db.transaction((t) => fn(txq(t as never)));
   const stateOf = async (caseId: string) => (await q<{ state: string }>(`select state from cases where id = $1`, [caseId]))[0].state;
-  return { db, q, emit, tx, events, createTask, heldCase, stateOf, store: makeCaseStore(q) };
+  return { db, q, migrate, emit, tx, events, createTask, heldCase, stateOf, store: makeCaseStore(q) };
 }
