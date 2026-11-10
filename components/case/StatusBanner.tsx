@@ -2,7 +2,7 @@
 import { Stamp } from '@/components/call/Stamp';
 import { headline, type Tone } from '@/lib/copy';
 import type { CaseView } from '@/lib/reducer';
-import { elapsedMs, mmss } from '@/lib/selectors';
+import { elapsedAt, mmss } from '@/lib/selectors';
 
 const TONE: Record<Tone, { box: string; icon: string; glyph: string }> = {
   danger: { box: 'border-blocked/50 bg-blocked/15', icon: 'bg-blocked text-paper-raised', glyph: '\u2715' },
@@ -12,7 +12,7 @@ const TONE: Record<Tone, { box: string; icon: string; glyph: string }> = {
   neutral: { box: 'border-rule bg-surface-raised', icon: 'bg-fg-muted text-surface', glyph: '\u2022' },
 };
 
-export function StatusBanner({ c }: { c: CaseView }) {
+export function StatusBanner({ c, nowMs }: { c: CaseView; /** wall clock, live view only: the case clock ticks while the case is still working */ nowMs?: number }) {
   const h = headline(c);
   const t = TONE[h.tone];
   const done = !!c.call?.outcome || c.state === 'cleared';
@@ -20,7 +20,7 @@ export function StatusBanner({ c }: { c: CaseView }) {
     <div className={`flex items-center gap-5 rounded-xl border px-6 py-3.5 ${t.box}`}>
       <span aria-hidden className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[16px] font-semibold ${t.icon}`}>{t.glyph}</span>
       <div className="min-w-0 flex-1">
-        <div className="cap">{c.id} {'·'} {c.vendorName ?? 'Unknown sender'} {'·'} {done ? `result in ${mmss(elapsedMs(c))}` : `${mmss(elapsedMs(c))} so far`}</div>
+        <div className="cap">{c.id} {'·'} {c.vendorName ?? 'Unknown sender'} {'·'} {done ? 'result in ' : ''}<span className="font-mono tabular-nums">{mmss(elapsedAt(c, nowMs))}</span>{done ? '' : ' so far'}</div>
         <h1 className="text-[21px] font-semibold leading-7 tracking-tight">{h.title}</h1>
         <p className="mt-0.5 text-[14px] leading-5 text-fg-muted">{h.sub}</p>
       </div>

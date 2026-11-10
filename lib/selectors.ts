@@ -30,4 +30,13 @@ export const phasesReached = (c: CaseView): Record<Phase, boolean> => ({
 export const mmss = (ms: number) => { const s = Math.max(0, Math.round(ms / 1000)); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
 /** Email -> outcome, from the events' own timestamps. Freezes at call.outcome, which is what makes the "in minutes" claim honest. */
 export const elapsedMs = (c: CaseView) => Date.parse(c.call?.outcome?.at ?? c.updatedAt) - Date.parse(c.timeline[0]?.ts ?? c.createdAt);
+/** Still working on its own (reading, holding, calling): the only states in which the case clock keeps running. Every other state waits on a person or is done. */
+export const clockRunning = (c: CaseView) => !c.call?.outcome && (c.state === 'scanning' || c.state === 'flagged' || c.state === 'held' || c.state === 'calling');
+/** The case clock. With `nowMs` (live view only) it ticks while the case is still running; it freezes at call.outcome. Replays pass no `nowMs`: their
+ *  timestamps are not wall-clock time, so the clock follows the events. Never runs backwards past the last event (clock skew). */
+export const elapsedAt = (c: CaseView, nowMs?: number) => {
+  const base = elapsedMs(c);
+  if (nowMs === undefined || !clockRunning(c)) return base;
+  return Math.max(base, nowMs - Date.parse(c.timeline[0]?.ts ?? c.createdAt));
+};
 export const SEVERITY_RANK: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1, info: 0 };

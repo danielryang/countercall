@@ -103,14 +103,7 @@ export const PLAIN_SIGNAL: Record<string, (vendor: string) => string> = {
 const SEV = { critical: 4, high: 3, medium: 2, low: 1, info: 0 } as const;
 /** The few reasons that matter most, in plain English, most serious first (duplicates collapsed). */
 export function plainReasons(c: CaseView): string[] {
-  const v = c.vendorName ?? 'the vendor';
-  const out: string[] = [];
-  for (const s of [...c.signals].sort((a, b) => SEV[b.severity] - SEV[a.severity])) {
-    if (s.severity === 'info') continue;
-    const t = (PLAIN_SIGNAL[s.id] ?? (() => s.detail))(v);
-    if (!out.includes(t)) out.push(t);
-  }
-  return out;
+  return plainReasonGroups(c).map((g) => g.text);
 }
 
 export type Tone = 'danger' | 'warn' | 'ok' | 'progress' | 'neutral';
@@ -165,3 +158,41 @@ export const SCENARIO_COPY: Record<'confirmed' | 'denied' | 'voicemail' | 'vague
 export const CHEAT_DIGITS = '(the four digits, looked up off-screen)';
 export const STAGE_OK = 'Stage 1280×720 OK';
 export const stageOff = (w: number, h: number) => `Stage ${w}×${h} · needs 1280×720`;
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Evidence links and timing (reason row <-> highlighted evidence in the email; the "how long each step took" waterfall).
+// ---------------------------------------------------------------------------------------------------------------------------------
+import type { LapKey } from './waterfall';
+
+/** plainReasons() with the signal ids behind each sentence, so a reason row can point at its evidence in the email. Same order, same dedupe. */
+export function plainReasonGroups(c: CaseView): { text: string; ids: string[] }[] {
+  const v = c.vendorName ?? 'the vendor';
+  const out: { text: string; ids: string[] }[] = [];
+  for (const s of [...c.signals].sort((a, b) => SEV[b.severity] - SEV[a.severity])) {
+    if (s.severity === 'info') continue;
+    const text = (PLAIN_SIGNAL[s.id] ?? (() => s.detail))(v);
+    const g = out.find((x) => x.text === text);
+    if (g) g.ids.push(s.id); else out.push({ text, ids: [s.id] });
+  }
+  return out;
+}
+export const EVIDENCE_HINT = 'Point at a reason to see it in the email.';
+
+export const LAP_LABEL: Record<LapKey, string> = {
+  detect: 'Read and checked the email',
+  hold: 'Put the payments on hold',
+  dial: 'Dialed the number on file',
+  call: 'Talked to the vendor and decided',
+};
+export const TIMING = {
+  title: 'How long each step took',
+  total: 'Email to result',
+  sofar: 'So far',
+  running: 'in progress',
+  skipped: 'did not run',
+  model: (d: string) => `AI read: ${d}`,
+  ramp: (n: number, d: string, mode: string | null) => `${n} hold requests to ${mode === 'sandbox' ? 'Ramp sandbox' : 'the Ramp mock'}: ${d}`,
+  ring: (d: string) => `Answered after ${d}`,
+  measured: 'Times come from the event log.',
+  paced: 'This replay was generated for viewing, so its times are paced, not measured.',
+};
