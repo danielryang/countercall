@@ -193,9 +193,13 @@ A 6,000-seed run covered 11,949 calls, 93,296 deliveries and 25,350 forged reque
 1. The reaper skipped calls whose `call_ended` webhook arrived but whose `call_analyzed` webhook was lost, leaving cases stuck in `calling`.
 2. The case-id default used `lpad(n, 4, '0')`, which truncates, so case 10000 collided with an existing id. Fixed with `next_case_id()` in `db/001_schema.sql`.
 
-<!-- AUDIT_CHAIN -->
+**Sealed audit log and replay check** (`db/003_audit_chain.sql`, `lib/audit.ts`, `GET /api/audit/verify`, `npm run audit:verify`). Every new event row stores a SHA-256 seal of its own contents plus the seal of the row before it, computed by a database trigger, so the order of the log is fixed when it is written. The verifier recomputes every seal in SQL and reports the first row that no longer matches. It catches an edited row, a deleted row in the middle, and a row inserted without its seal; it cannot see the newest rows being cut off, which is why the latest seal is published so it can be pinned somewhere else. It does not stop someone who rewrites every later seal too, so we call it tamper-evident, not tamper-proof. Rows written before the migration are counted as "before the seal" and never backfilled, because `events` is append-only.
 
-**Other tests.** `npm test` runs 154 tests (including the verifier and simulator tests), all on PGlite. `npm run db:check` runs 11 groups of database invariants (append-only events, illegal transitions refused, trusted-number guard, row-level security, lifecycle table equals code, redaction).
+The same endpoint replays the whole log through the pure reducer and `nextState()` and checks that it rebuilds every case's stored status. A case whose status was changed without an event shows up as a mismatch. On production, before the seal migration was applied, it rebuilt 10 of 10 cases from 109 events in 458 ms (2026-11-10).
+
+While building this, the design review found a latent race: Postgres hands out `seq` before the insert trigger runs, so two concurrent writers could commit out of `seq` order and the `?after=` poll cursor could skip a row. The trigger now takes the case row lock, then a chain lock, and re-draws `seq` when needed, so `seq` order equals commit order equals chain order.
+
+**Other tests.** `npm test` runs 154 tests (including the verifier and simulator tests), all on PGlite. `npm run db:check` runs 12 groups of database invariants (append-only events, illegal transitions refused, trusted-number guard, row-level security, lifecycle table equals code, redaction, and the audit seal).
 
 Live runs also found bugs the unit tests could not see: jsonb double-encoding in postgres.js, `'\\D'` inside a JS template literal, case ids past 9999, and an import cycle that left the Ramp client undefined in the release route. A review found the public event feed leaked the full on-file phone number in one event; `toRow()` now masks every phone number before it is stored.
 
