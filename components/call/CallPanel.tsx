@@ -55,7 +55,7 @@ export function CallTranscript({ c }: { c: CaseView }) {
           return (
             <div key={t.id} className="grid grid-cols-[88px_minmax(0,1fr)] gap-2 py-1 text-[14px] leading-[22px]">
               <span className="cap pt-px">{t.role === 'agent' ? 'CounterCall' : c.vendorName?.split(' ')[0] ?? 'Vendor'}</span>
-              <span className={`${live && text.length < t.text.length ? 'caret' : ''} ${t.role === 'user' ? 'text-fg' : 'text-fg-muted'}`}>{i === ai_i && !!last ? <span className="ev">{text}</span> : text}</span>
+              <span className={`${live && text.length < t.text.length ? 'caret' : ''} ${t.role === 'user' ? 'text-fg' : 'text-fg-muted'}`}>{i === ai_i && !!last ? <span className="ev" data-verdict={last === 'no' ? 'no' : last === 'yes' ? 'yes' : undefined}>{text}</span> : text}</span>
             </div>
           );
         })}

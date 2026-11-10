@@ -8,6 +8,7 @@ import { EventsProvider, useStream } from '@/components/EventsProvider';
 import { fmtCents, heldCents } from '@/lib/selectors';
 
 const STATUS_TEXT = { connecting: 'Connecting', live: 'Live', reconnecting: 'Reconnecting', paused: 'Paused · click to resume', replay: 'Replay' } as const;
+const SPEEDS = [1, 2, 4, 0.5];
 const THEMES = ['graphite', 'paper', 'cloud'] as const;
 type Theme = (typeof THEMES)[number];
 
@@ -23,7 +24,7 @@ function Top() {
       <span className="cap hidden md:inline">Rice Robotics</span>
       <div className="ml-auto flex items-baseline gap-2.5">
         <span className="cap">Payments on hold</span>
-        <span className="font-mono text-[18px] font-medium tabular-nums">{fmtCents(held)}</span>
+        <span className="font-mono text-[18px] font-medium tabular-nums" style={held ? { color: 'color-mix(in oklab, var(--color-held) var(--chip-mix), var(--fg))' } : undefined}>{fmtCents(held)}</span>
       </div>
     </header>
   );
@@ -45,7 +46,7 @@ function Foot({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void 
           <button type="button" className={link} onClick={replay.playing ? replay.pause : replay.play}>{replay.playing ? 'Pause' : 'Play'}</button>
           <button type="button" className={link} onClick={replay.step}>Step</button>
           <button type="button" className={link} onClick={replay.restart}>Restart</button>
-          <button type="button" className={link} onClick={() => replay.setSpeed(replay.speed === 1 ? 4 : 1)} aria-label="Playback speed">{replay.speed}{'\u00d7'}</button>
+          <button type="button" className={link} onClick={() => replay.setSpeed(SPEEDS[(SPEEDS.indexOf(replay.speed) + 1) % SPEEDS.length])} aria-label="Playback speed">{replay.speed}{'\u00d7'}</button>
         </div>
       )}
       <button type="button" className={`ml-auto ${link}`} onClick={() => setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length])} aria-label="Change theme">Theme: {theme}</button>

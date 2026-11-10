@@ -13,9 +13,9 @@ interface Step { key: Key; title: string; summary: string; st: St; body: ReactNo
 
 function Icon({ st }: { st: St }) {
   const base = 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[12px] font-semibold';
-  if (st === 'done') return <span className={`${base} border-fg bg-fg text-surface`} aria-label="done">{'✓'}</span>;
-  if (st === 'active') return <span className={`${base} border-live`} aria-label="in progress"><i className="h-2 w-2 animate-blink rounded-full bg-live" /></span>;
-  if (st === 'warn') return <span className={`${base} border-held text-held`} aria-label="needs attention">!</span>;
+  if (st === 'done') return <span className={`${base} border-verified bg-verified text-ink`} aria-label="done">{'\u2713'}</span>;
+  if (st === 'active') return <span className={`${base} border-fg`} aria-label="in progress"><i className="h-2 w-2 animate-blink rounded-full bg-fg" /></span>;
+  if (st === 'warn') return <span className={`${base} border-held bg-held text-ink`} aria-label="needs attention">!</span>;
   return <span className={`${base} border-rule`} aria-label="waiting" />;
 }
 
@@ -85,7 +85,7 @@ export function CaseStory({ c }: { c: CaseView }) {
     summary: o ? REASON_TEXT[o.decision.reason].rule : cleared ? 'Cleared' : c.state === 'needs_human' ? plainTask(c.tasks.find((t) => t.status === 'open')?.reason ?? 'Needs a person') : 'Waiting for the call',
     body: (
       <div className="space-y-3 text-[14px] leading-5">
-        {ans && <p className="rounded-lg border border-rule bg-surface px-3 py-2"><span className="cap block">{v} said</span><span className="ev">{ans}</span></p>}
+        {ans && <p className="rounded-lg border border-rule bg-surface px-3 py-2"><span className="cap block">{v} said</span><span className="ev" data-verdict={c.state === 'fraud_blocked' ? 'no' : c.state === 'awaiting_approval' ? 'yes' : undefined}>{ans}</span></p>}
         <p>{c.state === 'fraud_blocked' ? 'The bank change is rejected and the payments stay on hold. A person can release them to the account already on file.'
           : c.state === 'awaiting_approval' ? 'A person must review and approve before any payment is released or the bank account changes.'
           : c.state === 'needs_human' ? 'A task was created for your team. The payments stay on hold until someone verifies this by hand.'
@@ -105,7 +105,7 @@ export function CaseStory({ c }: { c: CaseView }) {
         const isOpen = open[s.key] ?? s.key === current;
         return (
           <li key={s.key} className="relative grid grid-cols-[24px_minmax(0,1fr)] gap-x-4">
-            {i < steps.length - 1 && <span aria-hidden className="absolute left-[11.5px] top-7 h-[calc(100%-1.5rem)] w-px bg-rule" />}
+            {i < steps.length - 1 && <span aria-hidden className={`absolute left-[11.5px] top-7 h-[calc(100%-1.5rem)] w-px ${s.st === 'done' ? 'bg-verified/60' : 'bg-rule'}`} />}
             <div className="pt-2.5"><Icon st={s.st} /></div>
             <div className="min-w-0">
               <button type="button" aria-expanded={isOpen} onClick={() => setOpen({ ...open, [s.key]: !isOpen })} className="w-full rounded-lg px-2 py-2 text-left hover:bg-surface-raised">

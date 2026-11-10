@@ -2,6 +2,7 @@
 // lib/use-events.ts: the ONE transport hook (PLAN s13 M8). Snapshot, then adaptive polling of GET /api/events, into the pure reducer.
 // The UI never sees how events arrive: live polling and recorded-run replay both produce the same State. Swapping the transport touches only this file.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { beatDelay } from './beats';
 import { nextDelay, shouldPause } from './poll';
 import { apply, initial, type Ev, type State } from './reducer';
 import type { Run } from './runs';
@@ -27,15 +28,26 @@ export function useEventStream(opts: { replay?: string | null; at?: number | nul
   useEffect(() => {
     if (replayName) return;
     let stop = false; let timer: ReturnType<typeof setTimeout> | undefined; let errors = 0; let lastEventAt = 0; let paused = false;
+    let fetched = 0; let first = true;                    // cursor of what was FETCHED (the screen may lag it by a few beats)
+    const queue: Ev[] = []; let showing = false;
+    const drain = () => {                                  // draw queued events one story beat at a time
+      if (showing) return; showing = true;
+      const next = () => { const e = queue.shift(); if (!e || stop) { showing = false; return; } feed([e]); const w = beatDelay(e, queue.length); if (w) setTimeout(next, w); else next(); };
+      next();
+    };
     const tick = async () => {
       if (stop || paused) return;
       let more = false;
       try {
-        const res = await fetch(`/api/events?after=${stateRef.current.lastSeq}`, { cache: 'no-store' });
+        const res = await fetch(`/api/events?after=${fetched}`, { cache: 'no-store' });
         if (!res.ok) throw new Error(`events ${res.status}`);
         const body = (await res.json()) as { events: Ev[] };
         if (stop) return;
-        if (body.events.length) { feed(body.events); lastEventAt = Date.now(); }
+        if (body.events.length) {
+          fetched = body.events[body.events.length - 1].seq; lastEventAt = Date.now();
+          if (first) { feed(body.events); } else { queue.push(...body.events); drain(); }   // the first load is history: show it at once
+          if (body.events.length < PAGE) first = false;
+        } else first = false;
         more = body.events.length === PAGE;                           // a full page means there is more: catch up without waiting
         errors = 0; setStatus('live');
       } catch { errors += 1; setStatus('reconnecting'); }
@@ -69,7 +81,7 @@ export function useEventStream(opts: { replay?: string | null; at?: number | nul
   useEffect(() => {
     if (!run || !playing || position >= run.events.length) return;
     const next = run.events[position];
-    const t = setTimeout(() => { feed([next]); setPosition((p) => p + 1); }, Math.min(next.delay_ms, 4000) / speed);
+    const t = setTimeout(() => { feed([next]); setPosition((p) => p + 1); }, Math.min(next.delay_ms, 9000) / speed);
     return () => clearTimeout(t);
   }, [run, playing, position, speed, feed]);
 

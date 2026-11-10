@@ -4,12 +4,12 @@ import { headline, type Tone } from '@/lib/copy';
 import type { CaseView } from '@/lib/reducer';
 import { elapsedMs, mmss } from '@/lib/selectors';
 
-const TONE: Record<Tone, { box: string; dot: string }> = {
-  danger: { box: 'border-blocked/40 bg-blocked/10', dot: 'bg-blocked' },
-  warn: { box: 'border-held/40 bg-held/10', dot: 'bg-held' },
-  ok: { box: 'border-verified/40 bg-verified/10', dot: 'bg-verified' },
-  progress: { box: 'border-live/40 bg-live/10', dot: 'bg-live animate-blink' },
-  neutral: { box: 'border-rule bg-surface-raised', dot: 'bg-fg-muted' },
+const TONE: Record<Tone, { box: string; icon: string; glyph: string }> = {
+  danger: { box: 'border-blocked/50 bg-blocked/15', icon: 'bg-blocked text-paper-raised', glyph: '\u2715' },
+  warn: { box: 'border-held/50 bg-held/15', icon: 'bg-held text-ink', glyph: '!' },
+  ok: { box: 'border-verified/50 bg-verified/15', icon: 'bg-verified text-ink', glyph: '\u2713' },
+  progress: { box: 'border-rule bg-surface-raised', icon: 'border border-fg text-fg animate-blink', glyph: '\u2022' },
+  neutral: { box: 'border-rule bg-surface-raised', icon: 'bg-fg-muted text-surface', glyph: '\u2022' },
 };
 
 export function StatusBanner({ c }: { c: CaseView }) {
@@ -18,7 +18,7 @@ export function StatusBanner({ c }: { c: CaseView }) {
   const done = !!c.call?.outcome || c.state === 'cleared';
   return (
     <div className={`flex items-center gap-5 rounded-xl border px-6 py-3.5 ${t.box}`}>
-      <i aria-hidden className={`h-3 w-3 shrink-0 rounded-full ${t.dot}`} />
+      <span aria-hidden className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[16px] font-semibold ${t.icon}`}>{t.glyph}</span>
       <div className="min-w-0 flex-1">
         <div className="cap">{c.id} {'·'} {c.vendorName ?? 'Unknown sender'} {'·'} {done ? `result in ${mmss(elapsedMs(c))}` : `${mmss(elapsedMs(c))} so far`}</div>
         <h1 className="text-[21px] font-semibold leading-7 tracking-tight">{h.title}</h1>
