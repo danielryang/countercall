@@ -1,7 +1,7 @@
 // lib/demo.ts: demo-only operations shared by the /api/demo routes and the CLI scripts. Nothing here is reachable without a session + DEMO_ENABLED.
 import { getDeps } from './detect/deps';
 import { FIXTURES, fixtureToEmail, replayExtract } from './detect/fixtures';
-import { ingestEmail } from './detect/ingest';
+import { ingestEmail, type Deps } from './detect/ingest';
 import type { EmittedEvent } from './events';
 import type { Q } from './sink';
 import { emit, q, sql } from './store';
@@ -9,13 +9,15 @@ import { emit, q, sql } from './store';
 export const fixtureIds = () => FIXTURES.map((f) => f.id as string);
 
 /** Run a fixture through the SAME ingestEmail() the webhook uses. The email is tagged source:'injector' (the UI labels it SIMULATED). */
-export async function injectFixtureEmail(fixtureId: string, opts: { replay?: boolean } = {}): Promise<{ caseId: string | null }> {
+export async function injectFixtureEmail(fixtureId: string, opts: { replay?: boolean } = {}, io?: { deps: Deps; q: Q }): Promise<{ caseId: string | null }> {
   const f = FIXTURES.find((x) => x.id === fixtureId);
   if (!f) throw new Error(`unknown fixture ${fixtureId}`);
   const email = fixtureToEmail(f);
-  const deps = await getDeps({ provider: 'injector', payload: { fixtureId } });
+  const deps = io?.deps ?? await getDeps({ provider: 'injector', payload: { fixtureId } });   // io: the PGlite tests pass their own deps + driver
   await ingestEmail(email, opts.replay ? { ...deps, extract: replayExtract(f) } : deps);
-  const [c] = await sql`select id from cases where email_provider_event_id = ${email.providerEventId}`;
+  const [c] = io
+    ? await io.q<{ id: string }>(`select id from cases where email_provider_event_id = $1`, [email.providerEventId])
+    : await sql`select id from cases where email_provider_event_id = ${email.providerEventId}`;
   return { caseId: (c?.id as string | undefined) ?? null };
 }
 

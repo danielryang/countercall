@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { resetDemo } from './demo';
+import { injectFixtureEmail, resetDemo } from './demo';
+import { makeDeps } from './detect/deps';
+import { DbMockRampClient } from './ramp.mock-db';
 import { testDb } from './testing/pglite';
 
 test('reset archives live cases, keeps seeded history, frees held mock bills, and tells the UI where to cut', async () => {
@@ -19,4 +21,35 @@ test('reset archives live cases, keeps seeded history, frees held mock bills, an
   assert.equal((await t.q<{ n: number }>(`select count(*)::int n from bills where ramp_status_summary = 'ON_HOLD'`))[0].n, 0);
   const [ev] = (await t.events()).filter((e) => e.type === 'system.reset');
   assert.equal((ev.payload as { keepThrough: number }).keepThrough, keepThrough);
+});
+
+test('inject runs a fixture through the real pipeline as SIMULATED: bypasses the sender allowlist, holds, fails closed with calls off; reset then frees it', async () => {
+  const t = await testDb();
+  let dialed = 0;
+  const deps = await makeDeps({ q: t.q, emit: (e) => t.emit(e) }, {
+    rampMode: 'mock', ramp: new DbMockRampClient(t.q), callsEnabled: false, perVendorHourLimit: 1000, allowedSenders: ['nobody@example.invalid'],
+    dial: async () => { dialed++; return 'never'; } }, { provider: 'injector', payload: { fixtureId: '01-obvious-bank-change-freemail' } });
+
+  const { caseId } = await injectFixtureEmail('01-obvious-bank-change-freemail', { replay: true }, { deps, q: t.q });
+  assert.ok(caseId, 'a case was created');
+  const evs = await t.events(caseId);
+  const received = evs.find((e) => e.type === 'email.received');
+  assert.equal((received?.payload as { email: { source: string } }).email.source, 'injector', 'tagged as injected, so the UI can label it SIMULATED');
+  assert.ok(evs.some((e) => e.type === 'payment.held'), 'the injector bypasses INBOUND_ALLOWED_SENDERS and may hold');
+  assert.equal(dialed, 0, 'CALLS_ENABLED=0: nothing is dialed');
+  const [c] = await t.q<{ state: string }>(`select state from cases where id = $1`, [caseId]);
+  assert.equal(c.state, 'needs_human', 'calls off fails closed to a human task');
+  assert.ok((await t.q<{ n: number }>(`select count(*)::int n from bills where ramp_status_summary = 'ON_HOLD'`))[0].n > 0);
+
+  const { caseId: second } = await injectFixtureEmail('01-obvious-bank-change-freemail', { replay: true }, { deps, q: t.q });
+  assert.ok(second && second !== caseId, 'every injection is a fresh email (new provider id), so the same fixture can be sent again after a reset');
+
+  await resetDemo({ q: t.q, emit: (e) => t.emit(e) });
+  assert.equal((await t.q<{ n: number }>(`select count(*)::int n from cases where id in ($1, $2) and archived_at is null`, [caseId, second]))[0].n, 0);
+  assert.equal((await t.q<{ n: number }>(`select count(*)::int n from bills where ramp_status_summary = 'ON_HOLD'`))[0].n, 0);
+  assert.equal(dialed, 0);
+});
+
+test('unknown fixture ids are refused before anything runs', async () => {
+  await assert.rejects(() => injectFixtureEmail('nope', {}, { deps: {} as never, q: (async () => []) as never }), /unknown fixture/);
 });
