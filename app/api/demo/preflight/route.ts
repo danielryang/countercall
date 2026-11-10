@@ -17,10 +17,12 @@ export async function GET(req: Request) {
     const [o] = await q<{ n: number }>(`select count(*)::int as n from cases where state not in ('cleared','released','closed') and archived_at is null`);
     dbOk = true; lastSeq = r?.last ?? 0; openCases = o?.n ?? 0;
   } catch (err) { console.error('preflight db', err); }
+  const allowedNumbers = (process.env.ALLOWED_DEMO_NUMBERS ?? '').split(',').filter((x) => x.trim()).length;
   const checks = buildChecks({
     dbOk, lastSeq, openCases, callsEnabled: e.CALLS_ENABLED, rampMode: e.RAMP_MODE,
-    allowedNumbers: (process.env.ALLOWED_DEMO_NUMBERS ?? '').split(',').filter((x) => x.trim()).length, allowedSenders: e.INBOUND_ALLOWED_SENDERS.length,
+    allowedNumbers, allowedSenders: e.INBOUND_ALLOWED_SENDERS.length,
     has: { anthropic: has('ANTHROPIC_API_KEY'), retellKey: has('RETELL_API_KEY'), retellAgent: has('RETELL_AGENT_ID'), retellFrom: has('RETELL_FROM_NUMBER'), agentmailKey: has('AGENTMAIL_API_KEY'), agentmailSecret: has('AGENTMAIL_WEBHOOK_SECRET') },
   });
-  return Response.json({ checks, ...summarize(checks) }, { headers: { 'cache-control': 'no-store' } });
+  // The panel's header chips read these directly (RAMP MOCK must be the truth from env, never a constant in the UI). Counts and flags only.
+  return Response.json({ checks, ...summarize(checks), rampMode: e.RAMP_MODE, callsEnabled: e.CALLS_ENABLED, allowedNumbers },{ headers: { 'cache-control': 'no-store' } });
 }
