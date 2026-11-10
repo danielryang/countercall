@@ -5,6 +5,7 @@ CounterCall reads accounts-payable email, spots vendor bank-change requests, put
 **Judges: open https://countercall-steel.vercel.app/cases?replay=fraud** (no sign-in, no keys; a recorded run, labeled REPLAY).
 
 - Live app: https://countercall-steel.vercel.app
+- A real email, recorded on production with calls switched off (fail-closed: held, handed to a person): https://countercall-steel.vercel.app/cases?replay=email-live
 - <!-- VIDEO_URL --> Demo video: (link added at submission)
 
 Built for the BBS x Ramp "Automate the Old Way" hackathon (technical track). The customer (Rice Robotics) and the vendor (Acme) are fictional. No real vendor, bank or Ramp production account is ever contacted, and no real money moves.
@@ -157,7 +158,7 @@ The eval set is **20 hand-built email fixtures** (`fixtures/make.mjs`): 12 bank-
 
 | Command | What it does | Result |
 |---|---|---|
-| `npm run eval:live` | Real Claude calls, `claude-haiku-5-5` | **20/20 correct, bank-change recall 12/12, false positives 0/4**, LLM latency p50 1.8 s (max 3.4 s), $0.004 total. Run 2026-11-10; re-run with `npm run eval:live` (needs `ANTHROPIC_API_KEY`). |
+| `npm run eval:live` | Real Claude calls, `claude-haiku-5-5` | **20/20 correct, bank-change recall 12/12, false positives 0/4**, LLM latency p50 1.8 s (max 2.7 s), $0.0041 total ($0.00021 per email). Run 2026-11-10 (second run that day; the first gave the same accuracy with max 3.4 s); re-run with `npm run eval:live` (needs `ANTHROPIC_API_KEY`). |
 | `npm run eval` | Offline replay with recorded extractions | 20/20 correct, recall 12/12, false positives 0/4 |
 | `npm run eval -- --det-only` | Deterministic rules alone, as if the LLM were down | 16/20 correct, recall 12/12, false positives 4/4 |
 
@@ -195,11 +196,11 @@ A 6,000-seed run covered 11,949 calls, 93,296 deliveries and 25,350 forged reque
 
 **Sealed audit log and replay check** (`db/003_audit_chain.sql`, `lib/audit.ts`, `GET /api/audit/verify`, `npm run audit:verify`). Every new event row stores a SHA-256 seal of its own contents plus the seal of the row before it, computed by a database trigger, so the order of the log is fixed when it is written. The verifier recomputes every seal in SQL and reports the first row that no longer matches. It catches an edited row, a deleted row in the middle, and a row inserted without its seal; it cannot see the newest rows being cut off, which is why the latest seal is published so it can be pinned somewhere else. It does not stop someone who rewrites every later seal too, so we call it tamper-evident, not tamper-proof. Rows written before the migration are counted as "before the seal" and never backfilled, because `events` is append-only.
 
-The same endpoint replays the whole log through the pure reducer and `nextState()` and checks that it rebuilds every case's stored status. A case whose status was changed without an event shows up as a mismatch. On production, before the seal migration was applied, it rebuilt 10 of 10 cases from 109 events in 458 ms (2026-11-10).
+The same endpoint replays the whole log through the pure reducer and `nextState()` and checks that it rebuilds every case's stored status. A case whose status was changed without an event shows up as a mismatch. On production, before the seal migration was applied, it rebuilt 10 of 10 cases from 109 events in 458 ms (2026-11-10). The seal was switched on in production the same day: `npm run audit:verify` reported the chain intact, 131 earlier rows counted as before the seal, and 11 of 11 cases rebuilt from the log. `/audit` shows the same check live.
 
 While building this, the design review found a latent race: Postgres hands out `seq` before the insert trigger runs, so two concurrent writers could commit out of `seq` order and the `?after=` poll cursor could skip a row. The trigger now takes the case row lock, then a chain lock, and re-draws `seq` when needed, so `seq` order equals commit order equals chain order.
 
-**Other tests.** `npm test` runs 195 tests (including the verifier and simulator tests), all on PGlite. `npm run db:check` runs 12 groups of database invariants (append-only events, illegal transitions refused, trusted-number guard, row-level security, lifecycle table equals code, redaction, and the audit seal).
+**Other tests.** `npm test` runs 196 tests (including the verifier and simulator tests), all on PGlite. `npm run db:check` runs 12 groups of database invariants (append-only events, illegal transitions refused, trusted-number guard, row-level security, lifecycle table equals code, redaction, and the audit seal).
 
 Live runs also found bugs the unit tests could not see: jsonb double-encoding in postgres.js, `'\\D'` inside a JS template literal, case ids past 9999, and an import cycle that left the Ramp client undefined in the release route. A review found the public event feed leaked the full on-file phone number in one event; `toRow()` now masks every phone number before it is stored.
 
@@ -215,7 +216,7 @@ npm run verify               # typecheck, tests, eval, db invariants; offline, u
 npm run dev
 ```
 
-Then open http://localhost:3000/cases?replay=fraud. Replay mode needs no keys and no database. Other runs: `confirmed`, `voicemail`, `vague`, `impostor`, `fraud-live`. Jump to a moment with `&at=`: for example `/cases?replay=fraud&at=24` (detect), `at=30` (hold), `at=36` (live call), `at=41` (blocked).
+Then open http://localhost:3000/cases?replay=fraud. Replay mode needs no keys and no database. Other runs: `confirmed`, `voicemail`, `vague`, `impostor`, `fraud-live` (a real call), `email-live` (a real email on production with calls switched off). Jump to a moment with `&at=`: for example `/cases?replay=fraud&at=24` (detect), `at=30` (hold), `at=36` (live call), `at=41` (blocked).
 
 Other offline commands:
 
