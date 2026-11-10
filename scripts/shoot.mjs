@@ -24,7 +24,9 @@ for (const a of args) {
   const i = a.indexOf('='); const name = a.slice(0, i); const url = a.slice(i + 1);
   const page = await ctx.newPage();
   page.on('pageerror', (e) => errors.push(`${name}: ${e}`)); page.on('console', (m) => { if (m.type() === 'error') errors.push(`${name}: ${m.text()}`); });
-  await page.goto(BASE + url, { waitUntil: 'networkidle' });
+  // Live pages poll /api/events forever, so 'networkidle' never comes; replay pages are idle quickly. Wait for idle up to 5 s, then go on.
+  await page.goto(BASE + url, { waitUntil: 'load' });
+  await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
   await page.waitForTimeout(1400);   // let sweeps and stamps settle
   await page.screenshot({ path: `shots/${name}.png` });
   const overflow = await page.evaluate(() => ({ x: document.documentElement.scrollWidth > innerWidth, y: document.documentElement.scrollHeight > innerHeight }));
