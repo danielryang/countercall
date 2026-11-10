@@ -12,7 +12,9 @@ export async function testDb() {
   await db.exec('create role anon nologin; create role authenticated nologin;');
   await db.exec(file('001_schema.sql')); await db.exec(file('002_seed.sql'));
   const q: Q = async (text, params = []) => (await db.query(text, params as never)).rows as never;
-  const emit = (e: EmittedEvent, human?: string) => appendEvent(q, e, human);
+  // Same atomicity as production (`sql.begin` in lib/store.ts): each event + its state change is one transaction, so concurrent deliveries interleave only BETWEEN emits.
+  const txq = (tx: { query: PGlite['query'] }): Q => async (text, params = []) => (await tx.query(text, params as never)).rows as never;
+  const emit = (e: EmittedEvent, human?: string) => db.transaction((tx) => appendEvent(txq(tx as never), e, human));
   const events = async (caseId?: string) =>
     (await q<{ seq: number; type: string; payload: Record<string, unknown> }>(`select seq, type, payload from events ${caseId ? 'where case_id = $1' : ''} order by seq`, caseId ? [caseId] : []));
   const createTask = async (caseId: string, kind: TaskKind, title: string, reason: string) => {
