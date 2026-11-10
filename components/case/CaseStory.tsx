@@ -1,9 +1,10 @@
 'use client';
 // "What CounterCall did": four steps in plain language. The current step is open; finished steps are one line each and open on click. A first-time viewer can read
 // top to bottom and understand the whole product: flag the email, hold the money, phone the vendor on the number we already had, and show the result.
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { CallTranscript, answerTurn } from '@/components/call/CallPanel';
-import { plainReasons, plainTask, REASON_TEXT, SOURCE_LABEL, STAMP } from '@/lib/copy';
+import { EVIDENCE_HINT, plainReasonGroups, plainTask, REASON_TEXT, SOURCE_LABEL, STAMP } from '@/lib/copy';
+import { evidenceMap, hasEvidence, overlaps } from '@/lib/evidence';
 import type { CaseView } from '@/lib/reducer';
 import { fmtCents } from '@/lib/selectors';
 
@@ -21,10 +22,17 @@ function Icon({ st }: { st: St }) {
 
 const md = (iso: string) => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
-export function CaseStory({ c, onRelease, releaseBlocked }: { c: CaseView; onRelease?: () => void; releaseBlocked?: string }) {
+export function CaseStory({ c, onRelease, releaseBlocked, hot, onHot }: {
+  c: CaseView; onRelease?: () => void; releaseBlocked?: string;
+  /** signal ids lit up by the email pane (or by a row here); the case detail owns this state */
+  hot?: string[] | null; onHot?: (ids: string[] | null) => void;
+}) {
   const [open, setOpen] = useState<Partial<Record<Key, boolean>>>({});
+  const hintId = useId();
   const v = c.vendorName ?? 'the vendor';
-  const reasons = plainReasons(c);
+  const groups = plainReasonGroups(c);
+  const reasons = groups.map((g) => g.text);
+  const ev = evidenceMap(c);
   const holding = !!c.decision?.actions.some((a) => a.type === 'HOLD_VENDOR_PAYMENTS');
   const o = c.call?.outcome;
   const cents = c.payments.reduce((n, b) => n + b.amountCents, 0);
@@ -39,10 +47,21 @@ export function CaseStory({ c, onRelease, releaseBlocked }: { c: CaseView; onRel
     key: 'email', st: c.decision ? 'done' : 'active',
     title: cleared ? 'Checked the email: nothing suspicious' : c.decision ? 'Flagged as suspicious' : 'Reading the email',
     summary: cleared ? 'No bank change was requested' : reasons.length ? `${reasons[0]}${reasons.length > 1 ? ` \u00b7 +${reasons.length - 1} more` : ''}` : 'Looking for signs of a fake request',
-    body: reasons.length ? (
-      <ul className="space-y-1.5 text-[14px] leading-5">
-        {reasons.slice(0, 5).map((r) => <li key={r} className="flex gap-2"><span aria-hidden className="mt-px text-blocked">{'✕'}</span><span>{r}</span></li>)}
-        <li className="cap pt-1">Fixed rules decide. An AI model only adds context and can never clear a flag or release money.</li>
+    body: groups.length ? (
+      <ul className="-mx-1.5 space-y-0.5 text-[14px] leading-5">
+        {groups.slice(0, 5).map((g) => {
+          const ids = g.ids.filter((i) => hasEvidence(ev, i));     // only reasons with something in the email to point at are link targets
+          const live = ids.length > 0 && !!onHot;
+          return (
+            <li key={g.text} className={`flex gap-2 rounded-md px-1.5 py-0.5 data-[hot=true]:bg-surface-raised ${live ? 'cursor-default' : ''}`} {...(live ? {
+              tabIndex: 0, 'data-hot': overlaps(ids, hot ?? null) || undefined, 'aria-describedby': hintId,
+              onMouseEnter: () => onHot!(ids), onMouseLeave: () => onHot!(null), onFocus: () => onHot!(ids), onBlur: () => onHot!(null),
+            } : {})}>
+              <span aria-hidden className="mt-px text-blocked">{'✕'}</span><span>{g.text}</span>
+            </li>
+          );
+        })}
+        <li className="cap px-1.5 pt-1">Fixed rules decide. An AI model only adds context and can never clear a flag or release money.{onHot && groups.some((g) => g.ids.some((i) => hasEvidence(ev, i))) ? <span id={hintId}> {EVIDENCE_HINT}</span> : null}</li>
       </ul>
     ) : <p className="cap">Nothing unusual was found.</p>,
   });
