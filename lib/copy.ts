@@ -66,3 +66,71 @@ export const CATEGORY_LABEL: Record<string, string> = {
 export const PHASE_LABEL = { DETECT: 'Detect', FREEZE: 'Freeze', VERIFY: 'Verify', DECIDE: 'Decide' } as const;
 
 export const SOURCE_LABEL: Record<string, string> = { onboarding_w9: 'signed W-9', contract: 'contract', ramp_contact_at_import: 'Ramp record', vendor_website: 'vendor website', prior_verified_call: 'prior verified call', human_entered: 'entered by a person' };
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Plain language. A judge who has never seen this product should understand every screen without a glossary: no rule ids, no jargon.
+// ---------------------------------------------------------------------------------------------------------------------------------
+import type { CaseView } from './reducer';
+import { fmtCents } from './selectors';
+
+/** One short sentence per detector signal (what looked wrong, in everyday words). */
+export const PLAIN_SIGNAL: Record<string, (vendor: string) => string> = {
+  sender_domain_not_on_file: (v) => `Not sent from ${v}'s usual email domain`,
+  freemail_sender: () => 'Sent from a free email account (like Gmail), not a company address',
+  display_name_impersonation: (v) => `The sender's name says ${v}, but the email is not from ${v}`,
+  sender_not_known_contact: () => 'First time this sender has written to you',
+  lookalike_domain: (v) => `The domain looks like ${v}'s, but it is not`,
+  reply_to_mismatch: () => 'Replies would go to a different address than the sender',
+  reply_to_freemail: () => 'Replies would go to a free email account',
+  executive_impersonation: () => 'Pretends to be someone at your company',
+  auth_dmarc_fail: () => 'Failed the checks that prove who really sent the email',
+  auth_spf_fail: () => 'Failed the checks that prove who really sent the email',
+  auth_dkim_fail: () => 'Failed the checks that prove who really sent the email',
+  auth_unauthenticated: () => 'Could not prove who sent this email',
+  bank_details_differ: () => 'The new bank account does not match the one on file',
+  bank_details_present: () => 'Includes new bank account details',
+  bank_change_language: () => 'Asks to change where payments are sent',
+  urgency_language: () => 'Pressures you to act quickly',
+  secrecy_no_callback: () => 'Discourages checking by phone',
+  injection_markers: () => 'Contains text trying to instruct an AI',
+  phone_in_email: () => 'Lists a phone number to call (CounterCall never uses it)',
+  attachment_may_hold_details: () => 'Points to an attachment that may hold bank details',
+  amount_outlier: () => 'The amount is far larger than usual for this vendor',
+  amount_mismatch_invoice: () => 'The amount does not match the invoice on file',
+  routing_checksum_invalid: () => 'The routing number is not valid',
+  hidden_text: () => 'Contains hidden characters',
+};
+const SEV = { critical: 4, high: 3, medium: 2, low: 1, info: 0 } as const;
+/** The few reasons that matter most, in plain English, most serious first (duplicates collapsed). */
+export function plainReasons(c: CaseView): string[] {
+  const v = c.vendorName ?? 'the vendor';
+  const out: string[] = [];
+  for (const s of [...c.signals].sort((a, b) => SEV[b.severity] - SEV[a.severity])) {
+    if (s.severity === 'info') continue;
+    const t = (PLAIN_SIGNAL[s.id] ?? (() => s.detail))(v);
+    if (!out.includes(t)) out.push(t);
+  }
+  return out;
+}
+
+export type Tone = 'danger' | 'warn' | 'ok' | 'progress' | 'neutral';
+export interface Headline { title: string; sub: string; tone: Tone }
+const cents = (c: CaseView) => c.payments.reduce((n, b) => n + b.amountCents, 0);
+
+/** The one sentence that says what happened and what it means. Written for a reader who knows nothing about the product. */
+export function headline(c: CaseView): Headline {
+  const v = c.vendorName ?? 'the vendor'; const money = cents(c) ? fmtCents(cents(c)) : 'The payments';
+  const o = c.call?.outcome;
+  switch (c.state) {
+    case 'scanning': return { tone: 'progress', title: 'Reading a new email', sub: 'CounterCall checks every email sent to the accounts-payable inbox.' };
+    case 'cleared': return { tone: 'ok', title: 'Looks normal', sub: 'No bank change was requested, so nothing was held and nobody was called.' };
+    case 'flagged': return { tone: 'warn', title: 'Suspicious request found', sub: `Someone is asking to change where ${v} gets paid. Holding the payments now.` };
+    case 'held': return { tone: 'warn', title: 'Payments are on hold', sub: `${money} is frozen. Next, CounterCall phones ${v} on the number it already had on file, not any number from the email.` };
+    case 'calling': return { tone: 'progress', title: `Calling ${v}`, sub: 'Asking them directly: did you send this request? The call is automated and says so at the start.' };
+    case 'fraud_blocked': return { tone: 'danger', title: `Blocked. ${v} says they did not send this.`, sub: `The bank change was rejected and ${money} stays on hold. Only a person can release it.` };
+    case 'awaiting_approval': return { tone: 'ok', title: 'Verified by phone. Waiting for approval.', sub: `${v} confirmed the request and answered the security question. No money moves until a person approves.` };
+    case 'needs_human': return { tone: 'warn', title: 'Could not verify. A person needs to follow up.', sub: `${o ? REASON_TEXT[o.decision.reason].rule : (c.tasks.find((t) => t.status === 'open')?.reason ?? 'Verification did not complete')}. ${cents(c) ? `${money} stays on hold.` : ''}`.trim() };
+    case 'released': return { tone: 'ok', title: 'Payment released', sub: c.release ? `Approved by ${c.release.approvedBy}.` : 'A person approved the release.' };
+    case 'closed': return { tone: 'neutral', title: 'Case closed', sub: c.closed?.note ?? '' };
+  }
+}

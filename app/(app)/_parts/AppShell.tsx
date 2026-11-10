@@ -3,12 +3,14 @@
 // `?replay=<run>` swaps the live API for a recorded run (keyless, offline-safe, labelled REPLAY).
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, type ReactNode } from 'react';
+import { Suspense, useEffect, useState, type ReactNode } from 'react';
 import { EventsProvider, useStream } from '@/components/EventsProvider';
 import { fmtCents, heldCents } from '@/lib/selectors';
 
 const STATUS_TEXT = { connecting: 'Connecting', live: 'Live', reconnecting: 'Reconnecting', paused: 'Paused · click to resume', replay: 'Replay' } as const;
-const btn = 'border border-rule px-2 py-0.5 text-fg-muted hover:bg-surface-raised hover:text-fg';
+const btn = 'rounded-md border border-rule px-2 py-0.5 text-fg-muted hover:bg-surface-raised hover:text-fg';
+const THEMES = ['graphite', 'paper', 'cloud'] as const;
+type Theme = (typeof THEMES)[number];
 
 function Top() {
   const { state } = useStream();
@@ -21,14 +23,14 @@ function Top() {
       </Link>
       <span className="cap hidden md:inline">Rice Robotics</span>
       <div className="ml-auto flex items-baseline gap-2.5">
-        <span className="cap">Held</span>
+        <span className="cap">Payments on hold</span>
         <span className="font-mono text-[18px] font-medium tabular-nums">{fmtCents(held)}</span>
       </div>
     </header>
   );
 }
 
-function Foot() {
+function Foot({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void }) {
   const { status, replay, resume } = useStream();
   const live = status === 'live';
   return (
@@ -46,16 +48,27 @@ function Foot() {
           <button type="button" className={btn} onClick={() => replay.setSpeed(replay.speed === 1 ? 4 : 1)}>{replay.speed}x</button>
         </div>
       )}
-      <span className="ml-auto hidden md:inline">J / K move between cases</span>
+      <div className="ml-auto flex items-center gap-2" aria-label="Theme">
+        <span className="hidden md:inline">Theme</span>
+        {THEMES.map((t) => <button key={t} type="button" onClick={() => setTheme(t)} aria-pressed={theme === t} className={`rounded-md border px-2 py-0.5 capitalize ${theme === t ? 'border-fg text-fg' : 'border-rule hover:text-fg'}`}>{t}</button>)}
+      </div>
     </footer>
   );
 }
 
 function Providers({ children }: { children: ReactNode }) {
   const sp = useSearchParams(); const replay = sp.get('replay'); const atRaw = sp.get('at');
+  const [theme, setThemeState] = useState<Theme>('graphite');
+  useEffect(() => {   // ?theme= wins, then the last choice, then the default
+    const q = sp.get('theme'); let stored: string | null = null;
+    try { stored = localStorage.getItem('cc-theme'); } catch { /* storage can be blocked; the default is fine */ }
+    const pick = [q, stored].find((x): x is Theme => THEMES.includes(x as Theme));
+    if (pick) setThemeState(pick);
+  }, [sp]);
+  const setTheme = (t: Theme) => { setThemeState(t); try { localStorage.setItem('cc-theme', t); } catch { /* ignore */ } };
   return (
     <EventsProvider replay={replay} at={atRaw ? Number(atRaw) : null}>
-      <div data-app className="night flex h-screen min-h-[720px] flex-col bg-surface text-fg"><Top /><div className="min-h-0 flex-1">{children}</div><Foot /></div>
+      <div data-app data-theme={theme} className="flex h-screen min-h-[720px] flex-col bg-surface text-fg"><Top /><div className="min-h-0 flex-1">{children}</div><Foot theme={theme} setTheme={setTheme} /></div>
     </EventsProvider>
   );
 }

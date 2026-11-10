@@ -11,6 +11,10 @@
   /* Wipe Tailwind defaults that produce generic output. bg-indigo-500 / rounded-xl / shadow-lg will not compile. */
   --color-*: initial;
   --radius-*: initial;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
   --shadow-*: initial;
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
@@ -97,6 +101,7 @@
   --color-hairline: var(--rule);        /* agent 05: dashed frame border */
   --color-rule-strong: var(--fg);       /* agent 05: solid 1px for selected / active */
   --color-focus-ring: var(--color-signal);
+  --color-live: var(--live);
   /* shadcn token map (04 section 7): the generated components use these semantic names. Radius stays wiped (0). */
   --color-background: var(--surface);
   --color-foreground: var(--fg);
@@ -126,6 +131,8 @@
   --fg-muted: #5C6170;
   --rule: rgb(20 22 29 / 0.28);
   --link: #1743E0;
+  --live: var(--color-signal);
+  --chip-mix: 55%;
   --rail: 2rem;                  /* inset of the dashed side rails */
   --cut: 10px;                   /* chamfer size for buttons and tags */
   --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 55%, transparent) 0 1px, transparent 1px 6px);  /* "frozen": a pattern, so it survives greyscale and video compression */
@@ -146,7 +153,33 @@
   --hl-strong-ink: #fff;
   --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 30%, transparent) 0 1px, transparent 1px 7px);
 }
-body:has(.night) { background: #0F1115; }
+
+/* ---------- App themes: ?theme=graphite|paper|cloud on the app shell ---------- */
+[data-theme="graphite"] {
+  color-scheme: dark;
+  --surface: #161616; --surface-raised: #1F1F1E; --surface-sunk: #111111;
+  --fg: #F1EFEA; --fg-muted: #A3A19A; --rule: rgb(241 239 234 / 0.10); --link: #9DB8FF;
+  --live: #7BA7FF; --chip-mix: 100%;
+  --hl-strong: color-mix(in oklab, #7BA7FF 38%, #161616); --hl-strong-ink: #F1EFEA;
+  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 40%, transparent) 0 1.5px, transparent 1.5px 6px);
+}
+[data-theme="paper"] {
+  color-scheme: light;
+  --surface: #F6F4EF; --surface-raised: #FFFFFF; --surface-sunk: #EDEAE2;
+  --fg: #1B1B18; --fg-muted: #6A6860; --rule: rgb(27 27 24 / 0.10); --link: #1743E0;
+  --live: #1B4DFF; --chip-mix: 55%;
+  --hl-strong: color-mix(in oklab, #1B4DFF 20%, white); --hl-strong-ink: #1B1B18;
+}
+[data-theme="cloud"] {
+  color-scheme: light;
+  --surface: #F3F5F8; --surface-raised: #FFFFFF; --surface-sunk: #E9EDF2;
+  --fg: #101828; --fg-muted: #667085; --rule: rgb(16 24 40 / 0.09); --link: #2F5BEA;
+  --live: #2F5BEA; --chip-mix: 55%;
+  --hl-strong: color-mix(in oklab, #2F5BEA 18%, white); --hl-strong-ink: #101828;
+}
+body:has([data-theme="graphite"]) { background: #161616; }
+body:has([data-theme="paper"]) { background: #F6F4EF; }
+body:has([data-theme="cloud"]) { background: #F3F5F8; }
 
 @layer base {
   html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-size-adjust: 100%; }
@@ -244,24 +277,23 @@ body:has(.night) { background: #0F1115; }
   .btn-outline:hover::after { background: var(--surface-raised); }
   .btn-sm { --cut: 7px; padding: .375rem 1rem; min-height: 2rem; font-size: .8125rem; }
 
-  /* Status chip: solid fill + glyph, so colour is never the only signal (WCAG 1.4.1). Contrast of each pair is >= 4.5:1. */
+  /* Status chip: a soft tinted pill with a glyph, so colour is never the only signal. Text colour is the status colour mixed toward the text colour for contrast on any theme. */
   .chip {
-    --cut: 5px;
-    display: inline-flex; align-items: center; gap: .5rem; padding: .125rem .625rem .125rem .5rem; height: 1.5rem;
-    font-family: var(--font-mono); font-size: var(--text-micro); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
-    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
-    background: var(--c, var(--color-paper-sunk)); color: var(--on, var(--color-ink));
+    display: inline-flex; align-items: center; gap: .375rem; height: 1.5rem; padding: 0 .625rem 0 .5rem; white-space: nowrap;
+    font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0;
+    border-radius: var(--radius-md); border: 1px solid color-mix(in oklab, var(--c) 40%, transparent);
+    background: color-mix(in oklab, var(--c) 16%, transparent); color: color-mix(in oklab, var(--c) var(--chip-mix), var(--fg));
   }
   .chip::before { content: ""; width: .5rem; height: .5rem; background: currentColor; flex: none; }   /* glyph: square by default */
-  .chip[data-status="HELD"]         { --c: var(--color-held);     --on: var(--color-ink); }
+  .chip[data-status="HELD"]         { --c: var(--color-held); }
   .chip[data-status="HELD"]::before { background: linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px, currentColor 5px 8px); }   /* pause bars */
-  .chip[data-status="CALLING"]      { --c: var(--color-calling);  --on: #fff; }
-  .chip[data-status="CALLING"]::before { animation: ping-dot 1.6s var(--ease-out) infinite; }
-  .chip[data-status="VERIFIED"]     { --c: var(--color-verified); --on: var(--color-ink); }
+  .chip[data-status="CALLING"]      { --c: var(--live); }
+  .chip[data-status="CALLING"]::before { border-radius: 9999px; animation: blink 1s steps(1) infinite; }
+  .chip[data-status="VERIFIED"]     { --c: var(--color-verified); }
   .chip[data-status="VERIFIED"]::before { clip-path: polygon(0 55%, 18% 40%, 40% 62%, 82% 12%, 100% 28%, 40% 100%); }   /* check */
-  .chip[data-status="BLOCKED"]      { --c: var(--color-blocked);  --on: var(--color-paper-raised); }
+  .chip[data-status="BLOCKED"]      { --c: var(--color-blocked); }
   .chip[data-status="BLOCKED"]::before { clip-path: polygon(15% 0, 50% 35%, 85% 0, 100% 15%, 65% 50%, 100% 85%, 85% 100%, 50% 65%, 15% 100%, 0 85%, 35% 50%, 0 15%); }  /* x */
-  .chip[data-status="NEEDS_REVIEW"] { --c: var(--color-review);   --on: var(--color-ink); }
+  .chip[data-status="NEEDS_REVIEW"] { --c: var(--color-review); }
   .chip[data-status="NEEDS_REVIEW"]::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); }   /* triangle */
 }
 
@@ -272,18 +304,18 @@ body:has(.night) { background: #0F1115; }
 @layer components {
   /* Neutral status chips are hairline rectangles; only RISK states get the solid cut-corner chip. */
   .chip-plain {
-    display: inline-flex; align-items: center; gap: .375rem; height: 1.5rem; padding: 0 .5rem; white-space: nowrap;
-    font-family: var(--font-mono); font-size: var(--text-micro); font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
-    border: 1px solid var(--rule); color: var(--fg);
+    display: inline-flex; align-items: center; gap: .375rem; height: 1.5rem; padding: 0 .625rem; white-space: nowrap;
+    font-family: var(--font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0;
+    border-radius: var(--radius-md); border: 1px solid var(--rule); color: var(--fg);
   }
   .chip-plain[data-variant="dashed"] { border-style: dashed; }
-  .chip-plain[data-variant="danger"] { border-color: var(--color-blocked); color: var(--color-blocked); }
+  .chip-plain[data-variant="danger"] { border-color: color-mix(in oklab, var(--color-blocked) 45%, transparent); color: color-mix(in oklab, var(--color-blocked) var(--chip-mix), var(--fg)); }
   .chip-plain[data-variant="quiet"] { color: var(--fg-muted); }
   .scan-dots::after { content: "..."; animation: blink 1s steps(1) infinite; }
 
   /* Evidence highlights: marker-pen sweeps, not fades. --sweep-delay staggers them in reading order. */
   :root { --hl-strong: var(--color-evidence-strong); --hl-strong-ink: var(--color-ink); }
-  .ev, .ev-strong { background-repeat: no-repeat; background-size: 0% 100%; animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms); }
+  .ev, .ev-strong { border-radius: var(--radius-sm); box-decoration-break: clone; padding: 0 2px; background-repeat: no-repeat; background-size: 0% 100%; animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms); }
   .ev { background-image: linear-gradient(var(--color-evidence), var(--color-evidence)); color: var(--color-ink); }
   .ev-strong { background-image: linear-gradient(var(--hl-strong), var(--hl-strong)); color: var(--hl-strong-ink); }
   .ev-quiet { text-decoration: underline dashed; text-underline-offset: 3px; }
@@ -293,7 +325,7 @@ body:has(.night) { background: #0F1115; }
 
   /* Frozen money: hatching over the amount. A pattern, so it survives greyscale and video compression. */
   .frozen { background-image: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 55%, transparent) 0 1.5px, transparent 1.5px 6px); }
-  .stamp { transform: rotate(-3deg); animation: stamp var(--d-stamp) var(--ease-snap) both; }
+  .stamp { border-radius: var(--radius-lg); transform: rotate(-3deg); animation: stamp var(--d-stamp) var(--ease-snap) both; }
   @keyframes stamp { from { opacity: 0; transform: rotate(-3deg) scale(1.16); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
   /* quiet caption: small sans, muted, sentence case. Uppercase mono is reserved for chips, keycaps and the stamp. */
   .cap { font-size: 12px; line-height: 16px; color: var(--fg-muted); }

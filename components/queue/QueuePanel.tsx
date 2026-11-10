@@ -9,8 +9,9 @@ export function QueuePanel({ groups, selectedId, onSelect, listening }: { groups
   const [showResolved, setShowResolved] = useState(false);
   const total = GROUPS.reduce((n, g) => n + groups[g].length, 0);
   return (
-    <nav aria-label="Cases" className="h-full overflow-y-auto">
-      <div className="px-4 pb-1 pt-4 text-[15px] font-medium">Cases</div>
+    <nav aria-label="Cases" className="h-full overflow-y-auto px-2 pb-4">
+      <div className="px-3 pt-4 text-[16px] font-semibold">Cases</div>
+      <p className="cap px-3 pb-2 pt-1">Every email to the AP inbox is checked. A suspicious bank change is put on hold and verified by phone.</p>
       {total === 0 ? (
         <div className="cap m-4 border border-dashed border-rule p-4">Watching {listening}<span className="scan-dots" /></div>
       ) : (
@@ -19,7 +20,7 @@ export function QueuePanel({ groups, selectedId, onSelect, listening }: { groups
           const open = !resolved || showResolved || groups[g].some((c) => c.id === selectedId);
           return (
             <div key={g} className="mt-2">
-              <button type="button" disabled={!resolved} onClick={() => setShowResolved((v) => !v)} className="cap flex w-full items-center gap-2 px-4 py-1.5 text-left enabled:hover:text-fg">
+              <button type="button" disabled={!resolved} onClick={() => setShowResolved((v) => !v)} className="cap flex w-full items-center gap-2 px-3 py-1.5 text-left enabled:hover:text-fg">
                 <span>{g === 'NEEDS ACTION' ? 'Needs action' : g === 'IN PROGRESS' ? 'In progress' : 'Resolved'}</span>
                 <span className="tabular-nums">{groups[g].length}</span>
                 {resolved && <span aria-hidden className="ml-auto">{open ? '▾' : '▸'}</span>}
