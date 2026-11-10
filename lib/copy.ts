@@ -239,3 +239,72 @@ export function ageText(days: number): string {
   const part = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
   return `${[y ? part(y, 'year') : '', m ? part(m, 'month') : ''].filter(Boolean).join(', ')} on file`;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Audit page and badge. The point a first-time viewer must get: every step is written down once, in order, and the system re-checks its own
+// record. Never say "tamper-proof": the seal shows a changed past entry unless every later seal is rewritten too.
+// ---------------------------------------------------------------------------------------------------------------------------------
+export const AUDIT = {
+  title: 'Audit log',
+  checkTitle: 'Log check',
+  badge: {
+    intact: 'Log sealed', not_installed: 'Seal not on yet', broken: 'Log changed', replay_mismatch: 'Status mismatch', unavailable: 'Check unavailable', replay: 'Replay',
+  },
+  sealed: (n: number) => `Audit log sealed: ${n.toLocaleString('en-US')} ${n === 1 ? 'entry' : 'entries'}, each locked to the one before it.`,
+  preChain: (n: number) => `${n.toLocaleString('en-US')} earlier ${n === 1 ? 'entry was' : 'entries were'} written before the seal was switched on.`,
+  broken: (seq: number) => `Changed after it was written: entry #${seq}.`,
+  notInstalled: 'Seal not switched on yet.',
+  appendOnly: 'Entries still cannot be edited or deleted: the database refuses it.',
+  rebuilt: (m: number, n: number) => `Every case's status rebuilt from the log: ${m} of ${n} match.`,
+  outOfBand: (n: number) => `${n} test ${n === 1 ? 'case was' : 'cases were'} put on hold by a script before ${n === 1 ? 'its' : 'their'} first entry; checked from there.`,
+  mismatch: (id: string, log: string, record: string) => `${id}: the log says ${log}, the case record says ${record}.`,
+  proves: 'Each entry is sealed together with the one before it. Changing, adding or removing a past entry shows up here, unless every later seal is rewritten too. The latest seal is shown so it can be written down and compared later.',
+  latestSeal: 'Latest seal',
+  checkedAt: (t: string, ms: number) => `Checked ${t} · ${ms} ms`,
+  unavailable: 'Could not run the log check right now. Nothing has changed.',
+  unauthorized: 'Sign in to run the log check.',
+  loading: 'Checking the log',
+  replay: 'Replay: the seal is checked on the live log.',
+  replayLink: 'Open the live audit log',
+  listIntro: 'Every step, in the order it happened. Entries are never edited; a correction is a new entry.',
+  filters: { case: 'Case', group: 'Kind', actor: 'Who', all: 'All' },
+  cols: { seq: '#', time: 'Time', case: 'Case', who: 'Who', what: 'What happened' },
+  count: (n: number) => `${n.toLocaleString('en-US')} ${n === 1 ? 'entry' : 'entries'}`,
+  more: (n: number) => `Show ${n.toLocaleString('en-US')} more`,
+  empty: 'No entries match these filters.',
+  emptyLog: 'No entries yet. They appear here as soon as an email arrives.',
+  export: 'Download JSON',
+  exporting: 'Preparing',
+  exportFailed: 'Download failed. Try again.',
+  exportNote: 'Phone numbers and spoken digits are already masked in every entry.',
+} as const;
+
+export const AUDIT_GROUP: Record<'email' | 'case' | 'payment' | 'call' | 'task' | 'system', string> = {
+  email: 'Email', case: 'Case status', payment: 'Payments', call: 'Phone call', task: 'People tasks', system: 'System',
+};
+export const AUDIT_ACTOR: Record<'system' | 'detector' | 'policy' | 'voice_agent' | 'human', string> = {
+  detector: 'Email check', policy: 'Rules', voice_agent: 'Phone agent', human: 'A person', system: 'System',
+};
+/** One plain sentence per event type. Unknown types fall back to the type name. */
+export const EVENT_LINE: Record<string, string> = {
+  'email.received': 'Email received',
+  'email.classified': 'Email read by the language model',
+  'case.flagged': 'Flagged as a bank-change request',
+  'case.cleared': 'Checked: not a bank-change request',
+  'case.state': 'Status changed',
+  'payment.held': 'Payments put on hold',
+  'ramp.call': 'Request sent to Ramp',
+  'call.requested': 'Call asked for, to the number on file',
+  'call.created': 'Call placed',
+  'call.status': 'Call status changed',
+  'call.transcript.delta': 'Transcript updated',
+  'call.tool': 'Phone agent reported what it heard',
+  'call.recording': 'Call recording saved',
+  'call.outcome': 'Call result decided by the rules',
+  'task.created': 'Handed to a person',
+  'task.resolved': 'Task resolved',
+  'payment.released': 'Payments released by a person',
+  'payment.release_failed': 'Release failed; payments stay on hold',
+  'case.closed': 'Case closed by a person',
+  'system.reset': 'Demo reset',
+};
