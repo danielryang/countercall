@@ -13,6 +13,7 @@ const Schema = z.object({
   DEMO_ENABLED: flag('1'),
   PUBLIC_READ: flag('1'),
   CALLS_ENABLED: flag('0'),                                  // PLAN s13 H4: off unless a shoot or the live final needs it
+  CALL_LIMIT_PER_VENDOR_HOUR: z.coerce.number().int().min(1).max(20).default(3),
   INBOUND_ALLOWED_SENDERS: list,                             // emails or bare domains; others are recorded but cannot hold or call
   AGENTMAIL_WEBHOOK_SECRET: z.string().optional(),
   RAMP_CLIENT_ID: z.string().optional(),

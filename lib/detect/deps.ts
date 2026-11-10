@@ -1,5 +1,6 @@
 // lib/detect/deps.ts: the real Deps for ingestEmail, on our schema (08-architecture.md section 3.7). Replaces the in-memory stub.
 // Built per request (cheap) because `seen()` needs the provider and raw payload of THIS webhook. No clients are constructed at module scope.
+import { startCall } from '../call';
 import { env, senderAllowed } from '../env';
 import type { EmittedEvent, TaskKind } from '../events';
 import { applyHolds } from '../holds';
@@ -7,7 +8,8 @@ import { makeRamp, type MockSeed } from '../ramp';
 import { DbMockRampClient, type HoldClient } from '../ramp.mock-db';
 import { emit as storeEmit, sql } from '../store';
 import type { Q } from '../sink';
-import type { AppEvent, CallContext, Deps } from './ingest';
+import { startVerificationCall } from '../voice/retell';
+import type { AppEvent, Deps } from './ingest';
 import type { NormalizedEmail, OrgConfig, Vendor } from './types';
 
 const q: Q = (text, params = []) => sql.unsafe(text, params as never) as never;
@@ -67,11 +69,6 @@ export async function createTask(caseId: string, kind: TaskKind, title: string, 
   await storeEmit({ type: 'task.created', caseId, taskId: Number(t.id), kind, title, reason, assignee: 'AP lead' });
 }
 
-/** S2 seam: nothing dials yet. S9 replaces this with lib/call.ts `startCall`. Fails closed into a human task either way. */
-async function startCallSeam(caseId: string, _vendorId: string, _context: CallContext): Promise<void> {
-  await createTask(caseId, 'verify_manually', 'Verify the bank change by phone', env().CALLS_ENABLED ? 'calls not wired yet' : 'calls disabled (CALLS_ENABLED=0)');
-}
-
 export async function getDeps(src: { provider: string; payload?: unknown } = { provider: 'agentmail' }): Promise<Deps> {
   const org = await loadOrg();
   return {
@@ -88,7 +85,9 @@ export async function getDeps(src: { provider: string; payload?: unknown } = { p
     emit: persist,
     holdPayments: (vendorId, paymentIds, caseId) => applyHolds({ q, ramp: rampClient(), mode: env().RAMP_MODE, emit: (e) => storeEmit(e) }, caseId, vendorId, paymentIds),
     createTask,
-    startCall: startCallSeam,
+    startCall: async (caseId, vendorId, context) => {   // the only dialer; refusals become human tasks inside startCall
+      await startCall({ q, emit: (e) => storeEmit(e), createTask, dial: startVerificationCall, callsEnabled: env().CALLS_ENABLED, perVendorHourLimit: env().CALL_LIMIT_PER_VENDOR_HOUR }, caseId, vendorId, context);
+    },
     canAct: (email: NormalizedEmail) => email.source === 'injector' || senderAllowed(email.from.address, env().INBOUND_ALLOWED_SENDERS),   // the session-gated injector bypasses the allowlist
     vendors: loadVendors,
   };
