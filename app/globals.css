@@ -11,10 +11,10 @@
   /* Wipe Tailwind defaults that produce generic output. bg-indigo-500 / rounded-xl / shadow-lg will not compile. */
   --color-*: initial;
   --radius-*: initial;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
   --shadow-*: initial;
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
@@ -130,7 +130,7 @@
   --fg: #14161D;
   --fg-muted: #5C6170;
   --rule: rgb(20 22 29 / 0.28);
-  --link: #1743E0;
+  --link: #1B1B18;
   --live: var(--color-signal);
   --chip-mix: 55%;
   --rail: 2rem;                  /* inset of the dashed side rails */
@@ -156,21 +156,21 @@
 [data-theme="graphite"] {
   color-scheme: dark;
   --surface: #161616; --surface-raised: #1F1F1E; --surface-sunk: #111111;
-  --fg: #F1EFEA; --fg-muted: #A3A19A; --rule: rgb(241 239 234 / 0.10); --link: #9DB8FF;
-  --live: #7BA7FF; --chip-mix: 100%;
+  --fg: #F1EFEA; --fg-muted: #A3A19A; --rule: rgb(241 239 234 / 0.10); --link: #F1EFEA;
+  --live: #E9E7E1; --chip-mix: 100%;
   --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 40%, transparent) 0 1.5px, transparent 1.5px 6px);
 }
 [data-theme="paper"] {
   color-scheme: light;
   --surface: #F6F4EF; --surface-raised: #FFFFFF; --surface-sunk: #EDEAE2;
-  --fg: #1B1B18; --fg-muted: #6A6860; --rule: rgb(27 27 24 / 0.10); --link: #1743E0;
-  --live: #1B4DFF; --chip-mix: 55%;
+  --fg: #1B1B18; --fg-muted: #6A6860; --rule: rgb(27 27 24 / 0.10); --link: #1B1B18;
+  --live: #1B1B18; --chip-mix: 55%;
 }
 [data-theme="cloud"] {
   color-scheme: light;
   --surface: #F3F5F8; --surface-raised: #FFFFFF; --surface-sunk: #E9EDF2;
-  --fg: #101828; --fg-muted: #667085; --rule: rgb(16 24 40 / 0.09); --link: #2F5BEA;
-  --live: #2F5BEA; --chip-mix: 55%;
+  --fg: #101828; --fg-muted: #667085; --rule: rgb(16 24 40 / 0.09); --link: #101828;
+  --live: #101828; --chip-mix: 55%;
 }
 body:has([data-theme="graphite"]) { background: #161616; }
 body:has([data-theme="paper"]) { background: #F6F4EF; }
@@ -179,8 +179,8 @@ body:has([data-theme="cloud"]) { background: #F3F5F8; }
 @layer base {
   html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-size-adjust: 100%; }
   body { background: var(--surface); color: var(--fg); font-family: var(--font-sans); font-size: 1.0625rem; line-height: 1.5; font-stretch: 100%; }
-  ::selection { background: var(--color-signal); color: var(--color-paper-raised); }
-  :focus-visible { outline: 2px solid var(--color-signal); outline-offset: 2px; }
+  ::selection { background: color-mix(in oklab, var(--fg) 22%, transparent); color: inherit; }
+  :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
   h1, h2, h3 { text-wrap: balance; }
   p { text-wrap: pretty; }
   table, .tnum { font-variant-numeric: tabular-nums; }
@@ -312,8 +312,8 @@ body:has([data-theme="cloud"]) { background: #F3F5F8; }
   /* ONE quiet marker for everything that looks suspicious: a soft tint of the same amber used for 'needs attention', plus a thin underline. No second colour. */
   .ev, .ev-strong {
     border-radius: var(--radius-sm); box-decoration-break: clone; padding: 0 2px; color: inherit;
-    background-image: linear-gradient(color-mix(in oklab, var(--color-held) 24%, transparent), color-mix(in oklab, var(--color-held) 24%, transparent));
-    background-repeat: no-repeat; background-size: 0% 100%; border-bottom: 1.5px solid color-mix(in oklab, var(--color-held) 70%, transparent);
+    background-image: linear-gradient(color-mix(in oklab, var(--color-held) 13%, transparent), color-mix(in oklab, var(--color-held) 13%, transparent));
+    background-repeat: no-repeat; background-size: 0% 100%; border-bottom: 1px solid color-mix(in oklab, var(--color-held) 45%, transparent);
     animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms);
   }
   .ev-quiet { text-decoration: underline dashed; text-underline-offset: 3px; }
