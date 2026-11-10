@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
 import { EventsProvider, useStream } from '@/components/EventsProvider';
+import { HeldTicker } from '@/components/ui/HeldTicker';
 import { PresentMode } from '@/components/ui/PresentMode';
-import { fmtCents, heldCents } from '@/lib/selectors';
+import { heldCents } from '@/lib/selectors';
 
 const STATUS_TEXT = { connecting: 'Connecting', live: 'Live', reconnecting: 'Reconnecting', paused: 'Paused · click to resume', replay: 'Replay' } as const;
 const SPEEDS = [1, 2, 4, 0.5];
@@ -26,7 +27,7 @@ function Top() {
       <span className="cap hidden md:inline">Rice Robotics</span>
       <div className="ml-auto flex items-baseline gap-2.5">
         <span className="cap">Payments on hold</span>
-        <span className="font-mono text-[18px] font-medium tabular-nums" style={held ? { color: 'color-mix(in oklab, var(--color-held) var(--chip-mix), var(--fg))' } : undefined}>{fmtCents(held)}</span>
+        <HeldTicker cents={held} />
       </div>
     </header>
   );
