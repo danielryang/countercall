@@ -33,3 +33,17 @@ test('the live recording replays to the real outcome: the vendor denied, the cas
   assert.equal(hero.payments.reduce((n, b) => n + b.amountCents, 0), 2_480_000);
   assert.equal(hero.release, undefined);
 });
+
+test('the recorded inbound email replays to fail-closed: calls off, so no call is placed, the money stays held and a person takes over', () => {
+  const r = load('email-live.json');
+  assert.equal(r.source, 'recorded');
+  const c = reduce(r.events).cases['CC-0111'];
+  assert.ok(c, 'the recorded case is present');
+  assert.equal(c.state, 'needs_human');
+  // call.requested gives the case a call view; a call that was actually placed would also have call.created and an outcome.
+  assert.ok(!r.events.some((e) => e.type === 'call.created'), 'no call was placed');
+  assert.equal(c.call?.outcome, undefined, 'no call outcome');
+  assert.equal(c.payments.reduce((n, b) => n + b.amountCents, 0), 2_480_000);
+  assert.equal(c.release, undefined);
+  assert.ok(r.events.some((e) => e.type === 'task.created' && /calls disabled/.test(JSON.stringify(e.payload))), 'the hand-off says why');
+});
