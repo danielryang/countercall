@@ -1,0 +1,30 @@
+{
+  "name": "countercall-video",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "data": "node scripts/policy-excerpts.mjs && cd .. && npx tsx eval/run.ts --json video/public/eval.json",
+    "studio": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "render": "remotion render src/index.ts Draft out/draft.mp4 --color-space=bt709",
+    "still": "remotion still src/index.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/mona-sans": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@remotion/cli": "4.0.539",
+    "@remotion/paths": "4.0.539",
+    "@remotion/transitions": "4.0.539",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.539"
+  },
+  "devDependencies": {
+    "@remotion/tailwind-v4": "4.0.539",
+    "@types/react": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}

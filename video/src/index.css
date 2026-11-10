@@ -1,0 +1,14 @@
+/* video/src/index.css. The @source lines are required: without them Tailwind never sees the classes used in the shared components and they
+   render unstyled on white (08 §7.5 S11, 09 D2). Tokens come from the app's own globals.css so the video matches the product. */
+@import "tailwindcss";
+@import "../../app/globals.css";
+@source "../../components";
+@source "../../app";
+@source "./";
+
+/* Remotion renders frame by frame, so CSS keyframe animations would not line up with the timeline. Scenes animate from useCurrentFrame() instead. */
+[data-video] .stamp,
+[data-video] .chip::before,
+[data-video] .scan-dots::after,
+[data-video] .caret::after { animation: none !important; }
+[data-video] { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }

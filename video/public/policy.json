@@ -1,0 +1,61 @@
+{
+  "commit": "6002e03",
+  "excerpts": [
+    {
+      "id": "nextState",
+      "file": "lib/policy/lifecycle.ts",
+      "title": "Only these events move a case",
+      "startLine": 26,
+      "lines": [
+        "case 'call.outcome': {",
+        "  if (cur !== 'calling') return null;",
+        "  switch (e.decision.outcome) {                       // exhaustive: a new Outcome is a compile error here",
+        "    case 'CONFIRMED_LEGIT': return 'awaiting_approval';",
+        "    case 'DENIED_FRAUD': return 'fraud_blocked';",
+        "    case 'UNVERIFIED': return 'needs_human';",
+        "    default: { const _never: never = e.decision.outcome; return _never; }"
+      ],
+      "hot": [
+        3,
+        6
+      ]
+    },
+    {
+      "id": "decideOutcome",
+      "file": "lib/voice/decide.ts",
+      "title": "What has to be true before \"verified\"",
+      "startLine": 64,
+      "lines": [
+        "if (said.has(\"yes\")) {",
+        "  const tries = i.challenges.slice(0, MAX_CHALLENGE_ATTEMPTS).map((c) => c.digits.replace(/\\D/g, \"\"));",
+        "  if (tries.every((d) => d === \"\")) return unverified(\"CHALLENGE_NOT_GIVEN\", \"high\");",
+        "  const matched = tries.some((d) => d.length >= 4 && d.slice(-4) === i.expectedLast4);",
+        "  if (!matched) return unverified(\"CHALLENGE_MISMATCH\", \"high\", false);",
+        "  if (flags.some((f) => SUSPICIOUS.includes(f))) return unverified(\"SUSPICIOUS_BEHAVIOR\", \"high\", true);",
+        "  if (i.secondReader === null) return unverified(\"ANALYSIS_MISSING\", \"medium\", true);",
+        "  if (i.secondReader !== \"yes\") return unverified(\"SECOND_READER_DISAGREES\", \"high\", true);",
+        "  return mk(\"CONFIRMED_LEGIT\", \"CHALLENGE_MATCHED\", \"low\", true);"
+      ],
+      "hot": [
+        8
+      ]
+    },
+    {
+      "id": "canRelease",
+      "file": "lib/policy/lifecycle.ts",
+      "title": "The only gate in front of Ramp release",
+      "startLine": 47,
+      "lines": [
+        "export function canRelease(state: CaseState, approvedBy: string | undefined, note: string | undefined, destination: ReleaseDestination): ReleaseCheck {",
+        "  if (!approvedBy?.trim()) return { ok: false, reason: 'approver required' };",
+        "  if (state === 'awaiting_approval') return { ok: true };                        // call CONFIRMED_LEGIT + human approves; either destination",
+        "  if (state === 'fraud_blocked') return destination === 'on_file' ? { ok: true } : { ok: false, reason: 'after a denied change only the on-file account can be paid' };",
+        "  if (state === 'needs_human') return (note?.trim().length ?? 0) >= OVERRIDE_NOTE_MIN ? { ok: true } : { ok: false, reason: `override needs a note of at least ${OVERRIDE_NOTE_MIN} characters` };",
+        "  return { ok: false, reason: `case is ${state}; nothing to release` };"
+      ],
+      "hot": [
+        1
+      ]
+    }
+  ]
+}

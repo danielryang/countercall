@@ -1,0 +1,267 @@
+{
+  "mode": "replay",
+  "model": null,
+  "generatedAt": "2026-11-10T08:23:57.623Z",
+  "n": 20,
+  "pass": 20,
+  "recall": {
+    "caught": 12,
+    "of": 12
+  },
+  "falsePositives": {
+    "count": 0,
+    "of": 4
+  },
+  "rows": [
+    {
+      "id": "01-obvious-bank-change-freemail",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "02-sneaky-attached-letter",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK"
+      ],
+      "risk": "medium",
+      "ok": true
+    },
+    {
+      "id": "03-sneaky-factoring-partner",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "04-thread-reply-hijack",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK"
+      ],
+      "risk": "medium",
+      "ok": true
+    },
+    {
+      "id": "05-lookalike-domain-hyphen-tld",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "06-ceo-urgent-wire",
+      "expected": [
+        "CREATE_HUMAN_TASK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "CREATE_HUMAN_TASK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "07-normal-invoice-no-change",
+      "expected": [],
+      "got": [],
+      "risk": "none",
+      "ok": true
+    },
+    {
+      "id": "08-legit-bank-change",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK"
+      ],
+      "risk": "medium",
+      "ok": true
+    },
+    {
+      "id": "09-w9-request",
+      "expected": [],
+      "got": [],
+      "risk": "none",
+      "ok": true
+    },
+    {
+      "id": "10-newsletter",
+      "expected": [],
+      "got": [],
+      "risk": "low",
+      "ok": true
+    },
+    {
+      "id": "11-gift-card-scam",
+      "expected": [
+        "CREATE_HUMAN_TASK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "CREATE_HUMAN_TASK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "12-prompt-injection-explicit",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "13-injection-fools-the-llm",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "14-homoglyph-punycode-domain",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "15-spoofed-dmarc-fail",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "16-urgent-no-call-phone-in-email",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    },
+    {
+      "id": "17-amount-outlier-same-bank",
+      "expected": [
+        "CREATE_HUMAN_TASK"
+      ],
+      "got": [
+        "CREATE_HUMAN_TASK"
+      ],
+      "risk": "medium",
+      "ok": true
+    },
+    {
+      "id": "18-iban-switch-international",
+      "expected": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK"
+      ],
+      "got": [
+        "HOLD_VENDOR_PAYMENTS",
+        "START_CALLBACK"
+      ],
+      "risk": "medium",
+      "ok": true
+    },
+    {
+      "id": "19-third-party-billing-invoice",
+      "expected": [],
+      "got": [],
+      "risk": "medium",
+      "ok": true
+    },
+    {
+      "id": "20-lookalike-invoice-pdf-only",
+      "expected": [
+        "CREATE_HUMAN_TASK",
+        "FLAG_PHISHING"
+      ],
+      "got": [
+        "CREATE_HUMAN_TASK",
+        "FLAG_PHISHING"
+      ],
+      "risk": "critical",
+      "ok": true
+    }
+  ]
+}

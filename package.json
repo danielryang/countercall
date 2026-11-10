@@ -33,7 +33,9 @@
     "sim": "tsx scripts/sim.ts",
     "make:runs": "tsx scripts/make-runs.ts",
     "scan:secrets": "bash scripts/secret-scan.sh",
-    "audit:verify": "tsx --env-file-if-exists=.env.local scripts/audit-verify.ts"
+    "audit:verify": "tsx --env-file-if-exists=.env.local scripts/audit-verify.ts",
+    "video:data": "npm --prefix video run data",
+    "video:render": "npm --prefix video run render"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

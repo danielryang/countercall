@@ -33,3 +33,24 @@ jobs:
       - run: npm run sim -- --seeds 500
       # `next build` imports every route module: it must succeed with no API keys in the environment (CLAUDE.md invariant 11).
       - run: npm run build
+
+  # Optional: keeps the Remotion project in video/ type-correct (no render, no browser download). It imports the app's components and
+  # lib types through the @ alias, so the root install is needed too. continue-on-error: a video typing slip never blocks the app.
+  video-typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            video/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: video
+      - run: npx tsc --noEmit
+        working-directory: video
