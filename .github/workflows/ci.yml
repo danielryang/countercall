@@ -24,8 +24,12 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # Tracked secrets, real phone numbers, tracked .env files, non-public lockfile hosts.
+      - run: npm run scan:secrets
       # typecheck, unit + flow + hold tests, eval (replay), eval unit + smoke, db invariants on PGlite. No secrets or network needed.
       - run: npm run verify
       - run: npm run lint:ui
+      # Deterministic simulation of the voice path under a hostile network (dup/reorder/drop/forged webhooks). A failing seed is printed with its replay command.
+      - run: npm run sim -- --seeds 500
       # `next build` imports every route module: it must succeed with no API keys in the environment (CLAUDE.md invariant 11).
       - run: npm run build

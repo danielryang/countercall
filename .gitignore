@@ -17,3 +17,6 @@ video/public/captions
 video/public/audio
 .DS_Store
 refs/
+
+# Claude Code agent worktrees (local only)
+.claude/worktrees/

@@ -31,7 +31,8 @@
     "setup:agentmail": "tsx --env-file-if-exists=.env.local scripts/setup-agentmail.ts",
     "verify:policy": "tsx scripts/verify-policy.ts",
     "sim": "tsx scripts/sim.ts",
-    "make:runs": "tsx scripts/make-runs.ts"
+    "make:runs": "tsx scripts/make-runs.ts",
+    "scan:secrets": "bash scripts/secret-scan.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
