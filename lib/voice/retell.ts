@@ -15,11 +15,12 @@ export type CaseForCall = {
   challengePrompt: string;         // "the last four digits of the new bank account number"
 };
 
-const ALLOWED = (process.env.ALLOWED_DEMO_NUMBERS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+// read at call time, never at import (module-scope env breaks `next build` and tests)
+const allowed = () => (process.env.ALLOWED_DEMO_NUMBERS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 
 export async function startVerificationCall(c: CaseForCall): Promise<string> {
   // Hard guard: nobody outside the allowlist can ever be dialed from this code path.
-  if (!ALLOWED.includes(c.trustedPhoneE164)) throw new Error(`refusing to dial ${c.trustedPhoneE164}: not on ALLOWED_DEMO_NUMBERS`);
+  if (!allowed().includes(c.trustedPhoneE164)) throw new Error(`refusing to dial ${c.trustedPhoneE164}: not on ALLOWED_DEMO_NUMBERS`);
   const call = await retell().call.createPhoneCall({
     from_number: process.env.RETELL_FROM_NUMBER!,
     to_number: c.trustedPhoneE164,

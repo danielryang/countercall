@@ -1,7 +1,7 @@
 // lib/voice/finalize.ts
 // lib/voice/finalize.ts — turns recorded tool calls + telephony result + second-reader into ONE outcome. Idempotent.
 import { decideOutcome, type Answer, type Decision, type Flag, type SpeakerRole } from "./decide";
-import { emit } from "./events";
+import { emit as defaultEmit, type CallEvent } from "./events";
 
 export interface CaseStore {                        // architect/agent 05 implements this on the chosen DB
   getExpectedLast4(caseId: string): Promise<string>;                                   // server-side secret; never sent to Retell
@@ -12,7 +12,7 @@ export interface CaseStore {                        // architect/agent 05 implem
 
 type AnalyzedCall = { disconnection_reason?: string; call_analysis?: { call_summary?: string; custom_analysis_data?: Record<string, unknown> } };
 
-export async function finalizeCall(store: CaseStore, caseId: string, callId: string, call: AnalyzedCall): Promise<Decision | null> {
+export async function finalizeCall(store: CaseStore, caseId: string, callId: string, call: AnalyzedCall, emit: (e: CallEvent) => Promise<unknown> = defaultEmit): Promise<Decision | null> {
   const rows = await store.getToolCalls(callId);
   const secondRaw = call.call_analysis?.custom_analysis_data?.vendor_answer;
   const decision = decideOutcome({
