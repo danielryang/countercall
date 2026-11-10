@@ -1,0 +1,148 @@
+{
+  "org": {
+    "domain": "ricerobotics.com",
+    "execNames": [
+      "Dana Rice",
+      "Priya Natarajan"
+    ]
+  },
+  "vendors": [
+    {
+      "id": "v_acme",
+      "name": "Acme Corp",
+      "domains": [
+        "acmecorp.com"
+      ],
+      "knownContacts": [
+        "ap@acmecorp.com",
+        "jordan.lee@acmecorp.com"
+      ],
+      "trustedPhone": "+14155550142",
+      "bank": {
+        "bankName": "Embarcadero Community Bank",
+        "routing": "121007775",
+        "accountLast4": "4417"
+      },
+      "openInvoices": [
+        {
+          "number": "4471",
+          "amountCents": 1240000
+        },
+        {
+          "number": "4472",
+          "amountCents": 1240000
+        }
+      ],
+      "typicalInvoiceCents": 1240000,
+      "scheduledPaymentIds": [
+        "pay_8101",
+        "pay_8102"
+      ]
+    },
+    {
+      "id": "v_globex",
+      "name": "Globex Industrial Supply",
+      "domains": [
+        "globex-industrial.com"
+      ],
+      "knownContacts": [
+        "billing@globex-industrial.com"
+      ],
+      "trustedPhone": "+14155550177",
+      "bank": {
+        "bankName": "Harbor Trust",
+        "routing": "026008811",
+        "accountLast4": "9021"
+      },
+      "openInvoices": [],
+      "typicalInvoiceCents": 860000,
+      "scheduledPaymentIds": [
+        "pay_8201"
+      ]
+    },
+    {
+      "id": "v_northwind",
+      "name": "Northwind Components",
+      "domains": [
+        "northwind-components.de"
+      ],
+      "knownContacts": [
+        "rechnung@northwind-components.de"
+      ],
+      "trustedPhone": "+14155550163",
+      "bank": {
+        "bankName": "Pacific Savings",
+        "routing": "061004126",
+        "accountLast4": "7730"
+      },
+      "openInvoices": [],
+      "typicalInvoiceCents": 2100000,
+      "scheduledPaymentIds": [
+        "pay_8301"
+      ]
+    },
+    {
+      "id": "v_summit",
+      "name": "Summit Packaging Co",
+      "domains": [
+        "summitpackaging.com"
+      ],
+      "knownContacts": [
+        "ar@summitpackaging.com"
+      ],
+      "trustedPhone": "+12065550117",
+      "bank": {
+        "bankName": "Cascade Federal Credit Union",
+        "routing": "101000019",
+        "accountLast4": "8120"
+      },
+      "openInvoices": [],
+      "typicalInvoiceCents": 540000,
+      "scheduledPaymentIds": [
+        "pay_8401"
+      ]
+    },
+    {
+      "id": "v_kestrel",
+      "name": "Kestrel Freight",
+      "domains": [
+        "kestrelfreight.com"
+      ],
+      "knownContacts": [
+        "billing@kestrelfreight.com"
+      ],
+      "trustedPhone": "+12065550134",
+      "bank": {
+        "bankName": "Pioneer Business Bank",
+        "routing": "202000028",
+        "accountLast4": "3359"
+      },
+      "openInvoices": [],
+      "typicalInvoiceCents": 1850000,
+      "scheduledPaymentIds": [
+        "pay_8501"
+      ]
+    },
+    {
+      "id": "v_orchard",
+      "name": "Orchard Office Supply",
+      "domains": [
+        "orchardoffice.com"
+      ],
+      "knownContacts": [
+        "accounts@orchardoffice.com"
+      ],
+      "trustedPhone": "+14155550188",
+      "bank": {
+        "bankName": "Mission Valley Bank",
+        "routing": "303000037",
+        "accountLast4": "6642"
+      },
+      "openInvoices": [],
+      "typicalInvoiceCents": 210000,
+      "scheduledPaymentIds": [
+        "pay_8601"
+      ]
+    }
+  ]
+}

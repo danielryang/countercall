@@ -1,0 +1,63 @@
+{
+  "name": "countercall",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"lib/**/*.test.ts\"",
+    "eval": "tsx eval/run.ts",
+    "eval:live": "tsx --env-file-if-exists=.env.local eval/run.ts --live",
+    "eval:unit": "tsx eval/unit.ts",
+    "eval:smoke": "tsx eval/smoke.ts",
+    "db:apply": "tsx --env-file-if-exists=.env.local scripts/db-apply.ts",
+    "db:check": "tsx scripts/db-check.ts",
+    "verify": "npm run typecheck && npm test && npm run eval && npm run eval:unit && npm run eval:smoke && npm run db:check",
+    "lint:ui": "bash scripts/check-ui.sh app components lib",
+    "lint:slop": "node tools/slop-lint.js http://localhost:3000",
+    "shoot": "node scripts/shoot.mjs",
+    "replay:webhooks": "tsx --env-file-if-exists=.env.local scripts/replay-webhooks.ts",
+    "export-run": "tsx --env-file-if-exists=.env.local scripts/export-run.ts",
+    "demo:reset": "tsx --env-file-if-exists=.env.local scripts/demo-reset.ts",
+    "seed:phones": "tsx --env-file-if-exists=.env.local scripts/seed-phones.ts",
+    "seed:history": "tsx --env-file-if-exists=.env.local scripts/seed-history.ts",
+    "preflight": "tsx --env-file-if-exists=.env.local scripts/preflight.ts",
+    "provision:agent": "tsx --env-file-if-exists=.env.local scripts/provision-agent.ts",
+    "setup:agentmail": "tsx --env-file-if-exists=.env.local scripts/setup-agentmail.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
+    "@fontsource-variable/mona-sans": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@number-flow/react": "^0.6.2",
+    "agentmail": "^0.5.46",
+    "html-to-text": "^10.0.1",
+    "motion": "^14.6.0",
+    "next": "^16.4.3",
+    "postgres": "^3.4.9",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "resend": "^6.34.1",
+    "retell-sdk": "^6.2.13",
+    "svix": "^2.9.1",
+    "use-stick-to-bottom": "^1.1.6",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.12",
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/html-to-text": "^9.0.4",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": [
+    "pdx1"
+  ],
+  "ignoreCommand": "test \"$VERCEL_GIT_COMMIT_REF\" != main",
+  "crons": [
+    {
+      "path": "/api/health",
+      "schedule": "17 13 * * *"
+    }
+  ],
+  "framework": "nextjs"
+}
