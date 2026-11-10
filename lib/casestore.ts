@@ -10,7 +10,7 @@ export const makeCaseStore = (q: Q): CaseStore => ({
     return r?.challenge_expected?.trim() ?? '';
   },
   async addToolCall(_caseId, callId, key, name, args) {
-    await q(`insert into call_tool_calls (retell_call_id, key, name, args) values ($1, $2, $3, $4::jsonb)
+    await q(`insert into call_tool_calls (retell_call_id, key, name, args) values ($1, $2, $3, $4::text::jsonb)
              on conflict (retell_call_id, key) do update set args = excluded.args`, [callId, key, name, JSON.stringify(args)]);
   },
   async getToolCalls(callId) {
@@ -18,7 +18,7 @@ export const makeCaseStore = (q: Q): CaseStore => ({
     return rows.map((r) => ({ name: r.name, args: r.args }));
   },
   async saveOutcome(caseId, callId, d) {   // the idempotence gate: false means "already decided, or no such call row"
-    const r = await q(`update calls set outcome = $1, reason = $2, decision = $3::jsonb, ended_at = coalesce(ended_at, now())
+    const r = await q(`update calls set outcome = $1, reason = $2, decision = $3::text::jsonb, ended_at = coalesce(ended_at, now())
                        where retell_call_id = $4 and case_id = $5 and outcome is null returning id`, [d.outcome, d.reason, JSON.stringify(d), callId, caseId]);
     return r.length === 1;
   },

@@ -9,7 +9,7 @@ export type Q = <T = Record<string, unknown>>(text: string, params?: unknown[]) 
 export async function appendEvent(q: Q, e: EmittedEvent, human?: string): Promise<number | null> {
   const row = toRow(e, human);
   const [ins] = await q<{ seq: string | number }>(
-    `insert into events (case_id, type, actor, idem_key, payload) values ($1, $2, $3, $4, $5::jsonb)
+    `insert into events (case_id, type, actor, idem_key, payload) values ($1, $2, $3, $4, $5::text::jsonb)
      on conflict (idem_key) do nothing returning seq`,
     [row.case_id, row.type, row.actor, row.idem_key, JSON.stringify(row.payload)]);
   if (!ins) return null;
@@ -26,7 +26,7 @@ export async function appendEvent(q: Q, e: EmittedEvent, human?: string): Promis
          released_by = case when $2::text = 'released' then $3 else released_by end,
          released_at = case when $2::text = 'released' then now() else released_at end
        where id = $1`, [row.case_id, to, row.actor]);
-    await q(`insert into events (case_id, type, actor, payload) values ($1, 'case.state', 'policy', $2::jsonb)`,
+    await q(`insert into events (case_id, type, actor, payload) values ($1, 'case.state', 'policy', $2::text::jsonb)`,
       [row.case_id, JSON.stringify({ from: c.state, to, cause: e.type })]);
   }
   return Number(ins.seq);

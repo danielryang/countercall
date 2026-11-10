@@ -11,5 +11,5 @@ export const POST = (req: Request) => webhookEndpoint(req, {
   ctx: makeVoiceCtx(q, emitVoice),
   verify: verifyRetell,
   // Keep every verified body for debugging, replay and golden-run capture (raw_webhooks is never served by any route).
-  recordRaw: async (key, raw) => { await q(`insert into raw_webhooks (provider, event_key, signature_ok, payload) values ('retell', $1, true, $2::jsonb) on conflict do nothing`, [key, raw]); },
+  recordRaw: async (key, raw) => { await q(`insert into raw_webhooks (provider, event_key, signature_ok, payload) values ('retell', $1, true, $2::text::jsonb) on conflict do nothing`, [key, raw]); },
 });

@@ -66,7 +66,7 @@ export async function makeDeps(io: DepsIo, cfg: DepsConfig, src: { provider: str
         await q(`update cases set category = $2, risk = $3 where id = $1`, [e.caseId, e.decision.category, e.decision.risk]);
         break;
       case 'call.requested':   // SERVER-ONLY columns (08 section 2.5): never echoed in events (toRow redacts)
-        await q(`update cases set claimed_last4 = $2, claimed_invoices = array(select jsonb_array_elements_text($3::jsonb)) where id = $1`, [e.caseId, e.context.claimedAccountLast4, JSON.stringify(e.context.invoiceNumbers)]);
+        await q(`update cases set claimed_last4 = $2, claimed_invoices = array(select jsonb_array_elements_text($3::text::jsonb)) where id = $1`, [e.caseId, e.context.claimedAccountLast4, JSON.stringify(e.context.invoiceNumbers)]);
         break;
     }
   };
@@ -74,7 +74,7 @@ export async function makeDeps(io: DepsIo, cfg: DepsConfig, src: { provider: str
   return {
     org,
     async seen(providerEventId) {   // insert-if-absent: no row back means this exact delivery was already processed
-      const r = await q(`insert into raw_webhooks (provider, event_key, signature_ok, payload) values ($1,$2,true,$3::jsonb) on conflict do nothing returning 1 as one`,
+      const r = await q(`insert into raw_webhooks (provider, event_key, signature_ok, payload) values ($1,$2,true,$3::text::jsonb) on conflict do nothing returning 1 as one`,
         [src.provider, providerEventId, JSON.stringify(src.payload ?? {})]);
       return r.length === 0;
     },
