@@ -27,6 +27,8 @@ export async function testDb() {
     await q(`update cases set state = 'flagged' where id = $1`, [c.id]); await q(`update cases set state = 'held' where id = $1`, [c.id]);
     return c.id;
   };
+  /** One transaction on the in-process database (the same shape production gets from postgres.js sql.begin). */
+  const tx = <T,>(fn: (q: Q) => Promise<T>): Promise<T> => db.transaction((t) => fn(txq(t as never)));
   const stateOf = async (caseId: string) => (await q<{ state: string }>(`select state from cases where id = $1`, [caseId]))[0].state;
-  return { db, q, emit, events, createTask, heldCase, stateOf, store: makeCaseStore(q) };
+  return { db, q, emit, tx, events, createTask, heldCase, stateOf, store: makeCaseStore(q) };
 }

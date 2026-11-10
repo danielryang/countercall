@@ -10,7 +10,7 @@ import { callingCase } from './selectors';
 
 export type StreamStatus = 'connecting' | 'live' | 'reconnecting' | 'paused' | 'replay';
 export interface ReplayControls { name: string; position: number; total: number; playing: boolean; speed: number; description: string; source: Run['source']; play(): void; pause(): void; step(): void; restart(): void; setSpeed(x: number): void }
-export interface Stream { state: State; status: StreamStatus; resume(): void; replay: ReplayControls | null }
+export interface Stream { state: State; status: StreamStatus; resume(): void; refresh(): void; replay: ReplayControls | null }
 
 const PAGE = 1000;
 
@@ -22,6 +22,7 @@ export function useEventStream(opts: { replay?: string | null; at?: number | nul
   const stateRef = useRef(state); stateRef.current = state;
   const interaction = useRef(Date.now());
   const resumeRef = useRef<() => void>(() => {});
+  const refreshRef = useRef<() => void>(() => {});
   const feed = useCallback((events: Ev[]) => setState((s) => events.reduce(apply, s)), []);
 
   // ---- live polling
@@ -55,6 +56,7 @@ export function useEventStream(opts: { replay?: string | null; at?: number | nul
       if (shouldPause(Date.now(), interaction.current)) { paused = true; setStatus('paused'); return; }
       timer = setTimeout(tick, more ? 0 : nextDelay({ calling: !!callingCase(stateRef.current), now: Date.now(), lastEventAt, hidden: typeof document !== 'undefined' && document.hidden, consecutiveErrors: errors }));
     };
+    refreshRef.current = () => { if (timer) clearTimeout(timer); void tick(); };   // fetch now (e.g. right after a release)
     resumeRef.current = () => { interaction.current = Date.now(); if (paused) { paused = false; setStatus('connecting'); void tick(); } };
     const touch = () => resumeRef.current();
     window.addEventListener('pointerdown', touch); window.addEventListener('keydown', touch);
@@ -93,5 +95,5 @@ export function useEventStream(opts: { replay?: string | null; at?: number | nul
     setSpeed: (x) => setSpeedState(x),
   }, [replayName, run, position, playing, speed, feed]);
 
-  return { state, status, resume: () => resumeRef.current(), replay };
+  return { state, status, resume: () => resumeRef.current(), refresh: () => refreshRef.current(), replay };
 }

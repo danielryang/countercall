@@ -19,5 +19,8 @@ registerSink(async (e) => { await emit(e); });
 /** Driver-agnostic query function over postgres.js (autocommit). Transactions go through `emit` / `sql.begin`. */
 export const q: Q = (text, params = []) => sql.unsafe(text, params as never) as never;
 
+/** One transaction on the production driver (postgres.js types wrap the result in a way that does not match a generic callback, hence the cast). */
+export const tx = <T>(fn: (q: Q) => Promise<T>): Promise<T> => sql.begin((t) => fn((text, params = []) => t.unsafe(text, params as never) as never)) as Promise<T>;
+
 /** 01's CaseStore on our schema (lib/casestore.ts). */
 export const store: CaseStore = makeCaseStore(q);

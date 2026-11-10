@@ -97,11 +97,15 @@ export async function makeDeps(io: DepsIo, cfg: DepsConfig, src: { provider: str
 // ---- production wiring (postgres.js + environment) -------------------------------------------------------------------------------------------------
 const EMPTY_SEED: MockSeed = { vendors: [], accounts: {}, contacts: {}, bills: [] };
 
+/** The Ramp client for the current mode. The mock is bound to the given query function (so a release can run inside its transaction). */
+export function rampFor(q: Q): HoldClient {
+  const e = env();
+  return e.RAMP_MODE === 'sandbox' ? makeRamp({ ...process.env, RAMP_MODE: 'sandbox' }, EMPTY_SEED) : new DbMockRampClient(q);   // sandbox throws without credentials: fail closed
+}
+
 export async function getDeps(src: { provider: string; payload?: unknown } = { provider: 'agentmail' }): Promise<Deps> {
   const e = env();
-  const ramp: HoldClient = e.RAMP_MODE === 'sandbox'
-    ? makeRamp({ ...process.env, RAMP_MODE: 'sandbox' }, EMPTY_SEED)   // throws without credentials: fail closed
-    : new DbMockRampClient(storeQ);
+  const ramp = rampFor(storeQ);
   return makeDeps({ q: storeQ, emit: (ev) => storeEmit(ev) }, {
     rampMode: e.RAMP_MODE, ramp, callsEnabled: e.CALLS_ENABLED, perVendorHourLimit: e.CALL_LIMIT_PER_VENDOR_HOUR,
     allowedSenders: e.INBOUND_ALLOWED_SENDERS, dial: startVerificationCall,

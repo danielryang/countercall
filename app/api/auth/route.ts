@@ -1,5 +1,5 @@
 // POST /api/auth {passcode, name} -> 204 + session cookie. DELETE clears it. Rate-limited: 5 attempts / 10 min / IP.
-import { clearCookieHeader, cookieHeader, isSecureContext, passcodeOk, sameOriginJson, sign, validName } from '@/lib/auth';
+import { clearCookieHeader, cookieHeader, isSecureContext, passcodeOk, sameOriginJson, sessionOf, sign, validName } from '@/lib/auth';
 import { allow } from '@/lib/ratelimit';
 
 export const maxDuration = 15;
@@ -11,6 +11,12 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => null)) as { passcode?: unknown; name?: unknown } | null;
   if (!body || typeof body.passcode !== 'string' || !validName(body.name) || !passcodeOk(body.passcode)) return new Response('unauthorized', { status: 401 });
   return new Response(null, { status: 204, headers: { 'Set-Cookie': cookieHeader(sign(body.name), isSecureContext()) } });
+}
+
+/** Who is signed in (the release dialog asks before it shows the confirm button). */
+export async function GET(req: Request) {
+  const s = sessionOf(req);
+  return s ? Response.json({ name: s.n }, { headers: { 'Cache-Control': 'no-store' } }) : new Response('unauthorized', { status: 401 });
 }
 
 export async function DELETE(req: Request) {

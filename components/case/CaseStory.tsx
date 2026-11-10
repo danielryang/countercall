@@ -7,7 +7,7 @@ import { plainReasons, plainTask, REASON_TEXT, SOURCE_LABEL, STAMP } from '@/lib
 import type { CaseView } from '@/lib/reducer';
 import { fmtCents } from '@/lib/selectors';
 
-type Key = 'email' | 'hold' | 'call' | 'result';
+type Key = 'email' | 'hold' | 'call' | 'result' | 'release';
 type St = 'done' | 'active' | 'pending' | 'warn';
 interface Step { key: Key; title: string; summary: string; st: St; body: ReactNode }
 
@@ -21,7 +21,7 @@ function Icon({ st }: { st: St }) {
 
 const md = (iso: string) => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
-export function CaseStory({ c }: { c: CaseView }) {
+export function CaseStory({ c, onRelease, releaseBlocked }: { c: CaseView; onRelease?: () => void; releaseBlocked?: string }) {
   const [open, setOpen] = useState<Partial<Record<Key, boolean>>>({});
   const v = c.vendorName ?? 'the vendor';
   const reasons = plainReasons(c);
@@ -32,6 +32,7 @@ export function CaseStory({ c }: { c: CaseView }) {
   const phone = ct?.phoneMasked ?? c.trusted?.phoneMasked;
   const cleared = c.state === 'cleared';
   const ans = c.call ? c.call.turns[answerTurn(c.call.turns)]?.text : undefined;
+  const canRelease = (c.state === 'awaiting_approval' || c.state === 'fraud_blocked' || c.state === 'needs_human') && !c.release;
   const steps: Step[] = [];
 
   steps.push({
@@ -91,9 +92,24 @@ export function CaseStory({ c }: { c: CaseView }) {
           : c.state === 'needs_human' ? 'A task was created for your team. The payments stay on hold until someone verifies this by hand.'
           : c.state === 'released' ? 'A person approved the release.' : 'CounterCall is working on it.'}</p>
         <div className="flex items-center gap-3">
-          <button type="button" disabled title="The approval step is not wired up yet" className="shrink-0 whitespace-nowrap rounded-lg border border-rule px-3 py-1.5 text-[13px] text-fg-muted disabled:cursor-not-allowed">Review and release{'…'}</button>
+          {!c.release && (
+            <button type="button" disabled={!canRelease || !onRelease} onClick={onRelease} title={!onRelease ? (releaseBlocked ?? 'Approval is not available here') : canRelease ? 'Review and approve' : 'Nothing to release yet'}
+              className="shrink-0 whitespace-nowrap rounded-lg border border-fg px-3 py-1.5 text-[13px] enabled:hover:bg-fg enabled:hover:text-surface disabled:cursor-not-allowed disabled:border-rule disabled:text-fg-muted">Review and release{'…'}</button>
+          )}
           <span className="cap">Only a person can release money. CounterCall never does it on its own.</span>
         </div>
+      </div>
+    ),
+  });
+
+  if (c.release) steps.push({
+    key: 'release', st: 'done', title: `Released by ${c.release.approvedBy}`,
+    summary: c.release.destination === 'on_file' ? 'Paid to the account already on file' : 'New bank account approved (Ramp still has to approve it)',
+    body: (
+      <div className="space-y-1 text-[14px] leading-5">
+        <p>{fmtCents(cents)} was released to {c.release.destination === 'on_file' ? 'the account we already had on file' : 'the new bank account, pending Ramp\u2019s own approval'}.</p>
+        {c.release.note && <p className="text-fg-muted">Reason given: {c.release.note}</p>}
+        <p className="cap">Approved by a person, recorded in the audit log.</p>
       </div>
     ),
   });
