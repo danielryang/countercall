@@ -7,15 +7,18 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
 import { EventsProvider, useStream } from '@/components/EventsProvider';
 import { HeldTicker } from '@/components/ui/HeldTicker';
+import { AuditBadge } from '@/components/ui/AuditBadge';
 import { PresentMode } from '@/components/ui/PresentMode';
+import { badgeState } from '@/lib/audit-view';
 import { heldCents } from '@/lib/selectors';
+import { useAudit } from '@/lib/use-audit';
 
 const STATUS_TEXT = { connecting: 'Connecting', live: 'Live', reconnecting: 'Reconnecting', paused: 'Paused · click to resume', replay: 'Replay' } as const;
 const SPEEDS = [1, 2, 4, 0.5];
 const THEMES = ['graphite', 'paper', 'cloud'] as const;
 type Theme = (typeof THEMES)[number];
 
-const NAV = [['/cases', 'Cases'], ['/vendors', 'Vendors']] as const;
+const NAV = [['/cases', 'Cases'], ['/vendors', 'Vendors'], ['/audit', 'Audit']] as const;
 function Nav() {   // section links keep the query (?replay=, ?theme=) so a replay stays a replay
   const path = usePathname(); const qs = useSearchParams().toString();
   return <nav aria-label="Sections" className="flex items-center gap-1 text-[13px]">{NAV.map(([h, l]) => <Link key={h} href={qs ? `${h}?${qs}` : h} aria-current={path.startsWith(h) ? 'page' : undefined} className={`rounded-md px-2 py-1 ${path.startsWith(h) ? 'bg-surface-raised text-fg' : 'text-fg-muted hover:text-fg'}`}>{l}</Link>)}</nav>;
@@ -40,6 +43,14 @@ function Top() {
   );
 }
 
+function AuditFoot() {   // the log check, quietly, next to the connection state; links to /audit and keeps the query like the nav
+  const { state, status } = useStream(); const qs = useSearchParams().toString(); const replay = status === 'replay';
+  const a = useAudit({ lastSeq: state.lastSeq, replay });
+  if (replay || a.status === 'loading') return null;   // replay: the footer already says so, and the audit page explains the seal is checked live
+  const kind = badgeState(a.report);
+  return <Link href={qs ? `/audit?${qs}` : '/audit'} className="hover:text-fg"><AuditBadge kind={kind} compact /></Link>;
+}
+
 function Foot({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void }) {
   const { status, replay, resume } = useStream();
   const live = status === 'live';
@@ -51,6 +62,7 @@ function Foot({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void 
         <i aria-hidden className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-verified' : status === 'replay' ? 'bg-live' : 'bg-held'}`} />
         {STATUS_TEXT[status]}{replay ? ` of a recorded run` : ''}
       </button>
+      <AuditFoot />
       {replay && (
         <div className="flex items-center gap-3" aria-label="Replay controls">
           <button type="button" className={link} onClick={replay.playing ? replay.pause : replay.play}>{replay.playing ? 'Pause' : 'Play'}</button>
