@@ -11,6 +11,7 @@ Config.setColorSpace('bt709'); // the default tags yuvj420p/bt470bg; also pass -
 Config.overrideWebpackConfig((c) =>
   enableTailwind({
     ...c,
-    resolve: { ...c.resolve, alias: { ...(c.resolve?.alias ?? {}), '@': path.resolve(process.cwd(), '..') } },
+    // roots: the app's CSS loads fonts by site-root URLs (/fonts/...), which the website serves from public/. Resolve them from the same folder.
+    resolve: { ...c.resolve, roots: [path.resolve(process.cwd(), '..', 'public')], alias: { ...(c.resolve?.alias ?? {}), '@': path.resolve(process.cwd(), '..') } },
   }),
 );
