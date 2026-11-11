@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import '@fontsource-variable/mona-sans/wdth.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '@fontsource/ibm-plex-mono/600.css';

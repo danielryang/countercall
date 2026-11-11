@@ -20,3 +20,16 @@ refs/
 
 # Claude Code agent worktrees (local only)
 .claude/worktrees/
+
+# Switzer webfont: fetched at build by scripts/fetch-fonts.mjs (license forbids redistributing it through a public repo)
+public/fonts/
+
+# impeccable runtime state (shared design artifacts stay tracked: .impeccable/surfaces/*.md, design.json, config.json)
+**/.impeccable/config.local.json
+**/.impeccable/hook.cache.json
+**/.impeccable/hook.pending.json
+**/.impeccable/*.png
+**/.impeccable/review/
+**/.impeccable/questions/
+**/.impeccable/mocks/
+**/.impeccable/live/

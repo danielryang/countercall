@@ -24,9 +24,10 @@ export function HoldButton({ children, onConfirm, disabled, busy }: { children: 
       onPointerDown={begin} onPointerUp={stop} onPointerLeave={stop} onPointerCancel={stop} onBlur={stop}
       onKeyDown={(e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); begin(); } }}
       onKeyUp={(e) => { if (e.key === ' ' || e.key === 'Enter') stop(); }}
-      className="relative select-none overflow-hidden rounded-lg border border-fg px-4 py-2 text-[14px] font-medium disabled:border-rule disabled:text-fg-muted">
-      <i aria-hidden className="absolute inset-y-0 left-0 bg-fg/20" style={{ width: `${p * 100}%` }} />
-      <span className="relative">{busy ? 'Releasing\u2026' : children}</span>
+      className="relative min-h-11 select-none overflow-hidden rounded-sm bg-approve px-5 py-2 text-[15px] font-[500] text-white disabled:bg-surface-raised disabled:text-fg-muted">
+      {/* state change: the hold is filling; the button darkens left to right until the release fires */}
+      <i aria-hidden className="absolute inset-y-0 left-0 bg-ink/35" style={{ width: `${p * 100}%` }} />
+      <span className="relative">{busy ? 'Releasing…' : children}</span>
     </button>
   );
 }

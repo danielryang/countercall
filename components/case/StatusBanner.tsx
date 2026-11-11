@@ -1,30 +1,41 @@
-// The headline: one plain sentence that says what happened and what it means, so a first-time viewer understands the case in two seconds.
-import { Stamp } from '@/components/call/Stamp';
+// The case banner, in the shape of Ramp's "Changes to this vendor are currently pending review" banner: a square tinted strip with a line icon and one
+// plain sentence. It says what happened and what it means; the status is said once, here.
 import { headline, type Tone } from '@/lib/copy';
 import type { CaseView } from '@/lib/reducer';
 import { clockRunning, elapsedAt, mmss } from '@/lib/selectors';
 
-const TONE: Record<Tone, { box: string; icon: string; glyph: string }> = {
-  danger: { box: 'border-blocked/50 bg-blocked/15', icon: 'bg-blocked text-paper-raised', glyph: '\u2715' },
-  warn: { box: 'border-held/50 bg-held/15', icon: 'bg-held text-ink', glyph: '!' },
-  ok: { box: 'border-verified/50 bg-verified/15', icon: 'bg-verified text-ink', glyph: '\u2713' },
-  progress: { box: 'border-rule bg-surface-raised', icon: 'border border-fg text-fg animate-blink', glyph: '\u2022' },
-  neutral: { box: 'border-rule bg-surface-raised', icon: 'bg-fg-muted text-surface', glyph: '\u2022' },
+const TONE: Record<Tone, string> = {
+  danger: 'bg-blocked-soft border-blocked-rule text-blocked',
+  warn: 'bg-banner border-banner-rule text-banner-ink',
+  ok: 'bg-verified-soft border-verified-rule text-approve',
+  progress: 'bg-surface-raised border-rule-strong text-fg',
+  neutral: 'bg-surface-raised border-rule-strong text-fg-muted',
 };
+
+function ToneIcon({ tone }: { tone: Tone }) {   // 20px line icons, 1.5 stroke
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="mt-0.5 shrink-0">
+      {tone === 'danger' && <><circle cx="10" cy="10" r="7.5" /><path d="M5 15L15 5" /></>}
+      {tone === 'warn' && <><path d="M10 2.8l7.6 13.4H2.4z" /><path d="M10 8v3.6M10 14v.1" /></>}
+      {tone === 'ok' && <><circle cx="10" cy="10" r="7.5" /><path d="M6.6 10.2l2.3 2.3 4.6-4.8" /></>}
+      {tone === 'progress' && <><circle cx="10" cy="10" r="7.5" /><path d="M10 6v4l2.6 1.6" /></>}
+      {tone === 'neutral' && <circle cx="10" cy="10" r="7.5" />}
+    </svg>
+  );
+}
 
 export function StatusBanner({ c, nowMs }: { c: CaseView; /** wall clock, live view only: the case clock ticks while the case is still working */ nowMs?: number }) {
   const h = headline(c);
-  const t = TONE[h.tone];
-  const done = !clockRunning(c);   // finished: an outcome, cleared, or handed to a person (same rule as the clock and the timing view)
+  const done = !clockRunning(c);
   return (
-    <div className={`flex items-center gap-5 rounded-xl border px-6 py-3.5 ${t.box}`}>
-      <span aria-hidden className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[16px] font-semibold ${t.icon}`}>{t.glyph}</span>
+    // state change: the banner's tone and sentence change with every case.state; it settles in when a result lands
+    <div key={h.tone} className={`flex shrink-0 items-start gap-3 rounded-sm border px-5 py-3.5 ${TONE[h.tone]} ${done ? 'stamp' : ''}`}>
+      <ToneIcon tone={h.tone} />
       <div className="min-w-0 flex-1">
-        <div className="cap">{c.id} {'·'} {c.vendorName ?? 'Unknown sender'} {'·'} {done ? 'result in ' : ''}<span className="font-mono tabular-nums">{mmss(elapsedAt(c, nowMs))}</span>{done ? '' : ' so far'}</div>
-        <h1 className="text-[21px] font-semibold leading-7 tracking-tight">{h.title}</h1>
-        <p className="mt-0.5 text-[14px] leading-5 text-fg-muted">{h.sub}</p>
+        <p className="text-[17px] font-[550] leading-6">{h.title}</p>
+        <p className="mt-0.5 text-[15px] leading-[22px] text-fg">{h.sub}</p>
       </div>
-      {c.call?.outcome && <Stamp c={c} />}
+      {c.state !== 'calling' && <span className="shrink-0 pt-0.5 text-[14px] text-fg-muted">{done ? 'Result in ' : ''}<span className="font-mono text-fg">{mmss(elapsedAt(c, nowMs))}</span>{done ? '' : ' so far'}</span>}
     </div>
   );
 }

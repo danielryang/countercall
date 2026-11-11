@@ -44,30 +44,30 @@ export function CallTranscript({ c }: { c: CaseView }) {
   const ai = turns.find((t) => t.role === 'agent')?.text.match(/automated/i);
   const ai_i = answerTurn(turns);
   return (
-    <div className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-rule bg-surface">
-      <div className="flex shrink-0 items-center gap-2 border-b border-rule px-4 py-2 text-[12px] text-fg-muted">
-        <i aria-hidden className={`h-1.5 w-1.5 rounded-full ${call.status === 'failed' ? 'bg-blocked' : ended ? 'bg-fg-muted' : 'bg-live animate-blink'}`} />
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-rule bg-surface">
+      <div className="flex shrink-0 items-center gap-2.5 border-b border-rule px-4 py-2 text-[13px] text-fg-muted">
+        <i aria-hidden className={`h-2 w-2 rounded-full ${call.status === 'failed' ? 'bg-blocked' : ended ? 'bg-fg-muted' : 'bg-fg animate-blink'}`} />
         <span>{call.status === 'dialing' ? 'Dialing' : call.status === 'connected' ? `On the call · ${mmss(elapsed)}` : call.status === 'failed' ? 'Call failed' : `Call ended · ${mmss(elapsed)}`}</span>
         {ai && <span className="ml-auto">The caller said it is an automated assistant</span>}
       </div>
-      {/* Height: at most 176px, and less when the case column is short (it is a shrinking flex item, see CaseStory), so the Result step stays on the stage. */}
-      <div ref={scrollRef} className="max-h-[176px] min-h-[66px] overflow-y-auto" aria-live="polite">
-      <div ref={contentRef} className="px-4 py-1.5">
+      {/* The transcript fills the open step and scrolls inside it. */}
+      <div ref={scrollRef} className="fade-top min-h-[66px] flex-1 overflow-y-auto" aria-live="polite">
+      <div ref={contentRef} className="px-4 pb-1.5 pt-9">
         {turns.length === 0 && <div className="cap py-2">{call.status === 'dialing' ? 'Dialing the number on file' : 'Waiting for someone to speak'}<span className="scan-dots" /></div>}
         {turns.map((t, i) => {
           const text = show(t); const live = i === turns.length - 1 && !ended;
           return (
-            <div key={t.id} className="grid grid-cols-[88px_minmax(0,1fr)] gap-2 py-1 text-[14px] leading-[22px]">
-              <span className="cap pt-px">{t.role === 'agent' ? 'CounterCall' : c.vendorName?.split(' ')[0] ?? 'Vendor'}</span>
+            <div key={t.id} className="grid grid-cols-[104px_minmax(0,1fr)] gap-3 py-1.5 text-[15.5px] leading-6">
+              <span className={`pt-0.5 text-[13px] font-semibold ${t.role === 'agent' ? 'text-fg-muted' : ''}`}>{t.role === 'agent' ? 'CounterCall' : c.vendorName?.split(' ')[0] ?? 'Vendor'}</span>
               <span className={`${live && text.length < t.text.length ? 'caret' : ''} ${t.role === 'user' ? 'text-fg' : 'text-fg-muted'}`}>{i === ai_i && !!last ? <span className="ev" data-verdict={last === 'no' ? 'no' : last === 'yes' ? 'yes' : undefined}>{text}</span> : text}</span>
             </div>
           );
         })}
       </div>
       </div>
-      <div className="flex shrink-0 gap-6 border-t border-rule px-4 py-2 text-[12px] text-fg-muted">
-        <span>Their answer: <b className="font-medium text-fg">{last ? ANSWER[last] ?? 'Unclear' : 'listening'}</b></span>
-        <span>Security question: <b className="font-medium text-fg">{digits ? 'answered' : 'not answered'}</b></span>
+      <div className="flex shrink-0 gap-8 border-t border-rule px-4 py-2.5 text-[13px] text-fg-muted">
+        <span>Their answer: <b className="font-semibold text-fg">{last ? ANSWER[last] ?? 'Unclear' : 'listening'}</b></span>
+        <span>Security question: <b className="font-semibold text-fg">{digits ? 'answered' : 'not answered'}</b></span>
       </div>
     </div>
   );

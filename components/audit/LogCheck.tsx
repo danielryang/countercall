@@ -10,16 +10,18 @@ export type LogCheckInput =
   | { kind: 'loading' } | { kind: 'error' } | { kind: 'unauthorized' } | { kind: 'replay' };
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString('en-US', { hour12: false });
+/** Banner tone per result, in Ramp's banner shapes: green when sealed, red when broken, yellow when a case does not replay, grey otherwise. */
+const TONE = { intact: 'border-verified-rule bg-verified-soft', broken: 'border-blocked-rule bg-blocked-soft', replay_mismatch: 'border-banner-rule bg-banner', other: 'border-rule-strong bg-surface-raised' } as const;
 
 export function LogCheck({ input, liveHref }: { input: LogCheckInput; liveHref?: string }) {
   if (input.kind !== 'report') {
     const badge = input.kind === 'replay' ? 'replay' : input.kind === 'loading' ? null : 'unavailable';
     const text = input.kind === 'replay' ? AUDIT.replay : input.kind === 'loading' ? AUDIT.loading : input.kind === 'unauthorized' ? AUDIT.unauthorized : AUDIT.unavailable;
     return (
-      <div className="flex items-center gap-4 px-5 py-4">
+      <div className={`flex items-center gap-4 rounded-sm border px-5 py-4 ${TONE.other}`}>
         {badge ? <AuditBadge kind={badge} /> : null}
-        <p className="text-[14px] leading-5">{text}{input.kind === 'loading' ? <span className="scan-dots" aria-hidden /> : null}</p>
-        {input.kind === 'replay' && liveHref ? <a href={liveHref} className="ml-auto text-[13px] underline underline-offset-4 hover:text-fg-muted">{AUDIT.replayLink}</a> : null}
+        <p className="text-[16px] leading-6">{text}{input.kind === 'loading' ? <span className="scan-dots" aria-hidden /> : null}</p>
+        {input.kind === 'replay' && liveHref ? <a href={liveHref} className="ml-auto shrink-0 text-[15px] underline underline-offset-4 hover:text-fg-muted">{AUDIT.replayLink} {'\u2192'}</a> : null}
       </div>
     );
   }
@@ -32,11 +34,11 @@ export function LogCheck({ input, liveHref }: { input: LogCheckInput; liveHref?:
   }
   const seal = c.installed ? c.head?.hash ?? null : null;
   return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-5 gap-y-2 px-5 pb-4 pt-2">
+    <div className={`grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-5 gap-y-2 rounded-sm border px-5 py-4 ${kind === 'intact' || kind === 'broken' || kind === 'replay_mismatch' ? TONE[kind] : TONE.other}`}>
       <div className="pt-px"><AuditBadge kind={kind} /></div>
       <div className="min-w-0">
-        {lines.map((l) => <p key={l} className="text-[14px] leading-5">{l}</p>)}
-        <p className="text-[14px] leading-5">{AUDIT.rebuilt(r.replay.matched, r.replay.cases)}</p>
+        {lines.map((l) => <p key={l} className="text-[16px] leading-6">{l}</p>)}
+        <p className="text-[16px] leading-6">{AUDIT.rebuilt(r.replay.matched, r.replay.cases)}</p>
         {r.replay.outOfBand.length > 0 && <p className="cap mt-1">{AUDIT.outOfBand(r.replay.outOfBand.length)}</p>}
         {r.replay.mismatches.length > 0 && (
           <ul className="mt-2 space-y-0.5 text-[13px] leading-5">
@@ -48,7 +50,7 @@ export function LogCheck({ input, liveHref }: { input: LogCheckInput; liveHref?:
         {seal ? (
           <>
             <span className="cap">{AUDIT.latestSeal}</span>
-            <span className="font-mono text-[15px] tabular-nums">{seal.slice(0, 12)}</span>
+            <span className="font-mono text-[16px]">{seal.slice(0, 12)}</span>
           </>
         ) : null}
         <span className="cap">{AUDIT.checkedAt(clock(r.checkedAt), r.ms)}</span>

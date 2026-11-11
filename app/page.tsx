@@ -6,7 +6,7 @@ import type { CaseState } from '@/lib/events';
 import { fmtCents } from '@/lib/selectors';
 import type { Reason } from '@/lib/voice/decide';
 import type { Outcome } from '@/components/landing/CallOutcomes';
-import { Footer, Hero, HowItWorks, Nav, Problem, Ramp, TheCall, THEMES, Trust, type LandingTheme } from '@/components/landing/Sections';
+import { Footer, Hero, HowItWorks, Nav, Problem, Ramp, TheCall, Trust } from '@/components/landing/Sections';
 import recorded from '@/public/runs/fraud-live.json';   // = RECORDED_RUN in components/landing/copy.ts; a missing file fails the build
 import confirmed from '@/public/runs/confirmed.json';
 import vague from '@/public/runs/vague.json';
@@ -43,11 +43,9 @@ const OUTCOMES: Outcome[] = [
   outcomeOf(vague as Run, 'unsure', '“I think so?”', 'Scripted vendor lines, run through the real pipeline'),
 ];
 
-export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const q = (await searchParams).theme;
-  const theme: LandingTheme = THEMES.find((t) => t === q) ?? 'graphite';
+export default function Home() {
   return (
-    <div data-theme={theme} className="min-h-screen overflow-x-clip bg-surface text-fg">
+    <div className="min-h-screen overflow-x-clip bg-surface text-fg">
       <Nav />
       <main>
         <Hero />
@@ -57,7 +55,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         <Trust />
         <Ramp />
       </main>
-      <Footer theme={theme} />
+      <Footer />
     </div>
   );
 }

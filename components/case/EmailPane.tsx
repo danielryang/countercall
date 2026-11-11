@@ -34,7 +34,7 @@ const linkProps = (ids: string[], { hot, onHot }: Link) => !ids.length || !onHot
 };
 
 export function EmailPane({ c, hot, onHot }: { c: CaseView } & Link) {
-  if (!c.email) return <div className="cap p-5">Reading the email<span className="scan-dots" /></div>;
+  if (!c.email) return <div className="cap rounded-xl border border-rule p-5">Reading the email<span className="scan-dots" /></div>;
   const ev = evidenceMap(c);
   const [local, domain] = c.email.from.address.split('@');
   const senderHot = ev.from.length > 0; const replyHot = ev.replyTo.length > 0;
@@ -45,13 +45,13 @@ export function EmailPane({ c, hot, onHot }: { c: CaseView } & Link) {
   const link = { hot, onHot };
   let n = 0;
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="px-5 pb-3 pt-2">
+    <div className="flex min-h-0 flex-1 flex-col rounded-xl border border-rule bg-surface">
+      <div className="px-5 pb-3 pt-3">
         <Hdr k="From">{c.email.from.name ? `${c.email.from.name} ` : ''}<span className="text-fg-muted">{'<'}</span>{local}@<span className={senderHot ? 'ev-strong' : ''} {...linkProps(ev.from, link)}>{domain}</span><span className="text-fg-muted">{'>'}</span></Hdr>
         {c.email.replyTo.length > 0 && <Hdr k="Reply to">{c.email.replyTo.map((r) => <span key={r.address} className={replyHot ? 'ev-strong' : ''} {...linkProps(ev.replyTo, link)}>{r.address}</span>)}</Hdr>}
         <Hdr k="Subject"><b className="font-medium">{c.email.subject}</b></Hdr>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto whitespace-pre-wrap border-t border-rule px-5 py-4 text-[15px] leading-[1.6]">
+      <div className="min-h-0 flex-1 overflow-y-auto whitespace-pre-wrap border-t border-rule px-5 py-4 text-[15.5px] leading-[1.6]">
         {merge(segs, (s) => signalsForSpan(c, s.start, s.end)).map((sg, i) => {
           if (sg.kind === null) return <span key={i}>{sg.text}</span>;
           if (sg.kind === 'quiet') return <span key={i} className="ev-quiet" data-struck={!!c.call} {...linkProps(sg.ids, link)}>{sg.text}</span>;
@@ -60,7 +60,7 @@ export function EmailPane({ c, hot, onHot }: { c: CaseView } & Link) {
       </div>
       {flagged && (
         <div className="flex items-center gap-2 border-t border-rule px-5 py-2.5 text-[12px] text-fg-muted">
-          <i className="ev inline-block h-3 w-5" aria-hidden />Highlighted: what looks suspicious
+          <i className="inline-block h-3.5 w-5 rounded-sm bg-solar" aria-hidden />Highlighted: what looks suspicious
         </div>
       )}
     </div>

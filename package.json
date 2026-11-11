@@ -35,7 +35,9 @@
     "scan:secrets": "bash scripts/secret-scan.sh",
     "audit:verify": "tsx --env-file-if-exists=.env.local scripts/audit-verify.ts",
     "video:data": "npm --prefix video run data",
-    "video:render": "npm --prefix video run render"
+    "video:render": "npm --prefix video run render",
+    "predev": "node scripts/fetch-fonts.mjs",
+    "prebuild": "node scripts/fetch-fonts.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

@@ -1,0 +1,514 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T00:00:00-08:00",
+  "title": "Design System: CounterCall",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#2E2E28",
+        "tonalRamp": [
+          "#1A1A16",
+          "#2E2E28",
+          "#45453D",
+          "#5C5C52",
+          "#707063",
+          "#9A9A8C",
+          "#C9C9BD",
+          "#EDEDE6"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Olive Gray",
+        "canonical": "#707063",
+        "tonalRamp": [
+          "#2E2E28",
+          "#45453D",
+          "#5C5C52",
+          "#707063",
+          "#8A8A7C",
+          "#A8A89A",
+          "#CACABD",
+          "#EDEDE6"
+        ]
+      },
+      "button-black": {
+        "role": "neutral",
+        "displayName": "Button Black",
+        "canonical": "#1A1919",
+        "tonalRamp": [
+          "#121111",
+          "#1A1919",
+          "#252423",
+          "#3A3837",
+          "#6E6A68",
+          "#B5B2AE",
+          "#D2CECB",
+          "#F4F3EF"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "canonical": "#FFFFFF"
+      },
+      "warm-gray": {
+        "role": "neutral",
+        "displayName": "Warm Gray",
+        "canonical": "#F4F3EF",
+        "tonalRamp": [
+          "#3A3837",
+          "#6E6A68",
+          "#B5B2AE",
+          "#D2CECB",
+          "#DBDACB",
+          "#EBE6E2",
+          "#F4F3EF",
+          "#FAF9F7"
+        ]
+      },
+      "warm-gray-active": {
+        "role": "neutral",
+        "displayName": "Warm Gray Active",
+        "canonical": "#EBE6E2"
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#EAE8E5"
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control Border",
+        "canonical": "#DBDACB"
+      },
+      "gray-dark": {
+        "role": "neutral",
+        "displayName": "Gray Dark",
+        "canonical": "#6E6A68"
+      },
+      "solar": {
+        "role": "primary",
+        "displayName": "Solar Lime",
+        "canonical": "#E4F222",
+        "tonalRamp": [
+          "#3A3E06",
+          "#5F660B",
+          "#8A9410",
+          "#B6C318",
+          "#E4F222",
+          "#F5FF78",
+          "#FAFFB8",
+          "#FEFFE4"
+        ]
+      },
+      "solar-light": {
+        "role": "primary",
+        "displayName": "Pale Solar",
+        "canonical": "#F5FF78"
+      },
+      "blaze": {
+        "role": "secondary",
+        "displayName": "Blaze Orange",
+        "canonical": "#E96516",
+        "tonalRamp": [
+          "#3D1A05",
+          "#6B2E09",
+          "#A3460D",
+          "#C95512",
+          "#E96516",
+          "#F29A63",
+          "#F8C9AB",
+          "#FCE8DC"
+        ]
+      },
+      "blaze-soft": {
+        "role": "secondary",
+        "displayName": "Blaze Tint",
+        "canonical": "#FCE8DC"
+      },
+      "blaze-ink": {
+        "role": "secondary",
+        "displayName": "Blaze Ink",
+        "canonical": "#A3460D"
+      },
+      "review-banner": {
+        "role": "tertiary",
+        "displayName": "Cream",
+        "canonical": "#FEFFE4"
+      },
+      "review-banner-rule": {
+        "role": "tertiary",
+        "displayName": "Bronze Rule",
+        "canonical": "#A77C3B"
+      },
+      "review-banner-ink": {
+        "role": "tertiary",
+        "displayName": "Bronze Ink",
+        "canonical": "#82673C"
+      },
+      "mustard": {
+        "role": "tertiary",
+        "displayName": "Mustard",
+        "canonical": "#E7DAA0"
+      },
+      "approve": {
+        "role": "tertiary",
+        "displayName": "Approve Green",
+        "canonical": "#1F833A",
+        "tonalRamp": [
+          "#0B2E14",
+          "#145424",
+          "#1F833A",
+          "#3F9F58",
+          "#6FBB82",
+          "#A3C1A8",
+          "#D3EBD9",
+          "#F7FFF9"
+        ]
+      },
+      "verified-soft": {
+        "role": "tertiary",
+        "displayName": "Mint Wash",
+        "canonical": "#F7FFF9"
+      },
+      "verified-rule": {
+        "role": "tertiary",
+        "displayName": "Sage Rule",
+        "canonical": "#A3C1A8"
+      },
+      "blocked": {
+        "role": "tertiary",
+        "displayName": "Brick",
+        "canonical": "#C0522E",
+        "tonalRamp": [
+          "#3B170B",
+          "#6A2914",
+          "#963A20",
+          "#C0522E",
+          "#D7805F",
+          "#E8C2B4",
+          "#F6E2DA",
+          "#FEF8F4"
+        ]
+      },
+      "blocked-soft": {
+        "role": "tertiary",
+        "displayName": "Blush Wash",
+        "canonical": "#FEF8F4"
+      },
+      "blocked-rule": {
+        "role": "tertiary",
+        "displayName": "Rose Rule",
+        "canonical": "#E8C2B4"
+      },
+      "review-blue": {
+        "role": "tertiary",
+        "displayName": "Review Blue",
+        "canonical": "#3D67B5"
+      },
+      "review-blue-soft": {
+        "role": "tertiary",
+        "displayName": "Review Blue Wash",
+        "canonical": "#E4EBF6"
+      },
+      "avatar-periwinkle": {
+        "role": "tertiary",
+        "displayName": "Avatar Periwinkle",
+        "canonical": "#ABB6D5"
+      },
+      "avatar-sage": {
+        "role": "tertiary",
+        "displayName": "Avatar Sage",
+        "canonical": "#D1DBCB"
+      },
+      "avatar-mauve": {
+        "role": "tertiary",
+        "displayName": "Avatar Mauve",
+        "canonical": "#DFC2D5"
+      }
+    },
+    "typographyMeta": {
+      "hero": {
+        "displayName": "Hero",
+        "purpose": "Landing headline only."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles (Cases, Vendors, Audit log); case title at 40px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Release drawer and demo sign-in titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section heads: Case details, Vendor details, drawer sections."
+      },
+      "banner-title": {
+        "displayName": "Banner title",
+        "purpose": "The one-sentence status banner headline."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Working size: step labels, nav, rows, email, transcript."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Quiet context in Olive Gray."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field labels and chips, sentence case, no tracking."
+      },
+      "figures": {
+        "displayName": "Figures",
+        "purpose": "Money, ids and clocks: Switzer with tabular figures."
+      }
+    },
+    "shadows": [
+      {
+        "name": "drawer",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Release drawer only (shadcn sheet, Tailwind shadow-lg). Nothing else floats."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default easing for every state change (Ramp's ease)."
+      },
+      {
+        "name": "ease-snap",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Quick settles."
+      },
+      {
+        "name": "ease-in",
+        "value": "cubic-bezier(0.4, 0, 1, 1)",
+        "purpose": "Exits."
+      },
+      {
+        "name": "d-instant",
+        "value": "120ms",
+        "purpose": "Cursor ring, micro feedback."
+      },
+      {
+        "name": "d-fast",
+        "value": "150ms",
+        "purpose": "Hover and colour changes on buttons, step labels, nav."
+      },
+      {
+        "name": "d-base",
+        "value": "250ms",
+        "purpose": "Replay progress, panel changes."
+      },
+      {
+        "name": "d-stamp",
+        "value": "300ms",
+        "purpose": "Result banner / stamp entrance (fade + scale from 0.94)."
+      },
+      {
+        "name": "pour",
+        "value": "450ms",
+        "purpose": "Held amount settles in: fade and 6px drop."
+      },
+      {
+        "name": "rise",
+        "value": "500ms",
+        "purpose": "Story step entrance: fade and 8px rise."
+      },
+      {
+        "name": "d-slow",
+        "value": "700ms",
+        "purpose": "Evidence highlighter sweep across a span."
+      },
+      {
+        "name": "blink",
+        "value": "1.2s steps(1) infinite",
+        "purpose": "Calling dot and scanning dots."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "prefers-reduced-motion makes every animation instant."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "3xl",
+        "value": "100rem"
+      },
+      {
+        "name": "stage",
+        "value": "1280x720 (recording and projector target)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one lime action on an app page. Ink text, near-square.",
+      "html": "<button class=\"ds-btn\">Release payment</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: .625rem 1.25rem; font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; font-size: .9375rem; font-weight: 500; border-radius: 2px; background: #E4F222; color: #2E2E28; border: 1px solid #E4F222; cursor: pointer; transition: background-color 150ms cubic-bezier(.4,0,.2,1), border-color 150ms cubic-bezier(.4,0,.2,1); } .ds-btn:hover { background: #F5FF78; border-color: #F5FF78; } .ds-btn:focus-visible { outline: 2px solid #2E2E28; outline-offset: 2px; } .ds-btn:disabled { background: #F4F3EF; color: #707063; border-color: #EAE8E5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary actions: white with the control-border hairline.",
+      "html": "<button class=\"ds-btn-outline\">Close</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; padding: .625rem 1.25rem; font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; font-size: .9375rem; font-weight: 500; border-radius: 2px; background: #FFFFFF; color: #2E2E28; border: 1px solid #DBDACB; cursor: pointer; transition: background-color 150ms cubic-bezier(.4,0,.2,1); } .ds-btn-outline:hover { background: #F4F3EF; } .ds-btn-outline:focus-visible { outline: 2px solid #2E2E28; outline-offset: 2px; }"
+    },
+    {
+      "name": "Landing Primary Button",
+      "kind": "button",
+      "refersTo": "button-landing-primary",
+      "description": "Black call to action on the landing page and its nav.",
+      "html": "<a class=\"ds-btn-black\" href=\"#\">Watch a recorded real run &rarr;</a>",
+      "css": ".ds-btn-black { display: inline-flex; align-items: center; gap: .5rem; height: 3rem; padding: 0 1.25rem; border-radius: 6px; background: #1A1919; color: #FFFFFF; font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 500; text-decoration: none; transition: background-color 150ms cubic-bezier(.4,0,.2,1); } .ds-btn-black:hover { background: #6E6A68; } .ds-btn-black:focus-visible { outline: 2px solid #2E2E28; outline-offset: 2px; }"
+    },
+    {
+      "name": "Status Chips",
+      "kind": "chip",
+      "refersTo": "chip-held",
+      "description": "Round tinted pills; glyph plus word, never colour alone.",
+      "html": "<span class=\"ds-chip ds-held\">Held</span> <span class=\"ds-chip ds-ok\">Verified</span> <span class=\"ds-chip ds-no\">Blocked</span> <span class=\"ds-chip ds-review\">Needs a person</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: .375rem; height: 1.625rem; padding: 0 .625rem 0 .5rem; border-radius: 9999px; font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; white-space: nowrap; } .ds-chip::before { content: ''; width: .5rem; height: .5rem; background: currentColor; flex: none; } .ds-held { background: #FCE8DC; color: #A3460D; } .ds-held::before { background: linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px, currentColor 5px 8px); } .ds-ok { background: #F7FFF9; color: #1F833A; box-shadow: inset 0 0 0 1px #A3C1A8; } .ds-ok::before { clip-path: polygon(0 55%, 18% 40%, 40% 62%, 82% 12%, 100% 28%, 40% 100%); } .ds-no { background: #FEF8F4; color: #C0522E; box-shadow: inset 0 0 0 1px #E8C2B4; } .ds-no::before { clip-path: polygon(15% 0, 50% 35%, 85% 0, 100% 15%, 65% 50%, 100% 85%, 85% 100%, 50% 65%, 15% 100%, 0 85%, 35% 50%, 0 15%); } .ds-review { background: #E7DAA0; color: #2E2E28; } .ds-review::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); }"
+    },
+    {
+      "name": "Status Banner",
+      "kind": "custom",
+      "refersTo": "banner-review",
+      "description": "Square tinted strip: line icon, one-sentence headline, sub-line, case clock.",
+      "html": "<div class=\"ds-banner\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 3 2.5 16.5h15L10 3z\"/><path d=\"M10 8.5v3.5M10 14.5v.01\"/></svg><div class=\"ds-banner-body\"><p class=\"ds-banner-title\">Suspicious request found</p><p class=\"ds-banner-sub\">Someone is asking to change where Acme Corp gets paid. Holding the payments now.</p></div><span class=\"ds-banner-clock\">00:05 so far</span></div>",
+      "css": ".ds-banner { display: flex; align-items: flex-start; gap: .75rem; padding: .875rem 1.25rem; border: 1px solid #A77C3B; border-radius: 2px; background: #FEFFE4; color: #82673C; font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; } .ds-banner svg { margin-top: 2px; flex: none; } .ds-banner-body { flex: 1; min-width: 0; } .ds-banner-title { margin: 0; font-size: 17px; font-weight: 550; line-height: 24px; } .ds-banner-sub { margin: 2px 0 0; font-size: 15px; line-height: 22px; color: #2E2E28; } .ds-banner-clock { font-size: 14px; color: #707063; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Timeline Rail",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "The case's steps as one sequence (Email, Phone call, Result; Release once a person releases): labels above one continuous rail (ink up to where the case is, grey after), the same ink tick marking each step's start and the case's position, the time each step happened below. The payment hold is a state, not a step: it shows in step 1's status word and in the case details.",
+      "html": "<div class=\"ds-rail\"><div class=\"ds-rail-labels\"><span class=\"ds-rail-step\"><small>Step 1</small><b>Email</b><em>Flagged, payments held</em></span><span class=\"ds-rail-step is-open\"><small>Step 2 <strong>Now</strong></small><b>Phone call</b><em>On the phone</em></span><span class=\"ds-rail-step is-pending\"><small>Step 3</small><b>Result</b><em>Waiting</em></span></div><div class=\"ds-rail-line\"><i style=\"left:0\"></i><i style=\"left:33.333%\"></i><i class=\"is-pending\" style=\"left:66.667%\"></i><span class=\"ds-rail-done\" style=\"width:52%\"><i class=\"ds-rail-now\"></i></span></div><div class=\"ds-rail-times\"><span>00:05</span><span>00:15</span><span>&nbsp;</span></div></div>",
+      "css": ".ds-rail { font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; color: #2E2E28; } .ds-rail-labels, .ds-rail-times { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); } .ds-rail-step { display: block; margin-left: -8px; margin-right: 16px; padding: 4px 8px; border-radius: 2px; } .ds-rail-step.is-open { background: #F4F3EF; } .ds-rail-step small { display: block; font-size: 13px; line-height: 20px; color: #707063; } .ds-rail-step small strong { color: #2E2E28; font-weight: 600; margin-left: 6px; } .ds-rail-step b { display: block; font-size: 16px; line-height: 24px; font-weight: 550; } .ds-rail-step em { display: block; font-style: normal; font-size: 14px; line-height: 20px; color: #707063; } .ds-rail-step.is-pending b { color: #707063; font-weight: 400; } .ds-rail-line { position: relative; margin-top: 12px; height: 3px; border-radius: 9999px; background: #DBDACB; } .ds-rail-line > i { position: absolute; top: -5px; width: 2px; height: 13px; background: #2E2E28; } .ds-rail-line > i.is-pending { background: #DBDACB; } .ds-rail-done { position: absolute; inset: 0 auto 0 0; border-radius: 9999px; background: #2E2E28; transition: width 700ms cubic-bezier(.4,0,.2,1); } .ds-rail-now { position: absolute; right: -1px; top: -5px; width: 2px; height: 13px; background: #2E2E28; } .ds-rail-times { margin-top: 8px; font-size: 13px; color: #707063; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Warm-gray rail with line icons, an active row fill and a lime count badge.",
+      "html": "<nav class=\"ds-side\"><a class=\"ds-row\" aria-current=\"page\" href=\"#\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 11h4l1 2h4l1-2h4M3 11l2-6h10l2 6v4H3z\"/></svg><span>Cases</span><b class=\"ds-count\">1</b></a><a class=\"ds-row\" href=\"#\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 17V8l7-4 7 4v9zM8 17v-5h4v5\"/></svg><span>Vendors</span></a></nav>",
+      "css": ".ds-side { width: 232px; padding: 12px; background: #F4F3EF; font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; } .ds-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 2px; font-size: 15px; color: #707063; text-decoration: none; transition: background-color 150ms cubic-bezier(.4,0,.2,1), color 150ms cubic-bezier(.4,0,.2,1); } .ds-row span { flex: 1; } .ds-row:hover { background: rgb(235 230 226 / .6); color: #2E2E28; } .ds-row[aria-current=page] { background: #EBE6E2; color: #2E2E28; } .ds-row:focus-visible { outline: 2px solid #2E2E28; outline-offset: 2px; } .ds-count { border-radius: 9999px; background: #E4F222; color: #2E2E28; padding: 0 8px; font-size: 12.5px; font-weight: 500; line-height: 20px; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "White, one hairline, 6px, flat. Never nested.",
+      "html": "<section class=\"ds-card\"><header><h2>Case details</h2><span>CC-0105</span></header><p>Two invoices, 4471 and 4472.</p></section>",
+      "css": ".ds-card { border: 1px solid #EAE8E5; border-radius: 6px; background: #FFFFFF; padding: 16px 20px; font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; color: #2E2E28; } .ds-card header { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; } .ds-card h2 { margin: 0; font-size: 16px; font-weight: 550; } .ds-card header span { font-size: 14px; color: #707063; font-variant-numeric: tabular-nums; } .ds-card p { margin: 8px 0 0; font-size: 15px; line-height: 22px; }"
+    },
+    {
+      "name": "Held Amount Slab",
+      "kind": "custom",
+      "refersTo": "held-slab",
+      "description": "Frozen money in Blaze Ink on Blaze Tint, settling in with the pour; hatch for frozen payments.",
+      "html": "<div class=\"ds-held-wrap\"><span class=\"ds-slab\">$24,800.00</span><div class=\"ds-hatch\" aria-hidden=\"true\"></div></div>",
+      "css": ".ds-held-wrap { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; } .ds-slab { padding: 4px 12px; border-radius: 2px; background: #FCE8DC; color: #A3460D; font-size: 26px; font-weight: 500; font-variant-numeric: tabular-nums; animation: ds-pour 450ms cubic-bezier(.4,0,.2,1) both; } .ds-hatch { width: 220px; height: 8px; border-radius: 2px; background-image: repeating-linear-gradient(-45deg, rgb(233 101 22 / .55) 0 1.5px, transparent 1.5px 6px); } @keyframes ds-pour { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } } @media (prefers-reduced-motion: reduce) { .ds-slab { animation: none; } }"
+    },
+    {
+      "name": "Evidence Highlight",
+      "kind": "custom",
+      "refersTo": "colors.solar",
+      "description": "Solar lime marker sweeps across suspicious words in reading order.",
+      "html": "<p class=\"ds-email\"><mark class=\"ds-ev\">We have changed banks.</mark> Please send this month's payment to <mark class=\"ds-ev\" style=\"animation-delay:300ms\">our new account</mark>.</p>",
+      "css": ".ds-email { font-family: Switzer, Lausanne, ui-sans-serif, system-ui, sans-serif; font-size: 15px; line-height: 26px; color: #2E2E28; } .ds-ev { color: inherit; padding: 0 2px; border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; background: none; background-image: linear-gradient(#E4F222, #E4F222); background-repeat: no-repeat; background-size: 0% 100%; animation: ds-sweep 700ms cubic-bezier(.4,0,.2,1) forwards; } @keyframes ds-sweep { to { background-size: 100% 100%; } } @media (prefers-reduced-motion: reduce) { .ds-ev { animation: none; background-size: 100% 100%; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Feature Inside Bill Pay",
+    "overview": "CounterCall looks like a page Ramp could have shipped: white pages, a warm-gray sidebar, warm olive-gray secondary text, hairline dividers, near-square controls and fully round pills. A held bank-change request is shown as one more item that needs a person, not as an alarm. The calm is the argument. The money is frozen, the facts are on the page, and the one lime button belongs to a human.\n\nDensity is low and type is large, because the real audience watches a 1280x720 recording or a projector with seconds per screen. Each case page tells one story (email flagged, payments held, vendor called on the number already on file, result) along one continuous timeline rail, with one step open beneath it. A single sentence banner says what happened. Held money is the only warm-orange thing on the screen. Headlines are regular weight (450) and tightly tracked. Amounts and ids stay in the sans with tabular figures, the way Ramp sets them.\n\nThere is one light look, used by the landing page, the app and the Remotion video. The `[data-theme]` attributes are inert. Switzer (ITF Free Font License) stands in for Ramp's licensed Lausanne. `scripts/fetch-fonts.mjs` fetches it at build into the gitignored `public/fonts`, and it is never committed. The system rejects the AI-dashboard default: dark mode, rounded card soup, glowing pills, and a status repeated four times.",
+    "keyCharacteristics": [
+      "White ground, warm-gray sidebar and bands, ink text at 5:1+ muted secondary.",
+      "Near-square controls, banners and inputs (2px), round pills and avatars, cards at 6px.",
+      "One Solar lime primary action per page. Lime also marks evidence and the nav count.",
+      "Blaze orange is reserved for held money.",
+      "Flat surfaces with hairline borders. The release drawer is the only lifted surface.",
+      "Regular-weight display type, sentence case, tabular figures for money.",
+      "Thin 1.5px-stroke inline SVG line icons."
+    ],
+    "rules": [
+      {
+        "name": "The One Lime Rule",
+        "body": "An app page carries at most one lime button. Lime elsewhere marks evidence or a count and is never a second call to action.",
+        "section": "colors"
+      },
+      {
+        "name": "The Blaze Means Held Rule",
+        "body": "Blaze orange in any form (hatch, tint, ink) says \"this money is frozen\". Never use it for a warning, a hover or decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Never Colour Alone Rule",
+        "body": "Every status pairs its tint with a glyph and a word: pause bars for held, a check for verified, a cross for blocked, a triangle for needs a person.",
+        "section": "colors"
+      },
+      {
+        "name": "The Regular Headline Rule",
+        "body": "Headlines are 450 weight and tightly tracked (-0.02em). Size carries the hierarchy, not boldness.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Every label, tab, button and chip is in sentence case at zero tracking. Nothing is uppercase-tracked.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Money Rule",
+        "body": "Amounts, case ids and clocks use tabular figures in the sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tone Not Shadow Rule",
+        "body": "Separate surfaces with a tone step or one hairline. The release drawer is the only surface allowed to float.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do take every colour, radius and duration from `app/globals.css`. `npm run lint:ui` (`scripts/check-ui.sh`) fails on hex, rgb() or hsl() literals, arbitrary radii, shadows and gradients, transition-all, literal durations, and Tailwind default palette classes anywhere outside `app/globals.css`.",
+      "Do keep one lime primary action per app page.",
+      "Do use Blaze (hatch, tint, Blaze Ink) only where money is held.",
+      "Do pair every status tint with a glyph and a word.",
+      "Do set money, ids and clocks with tabular figures in Switzer.",
+      "Do use the motion tokens: the standard ease cubic-bezier(.4,0,.2,1), 150-300ms for UI and 400-700ms for story beats, at most 8px of travel, and an instant reduced-motion branch.",
+      "Do keep `components/**` presentational (no `next/*`, no fetching), because the Remotion project in `video/` imports them.",
+      "Do self-host Switzer through `scripts/fetch-fonts.mjs` into gitignored `public/fonts`."
+    ],
+    "donts": [
+      "Don't commit the font files, add a font CDN, or add a second typeface.",
+      "Don't add a theme, a dark mode or a second look. The `.night` surface is reserved for the landing call widget and the video end cards.",
+      "Don't add shadows or gradients to cards, buttons or pills. The drawer is the one exception.",
+      "Don't use a radius above 6px except for full rounds.",
+      "Don't bold headlines or uppercase-track labels.",
+      "Don't put white text on lime, or let lime become a second call to action.",
+      "Don't restate a case's status four ways on one screen. The banner sentence and the step's status word carry it."
+    ]
+  }
+}

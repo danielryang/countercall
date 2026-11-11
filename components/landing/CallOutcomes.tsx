@@ -1,7 +1,7 @@
 'use client';
 // "Three ways a call ends": transcripts taken from recorded runs in public/runs (app/page.tsx extracts them), with the policy result beside each.
 // On tab change the lines appear one by one (the state change: the call is happening); the result rows follow; reduced motion shows everything at once.
-// The only dark surface on the page (.night), mirroring the app's call card.
+// Sits in the page's one dark section (TheCall is .night), as a raised panel.
 import { useEffect, useRef, useState } from 'react';
 import type { CaseState } from '@/lib/events';
 import { Chip } from '@/components/ui/Chip';
@@ -54,34 +54,34 @@ export function CallOutcomes({ outcomes }: { outcomes: Outcome[] }) {
   const done = shown >= total;
 
   return (
-    <div ref={box} className="night overflow-hidden rounded-xl border border-rule bg-surface text-fg">
+    <div ref={box} className="overflow-hidden rounded-xl border border-rule bg-surface-raised text-fg">
       <div role="tablist" aria-label="Call outcomes" className="flex overflow-x-auto border-b border-rule">
         {outcomes.map((x, k) => (
           <button key={x.key} role="tab" type="button" aria-selected={k === i} aria-controls="call-panel" onClick={() => pick(k)}
-            className={`min-h-11 shrink-0 border-b-2 px-4 text-[14px] transition-colors duration-[var(--d-fast)] sm:px-5 ${k === i ? 'border-fg text-fg' : 'border-transparent text-fg-muted hover:text-fg'}`}>
+            className={`-mb-px min-h-12 shrink-0 border-b-2 px-4 text-[16px] transition-colors duration-[var(--d-fast)] sm:px-5 ${k === i ? 'border-solar text-fg' : 'border-transparent text-fg-muted hover:text-fg'}`}>
             {x.tab}
           </button>
         ))}
-        <button type="button" onClick={() => setRun((r) => r + 1)} className="ml-auto hidden shrink-0 px-5 text-[13px] text-fg-muted hover:text-fg sm:block">{CALL.replay}</button>
+        <button type="button" onClick={() => setRun((r) => r + 1)} className="ml-auto hidden shrink-0 px-5 text-[15px] text-fg-muted underline underline-offset-4 hover:text-fg sm:block">{CALL.replay}</button>
       </div>
       <div id="call-panel" role="tabpanel" className="grid lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-h-[300px] px-4 py-4 sm:px-5" aria-live="polite">
-          <div className="cap mb-3 flex items-center gap-2"><i aria-hidden className={`h-1.5 w-1.5 rounded-full ${done ? 'bg-fg-muted' : 'animate-blink bg-fg'}`} />{o.provenance}</div>
+          <div className="mb-3 flex items-center gap-2 text-[14px] text-fg-muted"><i aria-hidden className={`h-2 w-2 rounded-full ${done ? 'bg-fg-muted' : 'animate-blink bg-signal'}`} />{o.provenance}</div>
           {o.turns.map((t, k) => (
-            <div key={`${run}-${k}`} data-on={k < shown} className="grid grid-cols-[92px_minmax(0,1fr)] gap-2 py-1.5 text-[15px] leading-6 transition-[opacity,transform] duration-[var(--d-base)] ease-[var(--ease-out)] data-[on=false]:translate-y-2 data-[on=false]:opacity-0">
-              <span className="cap pt-1">{t.role === 'agent' ? CALL.agent : CALL.vendor}</span>
+            <div key={`${run}-${k}`} data-on={k < shown} className="grid grid-cols-[104px_minmax(0,1fr)] gap-3 py-1.5 text-[17px] leading-7 transition-[opacity,transform] duration-[var(--d-base)] ease-[var(--ease-out)] data-[on=false]:translate-y-2 data-[on=false]:opacity-0">
+              <span className="pt-0.5 text-[15px] font-[500] text-fg-muted">{t.role === 'agent' ? CALL.agent : CALL.vendor}</span>
               <span className={t.role === 'user' ? 'text-fg' : 'text-fg-muted'}>{t.text}</span>
             </div>
           ))}
         </div>
-        <dl className="border-t border-rule bg-surface-raised px-4 py-4 text-[14px] sm:px-5 lg:border-l lg:border-t-0">
-          <div className="cap mb-3">{CALL.policy}</div>
+        <dl className="border-t border-rule px-4 py-4 text-[16px] sm:px-5 lg:border-l lg:border-t-0">
+          <div className="mb-3 text-[15px] font-[500]">{CALL.policy}</div>
           {[
             [CALL.rows.outcome, <Chip key="c" state={o.state} />],
             [CALL.rows.reason, o.reason],
             [CALL.rows.money, o.money],
           ].map(([k, v], r) => (
-            <div key={`${run}-${String(k)}`} data-on={o.turns.length + r < shown} className="grid grid-cols-[80px_minmax(0,1fr)] gap-3 border-b border-rule py-2.5 transition-opacity duration-[var(--d-base)] last:border-b-0 data-[on=false]:opacity-0">
+            <div key={`${run}-${String(k)}`} data-on={o.turns.length + r < shown} className="grid grid-cols-[88px_minmax(0,1fr)] gap-3 border-b border-rule py-3 transition-opacity duration-[var(--d-base)] last:border-b-0 data-[on=false]:opacity-0">
               <dt className="text-fg-muted">{k}</dt><dd>{v}</dd>
             </div>
           ))}

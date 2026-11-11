@@ -2,94 +2,97 @@
 @import "tw-animate-css";      /* keyframes used by the shadcn dialog/sheet/command */
 @import "shadcn/tailwind.css";  /* data-open / data-closed variants used by the generated components */
 
-/* Fonts (both SIL OFL 1.1). Tested path: import the fontsource CSS once in app/layout.tsx
-     import "@fontsource-variable/mona-sans/wdth.css";   // family "Mona Sans Variable" (wght 200-900, wdth 75-125)
-     import "@fontsource/ibm-plex-mono/400.css"; import "@fontsource/ibm-plex-mono/500.css"; import "@fontsource/ibm-plex-mono/600.css";
-   Lower-CLS path: next/font/local with --font-mona / --font-plex variables (see report section 4); the var() fallbacks below cover both. */
+/* ============================================================================================================================
+   RAMP-STYLE. One light look for the landing page, the app and the video, from Ramp's own values (ramp.com CSS + Ramp app screenshots):
+   app text #2E2E28, olive-grey #707063 secondary, white pages, warm grey #F4F3EF sidebar and bands, hairlines, #DBDACB control borders,
+   ONE Solar lime #E4F222 primary button per page (black buttons on the landing page), Blaze orange #E96516 for held money and nothing else,
+   near-square 2px controls (6px max), round pills and avatars, no shadows except the drawer, regular-weight headlines.
+   Type: Switzer (ITF Free Font License, fetched at build by scripts/fetch-fonts.mjs; never committed) standing in for Ramp's Lausanne;
+   amounts and ids use the same sans with tabular figures (`font-mono` maps to it). Body 15-16px and up: nothing a viewer squints at.
+   [data-theme] attributes are inert: there is one look. DESIGN.md records the system.
+   ============================================================================================================================ */
+
+@font-face { font-family: "Switzer"; src: url("/fonts/switzer/Switzer-Variable.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Switzer"; src: url("/fonts/switzer/Switzer-VariableItalic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
 
 @theme {
-  /* Wipe Tailwind defaults that produce generic output. bg-indigo-500 / rounded-xl / shadow-lg will not compile. */
   --color-*: initial;
   --radius-*: initial;
   --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
-  --radius-xl: 8px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
   --shadow-*: initial;
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
   --font-*: initial;
 
-  /* Raw palette: warm safety-paper, cool near-black ink, one cobalt */
-  --color-paper: #E9E6DE;
-  --color-paper-raised: #F4F2EC;
-  --color-paper-sunk: #DCD8CE;
-  --color-ink: #14161D;
-  --color-ink-2: #2B2F3B;
-  --color-ink-muted: #5C6170;
-  --color-night: #12141A;
-  --color-night-raised: #1B1E27;
-  --color-night-sunk: #0C0D12;
-  --color-chalk: #ECE9E1;
-  --color-chalk-muted: #A9A79F;
-  --color-signal: #1B4DFF;       /* brand accent AND the CALLING status. Flat only. Never a gradient. */
-  --color-signal-ink: #1743E0;   /* signal as small text on paper (5.8:1) */
-  --color-signal-soft: #7C9BFF;  /* signal as text on night (6.9:1) */
-  --color-hilite: #F7E26B;       /* marker-pen label highlight, marketing only */
+  /* Raw palette (Ramp names in comments) */
+  --color-ink: #2E2E28;             /* app text (sampled) */
+  --color-ink-muted: #707063;       /* app secondary text, olive grey (sampled): 5.0:1 */
+  --color-black: #1A1919;           /* button black */
+  --color-white: #FFFFFF;
+  --color-gray-light: #F4F3EF;      /* sidebar / secondary ground (sampled) */
+  --color-gray-active: #EBE6E2;     /* active sidebar row */
+  --color-mustard: #E7DAA0;         /* 'ready for review' pill */
+  --color-banner: #FEFFE4;          /* pending-review banner ground */
+  --color-banner-rule: #A77C3B;
+  --color-banner-ink: #82673C;
+  --color-approve: #1F833A;
+  --color-blocked-rule: #E8C2B4;
+  --color-verified-rule: #A3C1A8;
+  --color-avatar-1: #ABB6D5;
+  --color-avatar-2: #D1DBCB;
+  --color-avatar-3: #DFC2D5;
+  --color-gray-medium: #D2CECB;     /* grayMedium / border-primary */
+  --color-gray-dark: #6E6A68;       /* grayDark */
+  --color-solar: #E4F222;           /* the Ramp accent: highlights, active states. Ink text on it. */
+  --color-solar-light: #F5FF78;
+  --color-smolder: #17332D;         /* deep green: the dark surface */
+  --color-chalk: #FFFFFF;
+  --color-signal: #E96516;          /* Blaze: HELD money */
+  --color-blaze-soft: #FCE8DC;      /* Blaze tint for the held pill */
+  --color-blaze-ink: #A3460D;       /* Blaze as small text on white / on its tint (5.6:1) */
+  --color-spring: #5683D2;
+  --color-spring-light: #E4EBF6;
 
-  /* Role aliases requested by agent 05 (research/05-app-ui.md Hand-offs). Same hexes as above, app-facing names. */
-  --color-ink-faint: #8A8E9C;          /* decorative only (3.2:1 on paper), never for text a user must read */
-  --color-accent: #1B4DFF;             /* = signal: live / primary action. Verified is separate (--color-verified). */
-  --color-accent-ink: #1743E0;
-  --color-evidence: #F7E26B;           /* = hilite: highlighter for "what they ask" */
-  --color-evidence-strong: color-mix(in oklab, var(--color-signal) 28%, white); /* PLAN 7.4 #4: cobalt tint, not review pink */
-  --color-danger: #D42A14;             /* = blocked */
-  --color-warn: #FFB81C;               /* = held amber: unverified, voicemail, no answer */
-  --color-inverse-bg: #12141A;         /* the one dark surface in the app: the live call card */
-  --color-inverse-ink: #ECE9E1;
-  --color-inverse-muted: #A9A79F;
-
-  /* Status roles (fills and dots; ink text on held/verified/review, paper text on blocked/calling) */
-  --color-held: #FFB81C;
-  --color-calling: #1B4DFF;
-  --color-verified: #22B866;
-  --color-blocked: #D42A14;
-  --color-review: #EE6DB8;
+  /* Status: tint fills with dark text, glyph + text always */
+  --color-held: #E96516;
+  --color-calling: #E96516;
+  --color-verified: #1F833A;
+  --color-verified-soft: #F7FFF9;
+  --color-blocked: #C0522E;
+  --color-blocked-soft: #FEF8F4;
+  --color-review: #3D67B5;          /* "needs a person": Spring blue, darkened for text */
+  --color-review-soft: #E4EBF6;
+  --color-danger: #C0522E;
+  --color-warn: #E96516;
+  --color-evidence: #E4F222;
 
   /* Type */
-  --font-display: var(--font-mona, "Mona Sans Variable"), "Mona Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-mona, "Mona Sans Variable"), "Mona Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex, "IBM Plex Mono"), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --text-micro: 0.6875rem;               /* 11px mono labels */
-  --text-micro--line-height: 1rem;
-  --text-display-xl: clamp(3.5rem, 9.5vw, 8.5rem);
-  --text-display-xl--line-height: 0.88;
-  --text-display-lg: clamp(2.5rem, 5.5vw, 4.75rem);
-  --text-display-lg--line-height: 0.95;
-  --text-display-md: clamp(1.75rem, 3vw, 2.5rem);
-  --text-display-md--line-height: 1;
-  --tracking-label: 0.14em;
-  --tracking-display: -0.035em;
+  --font-display: "Switzer", "Lausanne", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-sans: "Switzer", "Lausanne", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-mono: "Switzer", "Lausanne", ui-sans-serif, system-ui, sans-serif;   /* Ramp shows amounts and ids in the sans; tabular figures below */
+  --text-micro: 0.8125rem;
+  --text-micro--line-height: 1.125rem;
+  --tracking-label: 0;
+  --tracking-display: -0.02em;
 
-  /* Motion: strong ease-out for entrances, steps() for machine readouts. No springs, no bounce. */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Motion: Ramp's ease (cubic-bezier(.4,0,.2,1)), 150-300 ms. No springs, no bounce. */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-snap: cubic-bezier(0.2, 0, 0, 1);
-  --ease-in: cubic-bezier(0.64, 0, 0.78, 0);   /* exits only; never for entrances */
-  --animate-rise: rise 600ms var(--ease-out) both;
-  --animate-blink: blink 1s steps(1) infinite;
-  --animate-ping-dot: ping-dot 1.6s var(--ease-out) infinite;
-  --animate-marquee: marquee 120s linear infinite;
-  --animate-draw: draw 900ms var(--ease-out) both;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --animate-rise: rise 500ms var(--ease-out) both;
+  --animate-blink: blink 1.2s steps(1) infinite;
+  --animate-pour: pour 450ms var(--ease-out) both;
   @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-  @keyframes blink { 50% { opacity: 0; } }
-  @keyframes ping-dot { 0% { transform: scale(1); opacity: .7; } 80%, 100% { transform: scale(2.6); opacity: 0; } }
-  @keyframes marquee { to { transform: translateX(-50%); } }
-  @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @keyframes blink { 50% { opacity: 0.25; } }
+  /* the held amount settles in: a short fade and 6px drop */
+  @keyframes pour { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
   --breakpoint-3xl: 100rem;
 }
 
-/* Semantic roles. `inline` makes utilities read var(--surface) at the element, so a .night ancestor flips the subtree. */
 @theme inline {
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
@@ -97,256 +100,177 @@
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-rule: var(--rule);
-  --color-link: var(--link);
-  --color-hairline: var(--rule);        /* agent 05: dashed frame border */
-  --color-rule-strong: var(--fg);       /* agent 05: solid 1px for selected / active */
-  --color-focus-ring: var(--color-signal);
-  --color-live: var(--live);
-  /* shadcn token map (04 section 7): the generated components use these semantic names. Radius stays wiped (0). */
+  --color-rule-strong: var(--rule-strong);
+  --color-link: var(--fg);
+  --color-live: var(--color-signal);
+  --color-focus-ring: var(--fg);
+  /* shadcn token map */
   --color-background: var(--surface);
   --color-foreground: var(--fg);
-  --color-card: var(--surface-raised);
+  --color-card: var(--surface);
   --color-card-foreground: var(--fg);
-  --color-popover: var(--surface-raised);
+  --color-popover: var(--surface);
   --color-popover-foreground: var(--fg);
-  --color-primary: var(--fg);
-  --color-primary-foreground: var(--color-paper-raised);
-  --color-secondary: var(--surface-sunk);
+  --color-primary: var(--color-black);
+  --color-primary-foreground: var(--color-white);
+  --color-secondary: var(--surface-raised);
   --color-secondary-foreground: var(--fg);
-  --color-muted: var(--surface-sunk);
+  --color-muted: var(--surface-raised);
   --color-muted-foreground: var(--fg-muted);
-  --color-accent: var(--surface-sunk);          /* shadcn uses accent for hover backgrounds, so map it to sunk, not signal */
+  --color-accent: var(--surface-raised);
   --color-accent-foreground: var(--fg);
   --color-destructive: var(--color-blocked);
   --color-border: var(--rule);
-  --color-input: var(--fg);
-  --color-ring: var(--color-signal);
+  --color-input: var(--rule-strong);
+  --color-ring: var(--fg);
 }
 
 :root {
-  --surface: #E9E6DE;
-  --surface-raised: #F4F2EC;
-  --surface-sunk: #DCD8CE;
-  --fg: #14161D;
-  --fg-muted: #5C6170;
-  --rule: rgb(20 22 29 / 0.28);
-  --link: #1B1B18;
-  --live: var(--color-signal);
-  --chip-mix: 55%;
-  --rail: 2rem;                  /* inset of the dashed side rails */
-  --cut: 10px;                   /* chamfer size for buttons and tags */
-  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 55%, transparent) 0 1px, transparent 1px 6px);  /* "frozen": a pattern, so it survives greyscale and video compression */
-  /* motion tokens in agent 05's names (durations); easings are --ease-* in @theme */
-  --d-instant: 120ms; --d-fast: 180ms; --d-base: 320ms; --d-slow: 800ms; --d-stamp: 450ms; --d-settle: 900ms; --beat-gap: 1200ms;
+  --surface: #FFFFFF;
+  --surface-raised: #F4F3EF;
+  --surface-sunk: #EBE6E2;
+  --fg: #2E2E28;
+  --fg-muted: #707063;
+  --rule: #EAE8E5;               /* hairline dividers */
+  --rule-strong: #DBDACB;        /* control borders: outlined buttons, inputs */
+  --live: #E96516;
+  --chip-mix: 100%;
+  --radius: 0.5rem;
+  --hatch: repeating-linear-gradient(-45deg, rgb(233 101 22 / 0.55) 0 1.5px, transparent 1.5px 6px);   /* frozen money: a pattern, survives greyscale and compression */
+  --d-instant: 120ms; --d-fast: 150ms; --d-base: 250ms; --d-slow: 700ms; --d-stamp: 300ms; --d-settle: 900ms; --beat-gap: 1200ms;
+  color-scheme: light;
 }
-/* Recording / projector mode: <html data-scale="video"> lifts the 11px micro size to 13px (agent 06 records with a 13px minimum). */
-[data-scale="video"] { --text-micro: 0.8125rem; --text-micro--line-height: 1.125rem; }
+/* The header panel (warm gray, rounded): holds the one focal fact on a screen. Not reversed: Ramp's app stays light. */
+.plate { background: var(--surface); color: var(--fg); }
+/* The one dark surface (landing call widget, video end cards): Ramp's near-black. */
 .night {
-  --surface: #0F1115;
-  --surface-raised: #161920;
-  --surface-sunk: #0B0C10;
-  --fg: #E9E7E1;
-  --fg-muted: #8D91A0;
-  --rule: rgb(233 231 225 / 0.11);     /* solid, low-contrast hairlines: the dark theme separates by tone, not by dashed frames */
-  --link: #8FA8FF;
-  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 30%, transparent) 0 1px, transparent 1px 7px);
+  --surface: #1A1919; --surface-raised: #252423; --surface-sunk: #121111;
+  --fg: #FFFFFF; --fg-muted: #B5B2AE; --rule: rgb(255 255 255 / 0.12); --rule-strong: rgb(255 255 255 / 0.24);
+  background: var(--surface); color: var(--fg);
 }
-
-/* ---------- App themes: ?theme=graphite|paper|cloud on the app shell ---------- */
-[data-theme="graphite"] {
-  color-scheme: dark;
-  --surface: #0A0A0A; --surface-raised: #141414; --surface-sunk: #050505;
-  --fg: #EDEDED; --fg-muted: #A1A1A1; --rule: rgb(255 255 255 / 0.10); --link: #EDEDED;
-  --live: #EDEDED; --chip-mix: 100%;
-  --hatch: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 40%, transparent) 0 1.5px, transparent 1.5px 6px);
-}
-[data-theme="paper"] {
-  color-scheme: light;
-  --surface: #F3EDE0; --surface-raised: #FFFCF5; --surface-sunk: #E8E0CF;
-  --fg: #1C1A15; --fg-muted: #5C574A; --rule: rgb(28 26 21 / 0.13); --link: #1B1B18;
-  --live: #1B1B18; --chip-mix: 55%;
-}
-[data-theme="cloud"] {
-  color-scheme: light;
-  --surface: #F3F5F8; --surface-raised: #FFFFFF; --surface-sunk: #E9EDF2;
-  --fg: #101828; --fg-muted: #667085; --rule: rgb(16 24 40 / 0.09); --link: #101828;
-  --live: #101828; --chip-mix: 55%;
-}
-body:has([data-theme="graphite"]) { background: #0A0A0A; }
-body:has([data-theme="paper"]) { background: #F3EDE0; }
-body:has([data-theme="cloud"]) { background: #F3F5F8; }
+[data-scale="video"] { --text-micro: 0.875rem; --text-micro--line-height: 1.25rem; }
 
 @layer base {
-  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-size-adjust: 100%; }
-  body { background: var(--surface); color: var(--fg); font-family: var(--font-sans); font-size: 1.0625rem; line-height: 1.5; font-stretch: 100%; }
-  ::selection { background: color-mix(in oklab, var(--fg) 22%, transparent); color: inherit; }
-  :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-size-adjust: 100%; background: #FFFFFF; font-feature-settings: "ss01" on; }
+  body { background: var(--surface); color: var(--fg); font-family: var(--font-sans); font-size: 1rem; line-height: 1.5; }
+  ::selection { background: var(--color-solar); color: var(--color-ink); }
+  :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; border-radius: var(--radius-sm); }
+  * { scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
   h1, h2, h3 { text-wrap: balance; }
   p { text-wrap: pretty; }
-  table, .tnum { font-variant-numeric: tabular-nums; }
+  a { text-underline-offset: 3px; }
+  table, .tnum, .font-mono { font-variant-numeric: tabular-nums; }
   @media (prefers-reduced-motion: reduce) {
     *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   }
 }
 
-/* ---------- Typography utilities ---------- */
-@utility display {
+/* ---------- Typography ---------- */
+@utility display {   /* Ramp headline: regular weight, large, tight */
   font-family: var(--font-display);
-  font-stretch: 112%;
-  font-weight: 800;
+  font-weight: 450;
   letter-spacing: var(--tracking-display);
-  line-height: 0.9;
+  line-height: 1.04;
 }
-@utility label {  /* mono micro-label: the single most Greptile-like detail */
-  font-family: var(--font-mono);
+@utility wide {      /* (kept name) short UI labels: tabs, step names, group headers. Sentence case, medium weight. */
+  font-weight: 550;
+  letter-spacing: 0;
+}
+@utility label {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
-  line-height: 1rem;
+  line-height: var(--text-micro--line-height);
   font-weight: 500;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
+  color: var(--fg-muted);
 }
+@utility hatch { background-image: var(--hatch); }
+@utility cell { border: 1px solid var(--rule); }
+@utility rule-b { border-bottom: 1px solid var(--rule); }
+@utility rule-t { border-top: 1px solid var(--rule); }
 
-/* ---------- Grid furniture ---------- */
-/* .shell: a full-bleed section with dashed top rule, dashed side rails and + registration marks at the rail/rule crossings */
-@utility shell {
-  position: relative;
-  border-top: 1px dashed var(--rule);
-  &::before {   /* side rails */
-    content: ""; position: absolute; inset: 0 var(--rail); pointer-events: none;
-    border-inline: 1px dashed var(--rule);
-  }
-  &::after {    /* + marks, 11px, centred on the rail/top-rule crossings */
-    content: ""; position: absolute; left: 0; right: 0; top: -6px; height: 11px; pointer-events: none; color: var(--fg);
-    background:
-      linear-gradient(currentColor, currentColor) left calc(var(--rail) - 0.5px) top 0 / 1px 11px no-repeat,
-      linear-gradient(currentColor, currentColor) left calc(var(--rail) - 5px) top 5px / 11px 1px no-repeat,
-      linear-gradient(currentColor, currentColor) right calc(var(--rail) - 0.5px) top 0 / 1px 11px no-repeat,
-      linear-gradient(currentColor, currentColor) right calc(var(--rail) - 5px) top 5px / 11px 1px no-repeat;
-  }
-  @media (max-width: 767px) { &::before, &::after { display: none; } }   /* rails are desktop furniture */
-}
-@utility rule-b { border-bottom: 1px dashed var(--rule); }
-@utility rule-t { border-top: 1px dashed var(--rule); }
-@utility rule-r { border-right: 1px dashed var(--rule); }
-@utility cell { border: 1px solid var(--rule); }       /* solid hairline cells for stat / logo grids */
-@utility dot-grid {
-  background-image: radial-gradient(circle, color-mix(in oklab, var(--fg) 18%, transparent) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-@utility hatch {     /* diagonal hatching for frozen / inactive fills (token --hatch, agent 05's 45deg 1px / 6px pitch) */
-  background-image: var(--hatch);
-}
-@utility microprint { /* check-security rule: put tiny repeated text inside, e.g. "CALL THE NUMBER ON FILE · " */
-  font-family: var(--font-mono); font-size: 6px; line-height: 8px; letter-spacing: 0.2em; text-transform: uppercase;
-  white-space: nowrap; overflow: hidden; color: var(--fg-muted);
-}
-/* ---------- Chamfer buttons and tags ---------- */
-/* chamfers top-left and bottom-right; the outline variant fakes a 1px border with an inset ::after (clip-path kills real borders) */
-@utility cut {
-  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
-}
 @layer components {
+  /* Buttons: Ramp black, 6px radius, medium label. Outline = white with the border-primary hairline. */
   .btn {
-    --cut: 10px;
-    position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: .625rem;
-    padding: .75rem 1.5rem; min-height: 2.75rem;
-    font-family: var(--font-sans); font-size: .9375rem; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap; cursor: pointer;
-    background: var(--color-ink); color: var(--color-paper-raised);
-    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
-    transition-property: background-color, color, transform;
-    transition-duration: 120ms; transition-timing-function: var(--ease-out);
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: .625rem 1.25rem;
+    font-family: var(--font-sans); font-size: .9375rem; font-weight: 500; white-space: nowrap; cursor: pointer; border-radius: var(--radius-sm);
+    background: var(--color-solar); color: var(--color-ink); border: 1px solid var(--color-solar);
+    transition-property: background-color, color, border-color; transition-duration: var(--d-fast); transition-timing-function: var(--ease-out);
   }
-  .btn > .arrow { transition: transform 160ms var(--ease-out); }
-  .btn:hover > .arrow { transform: translateX(4px); }
-  .btn:active { transform: translateY(1px); }
-  .btn-signal { background: var(--color-signal); color: #fff; }
-  .btn-signal:hover { background: var(--color-ink); }
-  .btn:not(.btn-signal):not(.btn-outline):hover { background: var(--color-signal); }
-  .night .btn:not(.btn-signal):not(.btn-outline) { background: var(--color-chalk); color: var(--color-night); }
-  .btn-outline { background: var(--fg); color: var(--fg); }
-  .btn-outline::after {
-    content: ""; position: absolute; inset: 1px; z-index: -1; background: var(--surface);
-    clip-path: polygon(calc(var(--cut) - .586px) 0, 100% 0, 100% calc(100% - var(--cut) + .586px), calc(100% - var(--cut) + .586px) 100%, 0 100%, 0 calc(var(--cut) - .586px));
-    transition: background-color 120ms var(--ease-out);
-  }
-  .btn-outline:hover::after { background: var(--surface-raised); }
-  .btn-sm { --cut: 7px; padding: .375rem 1rem; min-height: 2rem; font-size: .8125rem; }
+  .btn:hover { background: var(--color-solar-light); border-color: var(--color-solar-light); }
+  .btn-outline { background: var(--surface); color: var(--fg); border-color: var(--rule-strong); }
+  .btn-outline:hover { background: var(--surface-raised); border-color: var(--rule-strong); }
+  .btn-solar { background: var(--color-solar); color: var(--color-ink); border-color: var(--color-solar); }
+  .btn-solar:hover { background: var(--color-solar-light); border-color: var(--color-solar-light); }
+  .btn:disabled { cursor: not-allowed; background: var(--surface-raised); color: var(--fg-muted); border-color: var(--rule); }
+  .btn-sm { min-height: 2.25rem; padding: .375rem .875rem; font-size: .875rem; }
 
-  /* Status chip: a soft tinted pill with a glyph, so colour is never the only signal. Text colour is the status colour mixed toward the text colour for contrast on any theme. */
+  /* Status pill: soft tint, dark text, a small glyph. Colour is never the only signal. */
   .chip {
-    display: inline-flex; align-items: center; gap: .375rem; height: 1.5rem; padding: 0 .625rem 0 .5rem; white-space: nowrap;
-    font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0;
-    border-radius: var(--radius-md); border: 1px solid color-mix(in oklab, var(--c) 40%, transparent);
-    background: color-mix(in oklab, var(--c) 16%, transparent); color: color-mix(in oklab, var(--c) var(--chip-mix), var(--fg));
+    display: inline-flex; align-items: center; gap: .375rem; height: 1.625rem; padding: 0 .625rem 0 .5rem; white-space: nowrap; border-radius: 9999px;
+    font-family: var(--font-sans); font-size: 13px; font-weight: 500; letter-spacing: 0;
+    background: var(--bg); color: var(--ink);
   }
-  .chip::before { content: ""; width: .5rem; height: .5rem; background: currentColor; flex: none; }   /* glyph: square by default */
-  .chip[data-status="HELD"]         { --c: var(--color-held); }
-  .chip[data-status="HELD"]::before { background: linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px, currentColor 5px 8px); }   /* pause bars */
-  .chip[data-status="CALLING"]      { --c: var(--live); }
-  .chip[data-status="CALLING"]::before { border-radius: 9999px; animation: blink 1s steps(1) infinite; }
-  .chip[data-status="VERIFIED"]     { --c: var(--color-verified); }
-  .chip[data-status="VERIFIED"]::before { clip-path: polygon(0 55%, 18% 40%, 40% 62%, 82% 12%, 100% 28%, 40% 100%); }   /* check */
-  .chip[data-status="BLOCKED"]      { --c: var(--color-blocked); }
-  .chip[data-status="BLOCKED"]::before { clip-path: polygon(15% 0, 50% 35%, 85% 0, 100% 15%, 65% 50%, 100% 85%, 85% 100%, 50% 65%, 15% 100%, 0 85%, 35% 50%, 0 15%); }  /* x */
-  .chip[data-status="NEEDS_REVIEW"] { --c: var(--color-review); }
-  .chip[data-status="NEEDS_REVIEW"]::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); }   /* triangle */
-}
-
-/* PLAN 7.4 #2: dense app label tracking */
-[data-app] { --tracking-label: 0.08em; }
-
-/* ---------- App furniture (S4+) ---------- */
-@layer components {
-  /* Neutral status chips are hairline rectangles; only RISK states get the solid cut-corner chip. */
+  .chip::before { content: ""; width: .5rem; height: .5rem; background: currentColor; flex: none; border-radius: 9999px; }
+  .chip[data-status="HELD"]         { --bg: var(--color-blaze-soft); --ink: var(--color-blaze-ink); }
+  .chip[data-status="HELD"]::before { border-radius: 0; background: linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px, currentColor 5px 8px); }   /* pause bars */
+  .chip[data-status="CALLING"]      { --bg: var(--surface-raised); --ink: var(--fg); }   /* live call: ink + pulse; Blaze is only for held money */
+  .chip[data-status="CALLING"]::before { animation: blink 1.2s steps(1) infinite; }
+  .chip[data-status="VERIFIED"]     { --bg: var(--color-verified-soft); --ink: var(--color-verified); box-shadow: inset 0 0 0 1px var(--color-verified-rule); }
+  .chip[data-status="VERIFIED"]::before { border-radius: 0; clip-path: polygon(0 55%, 18% 40%, 40% 62%, 82% 12%, 100% 28%, 40% 100%); }
+  .chip[data-status="BLOCKED"]      { --bg: var(--color-blocked-soft); --ink: var(--color-blocked); box-shadow: inset 0 0 0 1px var(--color-blocked-rule); }
+  .chip[data-status="BLOCKED"]::before { border-radius: 0; clip-path: polygon(15% 0, 50% 35%, 85% 0, 100% 15%, 65% 50%, 100% 85%, 85% 100%, 50% 65%, 15% 100%, 0 85%, 35% 50%, 0 15%); }
+  .chip[data-status="NEEDS_REVIEW"] { --bg: var(--color-mustard); --ink: var(--color-ink); }
+  .chip[data-status="NEEDS_REVIEW"]::before { border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
   .chip-plain {
-    display: inline-flex; align-items: center; gap: .375rem; height: 1.5rem; padding: 0 .625rem; white-space: nowrap;
-    font-family: var(--font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0;
-    border-radius: var(--radius-md); border: 1px solid var(--rule); color: var(--fg);
+    display: inline-flex; align-items: center; gap: .375rem; height: 1.625rem; padding: 0 .625rem; white-space: nowrap; border-radius: 9999px;
+    font-family: var(--font-sans); font-size: 13px; font-weight: 500; letter-spacing: 0;
+    background: var(--surface-raised); color: var(--fg);
   }
-  .chip-plain[data-variant="dashed"] { border-style: dashed; }
-  .chip-plain[data-variant="danger"] { border-color: color-mix(in oklab, var(--color-blocked) 45%, transparent); color: color-mix(in oklab, var(--color-blocked) var(--chip-mix), var(--fg)); }
+  .chip-plain[data-variant="dashed"] { background: transparent; border: 1px dashed var(--rule-strong); }
+  .chip-plain[data-variant="danger"] { background: var(--color-blocked-soft); color: var(--color-blocked); }
   .chip-plain[data-variant="quiet"] { color: var(--fg-muted); }
-  .scan-dots::after { content: "..."; animation: blink 1s steps(1) infinite; }
+  .scan-dots::after { content: "..."; animation: blink 1.2s steps(1) infinite; }
 
-  /* Evidence highlights: marker-pen sweeps, not fades. --sweep-delay staggers them in reading order. */
-  /* ONE quiet marker for everything that looks suspicious: a soft tint of the same amber used for 'needs attention', plus a thin underline. No second colour. */
-  .ev, .ev-strong { --ev: var(--color-held); }
-  .ev[data-verdict="no"] { --ev: var(--color-blocked); }
-  .ev[data-verdict="yes"] { --ev: var(--color-verified); }
+  /* Evidence: Ramp's highlighter. A Solar lime marker sweeps across the suspicious words in reading order. */
+  .ev, .ev-strong { --ev: var(--color-solar); }
+  .ev[data-verdict="no"] { --ev: #F7C9C4; }
+  .ev[data-verdict="yes"] { --ev: #C4E8D2; }
   .ev, .ev-strong {
-    border-radius: var(--radius-sm); box-decoration-break: clone; padding: 0 2px; color: inherit;
-    background-image: linear-gradient(color-mix(in oklab, var(--ev) 16%, transparent), color-mix(in oklab, var(--ev) 16%, transparent));
-    background-repeat: no-repeat; background-size: 0% 100%; border-bottom: 1px solid color-mix(in oklab, var(--ev) 55%, transparent);
+    box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 0 2px; border-radius: 3px; color: inherit;
+    background-image: linear-gradient(var(--ev), var(--ev)); background-repeat: no-repeat; background-size: 0% 100%;
     animation: sweep var(--d-slow) var(--ease-out) forwards; animation-delay: var(--sweep-delay, 0ms);
   }
   .ev-quiet { text-decoration: underline dashed; text-underline-offset: 3px; }
   .ev-quiet[data-struck="true"] { text-decoration: line-through; color: var(--fg-muted); }
-  [data-hot="true"] { outline: 1px solid var(--fg); outline-offset: 1px; }
+  [data-hot="true"] { outline: 2px solid var(--fg); outline-offset: 1px; border-radius: 3px; }
   @keyframes sweep { to { background-size: 100% 100%; } }
 
-  /* Frozen money: hatching over the amount. A pattern, so it survives greyscale and video compression. */
-  .frozen { background-image: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--fg) 55%, transparent) 0 1.5px, transparent 1.5px 6px); }
-  .stamp { border-radius: var(--radius-lg); transform: rotate(-3deg); animation: stamp var(--d-stamp) var(--ease-snap) both; }
-  @keyframes stamp { from { opacity: 0; transform: rotate(-3deg) scale(1.16); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
-  /* quiet caption: small sans, muted, sentence case. Uppercase mono is reserved for chips, keycaps and the stamp. */
-  .cap { font-size: 12px; line-height: 16px; color: var(--fg-muted); }
-  .caret::after { content: ""; display: inline-block; width: .5ch; height: 1em; margin-left: 2px; vertical-align: text-bottom; background: currentColor; animation: blink 1s steps(1) infinite; }
+  .frozen { background-image: var(--hatch); }
+  .stamp { animation: stamp var(--d-stamp) var(--ease-out) both; }
+  @keyframes stamp { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+  /* Held money: Blaze on its tint. */
+  .slab { background: var(--color-blaze-soft); color: var(--color-blaze-ink); border-radius: var(--radius-md); }
+  .slab-pour { animation: pour 450ms var(--ease-out) both; }
+  .cap { font-size: 14px; line-height: 20px; color: var(--fg-muted); }
+  /* a scrolled transcript fades at the top edge instead of cutting a line in half (reads cleanly on video) */
+  .fade-top { -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 10px, #000 44px); mask-image: linear-gradient(to bottom, transparent 0, transparent 10px, #000 44px); }
+  .caret::after { content: ""; display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: text-bottom; background: currentColor; animation: blink 1s steps(1) infinite; }
 }
 
-/* ---------- Present mode (P): html[data-present], set by components/ui/PresentMode.tsx ----------
-   The whole frame is scaled to 115% (type, spacing and hit areas together, so layouts keep their proportions) and shrunk back to fit the
-   viewport; dev affordances (footer, replay controls, theme switch) and toasts are hidden; a ring marks the pointer for the room. */
-html[data-present] [data-app] { zoom: 1.15; min-height: 0; }   /* 05 §2.7: 1.15 keeps the case view readable on a 1280×720 stage */
+/* ---------- Present mode (P): html[data-present], set by components/ui/PresentMode.tsx ---------- */
+html[data-present] [data-app] { zoom: 1.15; min-height: 0; }
 html[data-present] [data-app].h-screen { height: 86.96vh; }
 html[data-present] [data-app]:not(.h-screen) { min-height: 86.96vh; }
 html[data-present] [data-present-hide], html[data-present] [data-sonner-toaster] { display: none !important; }
-html[data-present] [data-present-solo] { grid-template-columns: minmax(0, 1fr); }   /* /demo: only the cheat-card stays, full width, for the teammate on the phone */
-/* The ring: where the presenter is pointing. Glides with the pointer (transform only); a press fills it. Reduced motion: it jumps, no glide. */
+html[data-present] [data-present-solo] { grid-template-columns: minmax(0, 1fr); }
+/* the sidebar collapses to its icons so the case keeps its width on the 1280x720 stage */
+html[data-present] [data-sidebar] { width: 64px; padding-inline: 10px; }
+html[data-present] [data-sidebar] [data-nav-label] { display: none; }
 .cursor-ring {
   position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; width: 40px; height: 40px; margin: -20px 0 0 -20px; opacity: 0;
-  border-radius: 9999px; border: 2px solid color-mix(in oklab, var(--live) 75%, transparent); background: color-mix(in oklab, var(--live) 6%, transparent);
+  border-radius: 9999px; border: 2.5px solid var(--color-ink); background: rgb(228 242 34 / 0.35);
   transition: transform var(--d-instant) var(--ease-out), opacity var(--d-fast) var(--ease-out), background-color var(--d-instant) var(--ease-out);
 }
 .cursor-ring[data-shown] { opacity: 1; }
-.cursor-ring[data-down] { background: color-mix(in oklab, var(--live) 28%, transparent); }
+.cursor-ring[data-down] { background: rgb(228 242 34 / 0.7); }
 @media (prefers-reduced-motion: reduce) { .cursor-ring { transition: opacity var(--d-fast) linear; } }

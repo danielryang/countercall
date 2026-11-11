@@ -7,7 +7,6 @@ import { useMemo, useState } from 'react';
 import { useStream } from '@/components/EventsProvider';
 import { EventList } from '@/components/audit/EventList';
 import { LogCheck, type LogCheckInput } from '@/components/audit/LogCheck';
-import { Card } from '@/components/ui/Card';
 import { ACTOR_KINDS, auditCaseIds, auditRows, EVENT_GROUPS, exportDoc, NO_FILTER, type ActorKind, type AuditFilter, type EventGroup } from '@/lib/audit-view';
 import { AUDIT, AUDIT_ACTOR, AUDIT_GROUP } from '@/lib/copy';
 import type { Envelope, Run } from '@/lib/runs';
@@ -34,14 +33,15 @@ async function loadEnvelopes(replay: string | null, upTo: number): Promise<Envel
 }
 
 function Select<T extends string>({ label, value, options, onChange }: { label: string; value: T | null; options: { v: T; l: string }[]; onChange: (v: T | null) => void }) {
-  return (
-    <label className="flex items-center gap-2 text-[12px] text-fg-muted">
-      {label}
+  return (   // a Ramp filter pill: "Case: All" with a chevron
+    <label className="relative inline-flex items-center">
+      <span className="sr-only">{label}</span>
       <select value={value ?? ''} onChange={(e) => onChange((e.target.value || null) as T | null)}
-        className="h-7 rounded-md border border-rule bg-surface px-2 text-[13px] text-fg">
-        <option value="">{AUDIT.filters.all}</option>
-        {options.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}
+        className={`h-9 appearance-none rounded-full border bg-surface pl-3.5 pr-8 text-[14px] focus:border-fg focus:outline-none ${value ? 'border-fg text-fg' : 'border-rule-strong text-fg'}`}>
+        <option value="">{label}: {AUDIT.filters.all}</option>
+        {options.map((o) => <option key={o.v} value={o.v}>{label}: {o.l}</option>)}
       </select>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="pointer-events-none absolute right-3 text-fg-muted"><path d="M4 6l4 4 4-4" /></svg>
     </label>
   );
 }
@@ -78,28 +78,31 @@ export function AuditView() {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-5">
-      <Card title={AUDIT.checkTitle} className="shrink-0"><LogCheck input={input} liveHref="/audit" /></Card>
-      <Card title={AUDIT.title} aside={rows.length === total ? AUDIT.count(total) : `${AUDIT.count(rows.length)} of ${total.toLocaleString('en-US')}`} className="min-h-0 flex-1 overflow-hidden">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-5 pb-3">
-          <p className="cap mr-auto">{AUDIT.listIntro}</p>
-          <Select label={AUDIT.filters.case} value={filter.caseId} options={caseIds.map((id) => ({ v: id, l: id }))} onChange={(v) => set({ caseId: v })} />
-          <Select<EventGroup> label={AUDIT.filters.group} value={filter.group} options={EVENT_GROUPS.map((g) => ({ v: g, l: AUDIT_GROUP[g] }))} onChange={(v) => set({ group: v })} />
-          <Select<ActorKind> label={AUDIT.filters.actor} value={filter.actor} options={ACTOR_KINDS.map((k) => ({ v: k, l: AUDIT_ACTOR[k] }))} onChange={(v) => set({ actor: v })} />
-          <button type="button" onClick={download} disabled={!rows.length || dl === 'busy'} title={AUDIT.exportNote}
-            className="h-7 rounded-md border border-rule px-3 text-[13px] hover:bg-surface disabled:text-fg-muted">
-            {dl === 'busy' ? AUDIT.exporting : dl === 'failed' ? AUDIT.exportFailed : AUDIT.export}
-          </button>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          {rows.length
-            ? <EventList rows={rows.slice(0, shown)} onCase={(id) => set({ caseId: filter.caseId === id ? null : id })} />
-            : <p className="cap mx-5 rounded-lg border border-dashed border-rule p-4">{total ? AUDIT.empty : AUDIT.emptyLog}</p>}
-          {rows.length > shown && (
-            <button type="button" onClick={() => setShown((n) => n + PAGE)} className="cap mx-5 mb-3 underline underline-offset-4 hover:text-fg">{AUDIT.more(Math.min(PAGE, rows.length - shown))}</button>
-          )}
-        </div>
-      </Card>
+    <div className="flex h-full min-h-0 flex-col px-10 pt-7">
+      <div className="flex items-end justify-between gap-6">
+        <h1 className="display text-[44px] leading-[48px]">{AUDIT.title}</h1>
+        <button type="button" onClick={download} disabled={!rows.length || dl === 'busy'} title={AUDIT.exportNote} className="btn btn-outline btn-sm mb-1">
+          {dl === 'busy' ? AUDIT.exporting : dl === 'failed' ? AUDIT.exportFailed : AUDIT.export}
+        </button>
+      </div>
+      <p className="mt-1 text-[15px] text-fg-muted">{AUDIT.listIntro}</p>
+      <div className="mt-5 shrink-0"><LogCheck input={input} liveHref="/audit" /></div>
+      <div className="mt-5 flex shrink-0 flex-wrap items-center gap-2 rounded-sm bg-surface-raised px-4 py-2.5">
+        <Select label={AUDIT.filters.case} value={filter.caseId} options={caseIds.map((id) => ({ v: id, l: id }))} onChange={(v) => set({ caseId: v })} />
+        <Select<EventGroup> label={AUDIT.filters.group} value={filter.group} options={EVENT_GROUPS.map((g) => ({ v: g, l: AUDIT_GROUP[g] }))} onChange={(v) => set({ group: v })} />
+        <Select<ActorKind> label={AUDIT.filters.actor} value={filter.actor} options={ACTOR_KINDS.map((k) => ({ v: k, l: AUDIT_ACTOR[k] }))} onChange={(v) => set({ actor: v })} />
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {rows.length
+          ? <EventList rows={rows.slice(0, shown)} onCase={(id) => set({ caseId: filter.caseId === id ? null : id })} />
+          : <p className="border-y border-rule px-4 py-10 text-center text-[15px] text-fg-muted">{total ? AUDIT.empty : AUDIT.emptyLog}</p>}
+        {rows.length > shown && (
+          <button type="button" onClick={() => setShown((n) => n + PAGE)} className="my-3 text-[14px] text-fg-muted underline underline-offset-4 hover:text-fg">{AUDIT.more(Math.min(PAGE, rows.length - shown))}</button>
+        )}
+      </div>
+      <div className="-mx-10 flex shrink-0 justify-end border-t border-rule bg-surface-raised px-10 py-2.5 text-[14px] text-fg-muted">
+        {rows.length === total ? AUDIT.count(total) : `${AUDIT.count(rows.length)} of ${total.toLocaleString('en-US')}`}
+      </div>
     </div>
   );
 }

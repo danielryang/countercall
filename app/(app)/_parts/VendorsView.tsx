@@ -1,11 +1,12 @@
 'use client';
-// The vendors screen: directory (left) and the selected vendor's file (right). Reads GET /api/vendors (masked, read-only) and refetches when the
-// event stream moves, so held amounts follow the cases. In replay mode there is no vendor data to replay, and the screen says so instead of
-// mixing live database rows into a recorded run.
+// The vendors screen, in Ramp's two page shapes: the list (page header + table) and one vendor (breadcrumb back + the vendor page). Reads GET /api/vendors
+// (masked, read-only) and refetches when the event stream moves, so held amounts follow the cases. In replay mode there is no vendor data to replay,
+// and the screen says so instead of mixing live database rows into a recorded run.
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useStream } from '@/components/EventsProvider';
-import { Card } from '@/components/ui/Card';
+import { Avatar } from '@/components/ui/Avatar';
 import { VendorFile } from '@/components/vendors/VendorFile';
 import { VendorTable } from '@/components/vendors/VendorTable';
 import { VENDORS } from '@/lib/copy';
@@ -13,8 +14,20 @@ import type { VendorEntry } from '@/lib/vendors';
 
 type Load = { kind: 'loading' } | { kind: 'ok'; vendors: VendorEntry[] } | { kind: 'error'; unauthorized: boolean };
 
+function Header({ count }: { count?: number }) {
+  return (
+    <>
+      <div className="flex items-end justify-between gap-6">
+        <h1 className="display text-[44px] leading-[48px]">{VENDORS.title}</h1>
+        {count ? <p className="pb-1.5 text-[15px] text-fg-muted">{count} {VENDORS.seeded}</p> : null}
+      </div>
+    </>
+  );
+}
+
 export function VendorsView() {
   const { replay, state } = useStream();
+  const router = useRouter();
   const [load, setLoad] = useState<Load>({ kind: 'loading' });
   const [picked, setPicked] = useState<string | null>(null);
   const seq = state.lastSeq;
@@ -37,29 +50,40 @@ export function VendorsView() {
   }, [replay, seq]);
 
   if (replay) return (
-    <div className="flex h-full items-center justify-center p-5">
-      <Card className="max-w-[440px] p-5">
-        <p className="text-[14px] leading-5">{VENDORS.replayNote}</p>
-        <Link href="/vendors" className="mt-3 inline-block text-[13px] underline underline-offset-4 hover:text-fg-muted">{VENDORS.replayLink}</Link>
-      </Card>
+    <div className="px-10 pt-7">
+      <Header />
+      <div className="mt-8 flex max-w-[720px] items-center gap-3 rounded-sm border border-rule-strong bg-surface-raised px-5 py-4 text-[16px]">
+        <span className="flex-1">{VENDORS.replayNote}</span>
+        <Link href="/vendors" className="shrink-0 underline underline-offset-4 hover:text-fg-muted">{VENDORS.replayLink} {'→'}</Link>
+      </div>
     </div>
   );
 
   const vendors = load.kind === 'ok' ? load.vendors : [];
-  const selected = vendors.find((v) => v.id === picked) ?? vendors[0] ?? null;
+  const selected = picked ? vendors.find((v) => v.id === picked) ?? null : null;
+  if (selected) return (
+    <div className="h-full overflow-y-auto px-10 pb-8 pt-6">
+      <button type="button" onClick={() => setPicked(null)} className="flex w-fit items-center gap-1.5 text-[15px] text-fg-muted hover:text-fg">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M13 8H3M7 4L3 8l4 4" /></svg>
+        {VENDORS.title}
+      </button>
+      <div className="mt-2 flex items-center gap-4">
+        <Avatar name={selected.name} size={44} />
+        <h1 className="display min-w-0 flex-1 truncate text-[40px] leading-[46px]">{selected.name}</h1>
+      </div>
+      <div className="mt-7"><VendorFile key={selected.id} v={selected} onCases={() => router.push('/cases?view=list')} /></div>
+    </div>
+  );
   return (
-    <div className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_400px] gap-4 p-5">
-      <Card title={VENDORS.title} aside={load.kind === 'ok' && vendors.length ? `${vendors.length} ${VENDORS.seeded}` : undefined} className="overflow-hidden">
-        <p className="cap px-5 pb-3">{VENDORS.intro}</p>
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          {load.kind === 'loading' && <p className="cap px-5 py-2">{VENDORS.loading}<span className="scan-dots" /></p>}
-          {load.kind === 'error' && <p className="px-5 py-2 text-[13px]">{load.unauthorized ? VENDORS.unauthorized : VENDORS.error}</p>}
-          {load.kind === 'ok' && (vendors.length
-            ? <VendorTable vendors={vendors} selectedId={selected?.id ?? null} onSelect={setPicked} />
-            : <p className="cap mx-5 rounded-lg border border-dashed border-rule p-4">{VENDORS.empty}</p>)}
-        </div>
-      </Card>
-      <Card className="overflow-hidden">{selected ? <VendorFile key={selected.id} v={selected} /> : <div className="cap p-5">{load.kind === 'loading' ? VENDORS.loading : ''}</div>}</Card>
+    <div className="h-full overflow-y-auto px-10 pb-8 pt-7">
+      <Header count={load.kind === 'ok' ? vendors.length : undefined} />
+      <div className="mt-7">
+        {load.kind === 'loading' && <p className="border-y border-rule px-4 py-10 text-center text-[15px] text-fg-muted">{VENDORS.loading}<span className="scan-dots" /></p>}
+        {load.kind === 'error' && <p className="border-y border-rule px-4 py-10 text-center text-[15px]">{load.unauthorized ? VENDORS.unauthorized : VENDORS.error}</p>}
+        {load.kind === 'ok' && (vendors.length
+          ? <VendorTable vendors={vendors} selectedId={null} onSelect={setPicked} />
+          : <p className="border-y border-rule px-4 py-10 text-center text-[15px] text-fg-muted">{VENDORS.empty}</p>)}
+      </div>
     </div>
   );
 }

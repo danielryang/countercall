@@ -36,7 +36,19 @@ export const SCENE = {
   vendor: 'No, we haven’t changed banks.',
   result: '$24,800.00 stays on hold. The bank change is rejected.',
   steps: ['Email', 'Hold', 'Number', 'Call', 'Result'],
-};
+  /** The app mock in the hero: the same words the case page prints (lib/copy.ts headline()), one banner per beat. */
+  tabs: ['Email', 'Phone call', 'Result'],
+  banner: [
+    { tone: 'progress', title: 'Reading a new email', sub: 'CounterCall checks every email sent to the accounts-payable inbox.' },
+    { tone: 'warn', title: 'Suspicious request found', sub: 'Someone is asking to change where Acme Corp gets paid. Holding the payments now.' },
+    { tone: 'warn', title: 'Payments are on hold', sub: '$24,800.00 is frozen. Next: call Acme Corp on the number already on file.' },
+    { tone: 'progress', title: 'Calling Acme Corp', sub: 'Asking them directly: did you send this request? The call says it is automated.' },
+    { tone: 'danger', title: 'Blocked. Acme Corp says they did not send this.', sub: 'The bank change was rejected and $24,800.00 stays on hold.' },
+  ],
+  body: { greeting: 'Hello Accounts Payable,', changed: 'We have changed banks.', ask: 'Please send this month’s payment to', newAccount: 'our new account', bankLabel: 'Bank:', bank: 'Bluebird Neobank ••••4321' },
+  invoices: [{ n: '4471', due: 'due Nov 13', amount: '$12,400.00' }, { n: '4472', due: 'due Dec 5', amount: '$12,400.00' }],
+  vendorSaid: 'Acme Corp said on the call',
+} as const;
 
 export const PROBLEM = {
   eyebrow: 'The problem',
