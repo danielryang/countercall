@@ -2,6 +2,7 @@
 // One case, as a Ramp detail page: a breadcrumb back to the list, the vendor as the title with its initials avatar, the actions on the right (one lime
 // primary), the banner that says what happened, then the four steps as tabs with the case details beside them.
 // This file owns the local UI state the pure components share: which signal is lit up (email <-> reasons), the live case clock, and the timing disclosure.
+import { useCallPacing } from '@/components/call/useCallPacing';
 import { CaseDetails } from '@/components/case/CaseDetails';
 import { CaseStory } from '@/components/case/CaseStory';
 import { EmailPane } from '@/components/case/EmailPane';
@@ -30,7 +31,10 @@ function useNow(on: boolean): number | undefined {
 
 const READ_ONLY = 'A replay is read-only. Open the live view to approve.';
 
-export function CaseDetail({ c, onBack }: { c: CaseView; onBack?: () => void }) {
+export function CaseDetail({ c: actual, onBack }: { c: CaseView; onBack?: () => void }) {
+  // For someone watching a call happen, the page shows it paced: the transcript line by line in the order spoken, and the result only once the last
+  // line has been readable for a moment (components/call/useCallPacing.ts). Everything below reads this view, so banner, steps and actions agree.
+  const { view: c, show } = useCallPacing(actual);
   const { replay, refresh } = useStream();
   const [open, setOpen] = useState(false);
   const [hot, setHot] = useState<string[] | null>(null);
@@ -66,7 +70,7 @@ export function CaseDetail({ c, onBack }: { c: CaseView; onBack?: () => void }) 
       </div>
       <div className="mt-5"><StatusBanner c={c} nowMs={now} /></div>
       <div className="mt-6 flex min-h-0 flex-1 flex-col">
-        <CaseStory key={c.id} c={c} hot={hot} onHot={setHot} times={times}
+        <CaseStory key={c.id} c={c} show={show} hot={hot} onHot={setHot} times={times}
           email={<EmailPane c={c} hot={hot} onHot={setHot} />}
           details={<CaseDetails c={c} heldAtMs={times.hold} />}
           timing={w && finished && c.state !== 'scanning' && c.state !== 'cleared' ? (   // timing is a footnote: offered only once the case is decided

@@ -1,24 +1,12 @@
 'use client';
-// The call transcript. Agent text is revealed at speaking pace ONLY for turns that arrive while the viewer is watching; a reload or a paused frame shows everything.
-import { useEffect, useRef, useState } from 'react';
+// The call transcript. The case page paces it for someone watching (components/call/useCallPacing.ts): lines type out one at a time, in the order they
+// were spoken. `show` says how much of each line is on screen; a line that has not started yet is not drawn. Without `show`, every line is shown whole.
 import { useStickToBottom } from 'use-stick-to-bottom';
-import { CPS } from '@/lib/level';
 import type { CaseView } from '@/lib/reducer';
 import { mmss } from '@/lib/selectors';
 import type { TranscriptItem } from '@/lib/voice/events';
 
-function useReveal(turns: TranscriptItem[], pace: boolean): (t: TranscriptItem) => string {
-  const first = useRef(new Map<string, number>());
-  const initial = useRef<Set<string> | null>(null);
-  if (initial.current === null) initial.current = new Set(turns.map((t) => t.id));
-  const [, tick] = useState(0);
-  const now = typeof performance === 'undefined' ? 0 : performance.now();
-  for (const t of turns) if (!first.current.has(t.id)) first.current.set(t.id, now);
-  const shown = (t: TranscriptItem) => (t.role !== 'agent' || !pace || initial.current!.has(t.id) ? t.text.length : Math.floor(((now - (first.current.get(t.id) ?? now)) / 1000) * CPS));
-  const pending = turns.some((t) => shown(t) < t.text.length);
-  useEffect(() => { if (!pending) return; const i = setInterval(() => tick((n) => n + 1), 80); return () => clearInterval(i); }, [pending]);
-  return (t) => t.text.slice(0, Math.min(t.text.length, shown(t)));
-}
+const whole = (t: TranscriptItem) => t.text;
 
 const ANSWER = { yes: 'Yes, they sent it', no: 'No, they did not send it', unsure: 'Not sure', callback_requested: 'Asked for a call back', wrong_person: 'Wrong person' } as const;
 
@@ -28,21 +16,27 @@ export const answerTurn = (turns: TranscriptItem[]) => {
   return ask >= 0 ? turns.findIndex((t, i) => i > ask && t.role === 'user') : -1;
 };
 
-export function CallTranscript({ c }: { c: CaseView }) {
+export function CallTranscript({ c, show = whole }: { c: CaseView; show?: (t: TranscriptItem) => string }) {
   const call = c.call;
   const ended = call?.status === 'ended' || call?.status === 'failed';
   const turns = call?.turns ?? [];
-  const show = useReveal(turns, !!call && !ended);
   // The transcript scrolls inside its own box and stays pinned to the newest words while they are revealed (new turns AND growing text), unless the viewer
   // scrolls up to reread. Instant, not the library's spring: the motion rules allow no springs, and an instant jump is also the reduced-motion behaviour.
   const { scrollRef, contentRef } = useStickToBottom({ initial: 'instant', resize: 'instant' });
   if (!call) return null;
-  const answers = call.tools.filter((t) => t.name === 'report_answer');
-  const last = answers.at(-1)?.args.answer as keyof typeof ANSWER | undefined;
-  const digits = call.tools.filter((t) => t.name === 'report_challenge').map((t) => String(t.args.digits ?? '').replace(/[^\d•]/g, '')).find((d) => d.length) ?? '';
-  const elapsed = call.connectedAt ? Date.parse(call.endedAt ?? c.updatedAt) - Date.parse(call.connectedAt) : 0;
-  const ai = turns.find((t) => t.role === 'agent')?.text.match(/automated/i);
+  const shown = turns.map((t) => show(t));
+  const caughtUp = turns.every((t, i) => shown[i].length === t.text.length);
   const ai_i = answerTurn(turns);
+  // Nothing runs ahead of the transcript: the vendor's answer is reported once the line that carries it is on screen, the security question once every
+  // line received so far is.
+  const answerIn = ai_i >= 0 ? shown[ai_i].length === turns[ai_i].text.length : caughtUp;
+  const answers = call.tools.filter((t) => t.name === 'report_answer');
+  const last = answerIn ? answers.at(-1)?.args.answer as keyof typeof ANSWER | undefined : undefined;
+  const digits = !caughtUp ? '' : call.tools.filter((t) => t.name === 'report_challenge').map((t) => String(t.args.digits ?? '').replace(/[^\d•]/g, '')).find((d) => d.length) ?? '';
+  const elapsed = call.connectedAt ? Date.parse(call.endedAt ?? c.updatedAt) - Date.parse(call.connectedAt) : 0;
+  const firstAgent = turns.findIndex((t) => t.role === 'agent');
+  const ai = firstAgent >= 0 && /automated/i.test(shown[firstAgent]);
+  const started = shown.some((s) => s.length > 0);
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-rule bg-surface">
       <div className="flex shrink-0 items-center gap-2.5 border-b border-rule px-4 py-2 text-[13px] text-fg-muted">
@@ -53,13 +47,15 @@ export function CallTranscript({ c }: { c: CaseView }) {
       {/* The transcript fills the open step and scrolls inside it. */}
       <div ref={scrollRef} className="fade-top min-h-[66px] flex-1 overflow-y-auto" aria-live="polite">
       <div ref={contentRef} className="px-4 pb-1.5 pt-9">
-        {turns.length === 0 && <div className="cap py-2">{call.status === 'dialing' ? 'Dialing the number on file' : 'Waiting for someone to speak'}<span className="scan-dots" /></div>}
+        {!started && <div className="cap py-2">{call.status === 'dialing' ? 'Dialing the number on file' : 'Waiting for someone to speak'}<span className="scan-dots" /></div>}
         {turns.map((t, i) => {
-          const text = show(t); const live = i === turns.length - 1 && !ended;
+          const text = shown[i];
+          if (!text && t.text) return null;                       // waiting for the line above it to finish
+          const typing = text.length < t.text.length;
           return (
             <div key={t.id} className="grid grid-cols-[104px_minmax(0,1fr)] gap-3 py-1.5 text-[15.5px] leading-6">
               <span className={`pt-0.5 text-[13px] font-semibold ${t.role === 'agent' ? 'text-fg-muted' : ''}`}>{t.role === 'agent' ? 'CounterCall' : c.vendorName?.split(' ')[0] ?? 'Vendor'}</span>
-              <span className={`${live && text.length < t.text.length ? 'caret' : ''} ${t.role === 'user' ? 'text-fg' : 'text-fg-muted'}`}>{i === ai_i && !!last ? <span className="ev" data-verdict={last === 'no' ? 'no' : last === 'yes' ? 'yes' : undefined}>{text}</span> : text}</span>
+              <span className={`${typing ? 'caret' : ''} ${t.role === 'user' ? 'text-fg' : 'text-fg-muted'}`}>{i === ai_i && !!last ? <span className="ev" data-verdict={last === 'no' ? 'no' : last === 'yes' ? 'yes' : undefined}>{text}</span> : text}</span>
             </div>
           );
         })}

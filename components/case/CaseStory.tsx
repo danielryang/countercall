@@ -10,6 +10,7 @@ import { EVIDENCE_HINT, plainReasonGroups, REASONS, plainTask, REASON_TEXT, SOUR
 import { evidenceMap, hasEvidence, overlaps } from '@/lib/evidence';
 import type { CaseView } from '@/lib/reducer';
 import { fmtCents, mmss } from '@/lib/selectors';
+import type { TranscriptItem } from '@/lib/voice/events';
 
 type Key = 'email' | 'hold' | 'call' | 'result' | 'release';
 type St = 'done' | 'active' | 'pending' | 'warn';
@@ -38,8 +39,10 @@ const RESULT_TEXT: Partial<Record<CaseView['state'], string>> = {
   needs_human: 'A task was created for your team. The payments stay on hold.',
 };
 
-export function CaseStory({ c, hot, onHot, email, timing, details, times }: {
+export function CaseStory({ c, hot, onHot, email, timing, details, times, show }: {
   c: CaseView;
+  /** how much of each transcript line is on screen (the case page paces the call for someone watching it); every line whole when absent */
+  show?: (t: TranscriptItem) => string;
   /** when each step happened, in ms after the email arrived (null: not yet) */
   times?: Partial<Record<Key, number | null>>;
   /** the case details list (right column, every tab but the email) */
@@ -109,7 +112,7 @@ export function CaseStory({ c, hot, onHot, email, timing, details, times }: {
   // Every step is on the timeline from the first frame (never growing mid-story); a step that has not happened yet is muted.
   if (!cleared) steps.push({
     key: 'call', name: 'Phone call', st: o ? 'done' : c.call ? 'active' : skipped ? 'warn' : 'pending',
-    title: skipped ? 'Did not run' : !c.call ? 'Waiting' : o ? 'Answered' : c.call.status === 'dialing' ? 'Ringing' : 'On the phone',
+    title: skipped ? 'Did not run' : !c.call ? 'Waiting' : o ? 'Answered' : c.call.status === 'dialing' ? 'Ringing' : c.call.status === 'ended' || c.call.status === 'failed' ? 'Call ended' : 'On the phone',
     body: (
       <div className="flex h-full min-h-0 flex-col gap-4">
         {skipped ? <p className="text-[15px]">{plainTask(openTask!.reason)}.</p> : (
@@ -119,7 +122,7 @@ export function CaseStory({ c, hot, onHot, email, timing, details, times }: {
             {phone && <span className="text-[14px] text-fg-muted" title={ct?.sourceDoc ?? undefined}>from {ct ? `${SOURCE_LABEL[ct.source] ?? ct.source}, added ${ct.firstSeenAt.slice(0, 10)}` : 'the vendor record'}. <b className="font-[600] text-fg">Never</b> a number from the email.</span>}
           </div>
         )}
-        {c.call && <CallTranscript c={c} />}
+        {c.call && <CallTranscript c={c} show={show} />}
       </div>
     ),
   });
@@ -172,9 +175,10 @@ export function CaseStory({ c, hot, onHot, email, timing, details, times }: {
   const live = at >= 0 && steps[at].st === 'active';
   const onCall = live && steps[idx].key === 'call';
   const creep = useCreep(live && !onCall ? `${c.id}:${steps[idx].key}` : null);
-  // The phone call moves with the call itself, never a clock: just inside the step while it rings, then one notch for every line spoken (each question
-  // the agent asks and each answer), up to 90% until the outcome lands. A step that lasts seconds (reading the email) creeps on a clock instead.
-  const spoken = c.call?.turns.filter((t) => t.text.trim()).length ?? 0;
+  // The phone call moves with the call itself, never a clock: just inside the step while it rings, then one notch for every line on screen (each
+  // question the agent asks and each answer, as it appears), up to 90% until the outcome lands. A step that lasts seconds (reading the email) creeps on a
+  // clock instead.
+  const spoken = c.call?.turns.filter((t) => (show ? show(t) : t.text).trim()).length ?? 0;
   const callFrac = !c.call || (c.call.status === 'dialing' && spoken === 0) ? 0.06 : Math.min(0.9, 0.16 + 0.1 * spoken);
   // the end when finished; on the call, where the conversation is; creeping through another step in progress; mid-step when a step needs a person;
   // at the next step's start between steps

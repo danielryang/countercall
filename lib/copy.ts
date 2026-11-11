@@ -119,7 +119,9 @@ export function headline(c: CaseView): Headline {
     case 'cleared': return { tone: 'ok', title: 'Looks normal', sub: 'No bank change requested. Nothing held.' };
     case 'flagged': return { tone: 'warn', title: 'Suspicious request found', sub: `Someone wants to change where ${v} gets paid. Holding payments.` };
     case 'held': return { tone: 'warn', title: 'Payments are on hold', sub: `${money} frozen. Calling ${v} on the number on file.` };
-    case 'calling': return { tone: 'progress', title: `Calling ${v}`, sub: 'Asking if they really sent this request.' };
+    case 'calling': return c.call?.status === 'ended' || c.call?.status === 'failed'   // hung up, result not in (or not shown yet: the viewer is reading the transcript)
+      ? { tone: 'progress', title: `Call with ${v} ended`, sub: 'Checking what they said.' }
+      : { tone: 'progress', title: `Calling ${v}`, sub: 'Asking if they really sent this request.' };
     case 'fraud_blocked': return { tone: 'danger', title: `Blocked. ${v} says they did not send this.`, sub: `${money} stays on hold. Only a person can release it.` };
     case 'awaiting_approval': return { tone: 'ok', title: 'Verified by phone. Waiting for approval.', sub: `${v} confirmed it. No money moves until a person approves.` };
     case 'needs_human': return { tone: 'warn', title: 'Could not verify. A person needs to follow up.', sub: `${o ? REASON_TEXT[o.decision.reason].rule : plainTask(c.tasks.find((t) => t.status === 'open')?.reason ?? 'Verification did not complete')}. ${cents(c) ? `${money} stays on hold.` : ''}`.trim() };
