@@ -6,7 +6,7 @@ Sources: PLAN §8, `docs/research/07-video-creative.md` §0, §3, §6, `docs/res
 
 `THEME` = the app theme for every screen recording and for the Remotion scenes. The team has not picked one: `graphite`, `paper` or `cloud`. Set it once here and in `video/src/timeline.ts` (`THEME`), then add `?theme=THEME` to every URL below.
 
-Voices: **DANIEL** and **ERIC** (team voices, never AI). **ACME** is played by a consenting teammate on the phone, from an improv card, not a script.
+Voices: **ERIC**, **SAKETH** and **DANIEL** (team voices, never AI). The speaker for each line is in `voiceover.md`, which overrides the names in the table below. **ACME** is played by a consenting teammate on the phone, from an improv card, not a script.
 
 ## Rules that apply to every frame (binding, from CLAUDE.md)
 
