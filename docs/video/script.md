@@ -147,7 +147,7 @@ Re-run each command before the lock; if a result changes, change `video/src/fact
 
 - Title: `CounterCall: an AI that phones your vendor before you wire the money | BBS x Ramp Hackathon`
 - Export: 1920x1080, 30 fps, H.264, BT.709, AAC 48 kHz, -14 LUFS integrated, -1 dBTP; upload `captions.srt`; a smaller Drive copy.
-- Description: use 07 §6.1 with these corrections: Ramp is a **mock** (no sandbox calls), the voice is **Retell**, the team is Daniel Yang and Eric Kim, chapter times from the beat table above, the hero label as recorded, and a "Prior art" line naming nsKnox, Trouvé and CallbackProof. Links: https://countercall-steel.vercel.app, https://countercall-steel.vercel.app/cases?replay=fraud, https://github.com/danielryang/countercall.
+- Description: use 07 §6.1 with these corrections: Ramp is a **mock** (no sandbox calls), the voice is **Retell**, the team is Daniel Yang, Eric Kim and Saketh Korada, chapter times from the beat table above, the hero label as recorded, and a "Prior art" line naming nsKnox, Trouvé and CallbackProof. Links: https://countercall-steel.vercel.app, https://countercall-steel.vercel.app/cases?replay=fraud, https://github.com/danielryang/countercall.
 - Chapters: 0:00 The scam and the old fix · 0:35 Email in, payments held · 1:10 The real call · 2:12 Result and the audit log · 2:34 Voicemail, vague answers, impostors · 3:02 Under the hood · 3:57 Close.
 
 ## Render commands

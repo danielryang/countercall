@@ -221,6 +221,6 @@ There is no published statistic for how often callbacks get skipped, so we do no
 
 ## Team, license, credits
 
-Built by Daniel Yang (github.com/danielryang) and Eric Kim (github.com/erickim73). **MIT license**, see [LICENSE](LICENSE).
+Built by Daniel Yang (github.com/danielryang), Eric Kim (github.com/erickim73) and Saketh Korada. **MIT license**, see [LICENSE](LICENSE).
 
 Fonts: Mona Sans and IBM Plex Mono, both SIL Open Font License 1.1, via Fontsource. Thanks to Retell AI, AgentMail, Anthropic, Supabase, Vercel, shadcn/ui and Radix. Research notes are in `docs/research/`.

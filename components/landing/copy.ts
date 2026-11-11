@@ -124,7 +124,7 @@ export const CTA = {
   primary: 'Watch a recorded real run',
   code: 'Read the code',
   fine: 'BBS x Ramp “Automate the Old Way” · technical track · fictional customer and vendor · no real payments moved',
-  team: 'Built by Daniel Yang and Eric Kim',
+  team: 'Built by Daniel Yang, Eric Kim and Saketh Korada',
   license: 'MIT license',
   themes: 'Theme',
 };

@@ -28,7 +28,7 @@ export function EndCard() {
           <div style={useRise(56, 18)} className="flex max-w-[720px] flex-col items-end gap-[12px] text-right font-mono text-[20px] leading-[1.5] text-fg-muted">
             <span>Rice Robotics and Acme are fictional. No real money moves.</span>
             <span>The agent says it is automated in its first sentence.</span>
-            <span>Daniel Yang · Eric Kim</span>
+            <span>Daniel Yang · Eric Kim · Saketh Korada</span>
           </div>
         </div>
       </div>
