@@ -11,7 +11,7 @@ import { CALL, CTA, HERO, HOW, LIVE_QUEUE_HREF, NAV, PROBLEM, RAMP, RECORDED_RUN
 const wrap = 'mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8';
 const h2 = 'display text-[clamp(2.25rem,4vw,3rem)] leading-[1.06]';
 const lead = 'text-[18px] leading-7 text-fg-muted';
-const btn = 'inline-flex h-12 items-center justify-center gap-2 rounded-xl px-5 text-[16px] font-[500] transition-colors duration-[var(--d-fast)] ease-[var(--ease-out)]';
+const btn = 'inline-flex h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 text-[15px] font-[500] transition-colors duration-[var(--d-fast)] ease-[var(--ease-out)]';   // a button label never wraps
 const primary = `${btn} bg-black text-white hover:bg-gray-dark`;
 const secondary = `${btn} border border-rule-strong bg-surface text-fg hover:bg-surface-raised`;
 
@@ -34,7 +34,7 @@ export function Nav() {
           <div className="ml-6 hidden items-center gap-7 text-[15px] text-fg-muted md:flex">
             {NAV.map((n) => <a key={n.href} href={n.href} className="hover:text-fg">{n.label}</a>)}
           </div>
-          <a href={LIVE_QUEUE_HREF} className="ml-auto inline-flex h-10 items-center rounded-xl bg-black px-4 text-[15px] font-[500] text-white transition-colors duration-[var(--d-fast)] hover:bg-gray-dark">{HERO.secondary}</a>
+          <a href={LIVE_QUEUE_HREF} className="ml-auto inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-xl bg-black px-4 text-[15px] font-[500] text-white transition-colors duration-[var(--d-fast)] hover:bg-gray-dark">{HERO.secondary}</a>
         </nav>
       </header>
     </>
@@ -47,7 +47,7 @@ export function Hero() {
       <div className="min-w-0">
         <h1 className="display text-[clamp(2.75rem,4.7vw,3.75rem)] leading-[1.04]">{HERO.title}</h1>
         <p className={`mt-5 max-w-[36ch] ${lead}`}>{HERO.sub}</p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <a href={RECORDED_RUN_HREF} className={primary}>{HERO.primary}<span aria-hidden>{'→'}</span></a>
           <a href={LIVE_QUEUE_HREF} className={secondary}>{HERO.secondary}</a>
         </div>
@@ -197,7 +197,7 @@ export function Footer() {
     <footer className="overflow-hidden bg-surface-raised">
       <div className={`${wrap} pb-10 pt-20 lg:pt-28`}>
         <h2 className="display text-[clamp(2.75rem,6vw,5rem)] leading-[1.04]">{CTA.title}</h2>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <a href={RECORDED_RUN_HREF} className={primary}>{CTA.primary}<span aria-hidden>{'→'}</span></a>
           <a href={REPO_URL} className={secondary} rel="noreferrer">{CTA.code}</a>
         </div>
