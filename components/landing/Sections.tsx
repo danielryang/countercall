@@ -6,6 +6,7 @@ import { Chip } from '@/components/ui/Chip';
 import { Mark } from '@/components/ui/Mark';
 import { CallOutcomes, type Outcome } from './CallOutcomes';
 import { InterceptScene } from './InterceptScene';
+import { Reveal } from './Reveal';
 import { CALL, CTA, HERO, HOW, LIVE_QUEUE_HREF, NAV, PROBLEM, RAMP, RECORDED_RUN_HREF, REPO_URL, STRIP, TRUST } from './copy';
 
 const wrap = 'mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8';
@@ -61,12 +62,12 @@ export function Hero() {
 export function Problem() {
   return (
     <section className="border-t border-rule">
-      <div className={`${wrap} py-20 lg:py-28`}>
+      <Reveal className={`${wrap} py-20 lg:py-28`}>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
           <h2 className={h2}>{PROBLEM.title.map((l) => <span key={l} className="block">{l}</span>)}</h2>
           <p className={`self-end lg:max-w-[46ch] ${lead}`}>{PROBLEM.lead}</p>
         </div>
-        <div className="mt-14 grid border-y border-rule md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.25fr)]">
+        <Reveal className="mt-14 grid border-y border-rule md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.25fr)]">
           {PROBLEM.stats.map((s, k) => (
             <div key={s.value} className={`py-8 md:px-8 ${k > 0 ? 'border-t border-rule md:border-l md:border-t-0' : 'md:pl-0'}`}>
               <div className="display text-[clamp(3rem,5vw,4.25rem)] leading-none tabular-nums">{s.value}<sup className="ml-1 align-super text-[14px] tracking-normal text-fg-muted"><a href={`#src-${s.ref}`} aria-label={`Source ${s.ref}`}>{s.ref}</a></sup></div>
@@ -74,13 +75,13 @@ export function Problem() {
               {s.note && <p className="mt-2 text-[14px] text-fg-muted">{s.note}</p>}
             </div>
           ))}
-        </div>
+        </Reveal>
         <ol className="mt-5 space-y-1 text-[13px] leading-5 text-fg-muted">
           {PROBLEM.sources.map((s) => (
             <li key={s.n} id={`src-${s.n}`}><span className="font-mono">{s.n}</span>{'  '}<a href={s.href} className="underline decoration-rule-strong underline-offset-4 hover:text-fg" rel="noreferrer">{s.text}</a></li>
           ))}
         </ol>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -90,9 +91,9 @@ export function HowItWorks() {
   const head = (s: typeof detect) => (<><h3 className="text-[26px] font-[450] leading-8 tracking-[-0.01em]">{s.title}</h3><p className="mt-2 max-w-[44ch] text-[16px] leading-6 text-fg-muted">{s.body}</p></>);
   return (
     <section id="how" className="scroll-mt-16 border-t border-rule">
-      <div className={`${wrap} py-20 lg:py-28`}>
+      <Reveal className={`${wrap} py-20 lg:py-28`}>
         <h2 className={`${h2} max-w-[18ch]`}>{HOW.title}</h2>
-        <div className="mt-12 grid gap-4 lg:grid-cols-12">
+        <Reveal className="mt-12 grid gap-4 lg:grid-cols-12">
           <Tile className="p-8 lg:col-span-5">
             {head(detect)}
             <dl className="mt-6 space-y-2 text-[15px]">
@@ -121,8 +122,8 @@ export function HowItWorks() {
             <div className="mt-6 flex flex-wrap gap-2"><Chip state="fraud_blocked" /><Chip state="awaiting_approval" /><Chip state="needs_human" /></div>
             <p className="mt-3 text-[14px] text-fg-muted">{HOW.decide}</p>
           </Tile>
-        </div>
-      </div>
+        </Reveal>
+      </Reveal>
     </section>
   );
 }
@@ -131,13 +132,13 @@ export function TheCall({ outcomes }: { outcomes: Outcome[] }) {
   return (
     // the page's one dark section, like ramp.com's
     <section id="call" className="night scroll-mt-16">
-      <div className={`${wrap} py-20 lg:py-28`}>
+      <Reveal className={`${wrap} py-20 lg:py-28`}>
         <div className="mb-10 grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
           <h2 className={h2}>{CALL.title}</h2>
           <p className={`self-end lg:max-w-[46ch] ${lead}`}>{CALL.lead}</p>
         </div>
         <CallOutcomes outcomes={outcomes} />
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -145,7 +146,7 @@ export function TheCall({ outcomes }: { outcomes: Outcome[] }) {
 export function Trust() {
   return (
     <section id="trust" className="scroll-mt-16">
-      <div className={`${wrap} grid gap-12 py-20 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-16 lg:py-28`}>
+      <Reveal className={`${wrap} grid gap-12 py-20 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-16 lg:py-28`}>
         <div>
           <h2 className={`${h2} max-w-[16ch]`}>{TRUST.title}</h2>
           <Tile className="mt-10 p-7">
@@ -154,7 +155,7 @@ export function Trust() {
             <a href={TRUST.priorSource.href} rel="noreferrer" className="mt-3 inline-block text-[14px] text-fg-muted underline decoration-rule-strong underline-offset-4 hover:text-fg">Source: {TRUST.priorSource.text}</a>
           </Tile>
         </div>
-        <ul className="self-start">
+        <Reveal as="ul" className="self-start">
           {TRUST.rules.map((r, k) => (
             <li key={r.title} className={`flex gap-3 py-6 ${k > 0 ? 'border-t border-rule' : 'pt-1'}`}>
               <Check />
@@ -162,8 +163,8 @@ export function Trust() {
             </li>
           ))}
           <li className="border-t border-rule pt-4 text-[14px] text-fg-muted">{TRUST.limit}</li>
-        </ul>
-      </div>
+        </Reveal>
+      </Reveal>
     </section>
   );
 }
@@ -171,7 +172,7 @@ export function Trust() {
 export function Ramp() {
   return (
     <section id="ramp" className="scroll-mt-16 border-t border-rule">
-      <div className={`${wrap} py-20 lg:py-28`}>
+      <Reveal className={`${wrap} py-20 lg:py-28`}>
         <h2 className={`${h2} max-w-[22ch]`}>{RAMP.title}</h2>
         <p className="mt-6 flex max-w-[64ch] flex-wrap items-center gap-3 text-[17px] leading-7 text-fg-muted"><span className="chip-plain" data-variant="dashed">{RAMP.chip}</span>{RAMP.truth}</p>
         <ol className="mt-12 grid gap-2 lg:grid-cols-[1fr_auto_1fr_auto_1.15fr_auto_1fr] lg:items-stretch">
@@ -187,7 +188,7 @@ export function Ramp() {
         </ol>
         <p className="mt-6 max-w-[70ch] text-[15px] leading-6 text-fg-muted">{RAMP.note}</p>
         <p className="mt-2 text-[14px] text-fg-muted">{RAMP.trademark}</p>
-      </div>
+      </Reveal>
     </section>
   );
 }

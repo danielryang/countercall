@@ -274,3 +274,16 @@ html[data-present] [data-sidebar] [data-nav-label] { display: none; }
 .cursor-ring[data-shown] { opacity: 1; }
 .cursor-ring[data-down] { background: rgb(228 242 34 / 0.7); }
 @media (prefers-reduced-motion: reduce) { .cursor-ring { transition: opacity var(--d-fast) linear; } }
+
+/* ---------- Landing scroll reveal (components/landing/Reveal.tsx) ----------
+   State change: a part of the page arrives as the reader scrolls to it. Children of a waiting block are hidden; when it scrolls in they rise 8px and fade,
+   one after another. Only blocks that start below the fold ever wait, so nothing on the first screen flashes. Reduced motion: shown at once. */
+[data-reveal="waiting"] > * { opacity: 0; }
+[data-reveal="in"] > * { animation: reveal-rise var(--d-slow) var(--ease-out) both; }
+[data-reveal="in"] > :nth-child(2) { animation-delay: 90ms; }
+[data-reveal="in"] > :nth-child(3) { animation-delay: 180ms; }
+[data-reveal="in"] > :nth-child(4) { animation-delay: 270ms; }
+[data-reveal="in"] > :nth-child(5) { animation-delay: 360ms; }
+[data-reveal="in"] > :nth-child(n + 6) { animation-delay: 450ms; }
+@keyframes reveal-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { [data-reveal] > * { opacity: 1; animation: none; } }
