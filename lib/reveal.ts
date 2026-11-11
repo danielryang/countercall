@@ -2,12 +2,15 @@
 // browser; components/call/useCallPacing.ts runs it on the clock.
 //  - The transcript appears strictly in the order it was spoken: a line starts only once the line above it is fully on screen, so an answer never
 //    shows before its question has finished.
-//  - Lines type at REVEAL_CPS, about three times speaking pace: fast enough to keep up with the call, slow enough to read along.
+//  - Lines type at REVEAL_CPS, about three times speaking pace, and no line takes longer than MAX_LINE_MS: the line was already spoken, so the screen catches up.
 //  - When the result arrives, the call stays on screen until its last line has been readable for READ_HOLD_MS; then the result replaces it.
 //  - Lines already there when the view opens (a reload, a paused replay frame) are shown whole, and a result already there shows at once.
 
 /** Characters per second the transcript types at. People speak about 15. */
 export const REVEAL_CPS = 45;
+/** Longest any one line takes to appear, in ms. Retell sends a line only after it was spoken, so a long line typed at REVEAL_CPS still left the
+ *  screen seconds behind the audio on a real take (CC-0124). Capping the line keeps the order rule and catches up with the call. */
+export const MAX_LINE_MS = 800;
 /** How long the whole transcript stays readable before the result replaces it, in ms. */
 export const READ_HOLD_MS = 3500;
 /** A result is never held back longer than this after it arrives, whatever the transcript is doing, in ms. */
@@ -42,9 +45,10 @@ export function revealAt(clock: RevealClock, lines: Line[], now: number, cps = R
       start = Math.max(prevEnd, clock.seen.get(l.id)!);
       clock.start.set(l.id, start);
     }
-    const end = start + (cps === Infinity ? 0 : (len / cps) * 1000);
+    const dur = cps === Infinity ? 0 : Math.min(MAX_LINE_MS, (len / cps) * 1000);
+    const end = start + dur;
     if (now >= end) { clock.done.set(l.id, end); chars.set(l.id, len); }
-    else { chars.set(l.id, Math.max(0, Math.floor(((now - start) / 1000) * cps))); waiting = true; }
+    else { chars.set(l.id, Math.max(0, Math.floor(((now - start) / dur) * len))); waiting = true; }
     prevEnd = Math.max(prevEnd, end);
   }
   return { chars, settled: !waiting, settledAt: !waiting && lines.length ? prevEnd : null };

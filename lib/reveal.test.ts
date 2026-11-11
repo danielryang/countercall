@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { holdingResult, MAX_HOLD_MS, newClock, READ_HOLD_MS, REVEAL_CPS, revealAt } from './reveal';
+import { holdingResult, MAX_HOLD_MS, MAX_LINE_MS, newClock, READ_HOLD_MS, REVEAL_CPS, revealAt } from './reveal';
 
 const line = (id: string, n: number) => ({ id, text: 'x'.repeat(n) });
 const ms = (chars: number) => (chars / REVEAL_CPS) * 1000;
+/** How long a line of `chars` takes to appear: speaking-times-three, but never longer than MAX_LINE_MS. */
+const dur = (chars: number) => Math.min(MAX_LINE_MS, ms(chars));
 
 test('an answer never shows before its question has finished: lines type strictly in order, one at a time', () => {
   const clock = newClock();
@@ -11,19 +13,23 @@ test('an answer never shows before its question has finished: lines type strictl
   const lines = [q1, a1, q2];                                               // one Retell update brings a question, its answer and the next question
   const at = (t: number) => [...revealAt(clock, lines, t).chars.values()];
   assert.deepEqual(at(1000), [0, 0, 0]);
-  assert.deepEqual(at(1000 + ms(45)), [45, 0, 0], 'halfway through the question, the answer is not shown');
-  assert.deepEqual(at(1000 + ms(90) - 1), [89, 0, 0]);
-  assert.deepEqual(at(1000 + ms(90)), [90, 0, 0], 'the question is complete; the answer starts now');
-  assert.deepEqual(at(1000 + ms(90 + 18)), [90, 18, 0]);
-  assert.deepEqual(at(1000 + ms(90 + 18 + 45)), [90, 18, 45]);
-  assert.ok(revealAt(clock, lines, 1000 + ms(153)).settled);
+  assert.deepEqual(at(1000 + dur(90) / 2), [45, 0, 0], 'halfway through the question, the answer is not shown');
+  assert.deepEqual(at(1000 + dur(90) - 1), [89, 0, 0]);
+  assert.deepEqual(at(1000 + dur(90)), [90, 0, 0], 'the question is complete; the answer starts now');
+  assert.deepEqual(at(1000 + dur(90) + dur(18)), [90, 18, 0]);
+  assert.deepEqual(at(1000 + dur(90) + dur(18) + dur(45)), [90, 18, 45]);
+  assert.ok(revealAt(clock, lines, 1000 + dur(90) + dur(18) + dur(45)).settled);
 });
 
-test('the pace: three times speaking speed, so a long question takes a few seconds, not ten', () => {
+test('the pace: short lines type at three times speaking speed, and no line takes longer than MAX_LINE_MS (it was already spoken)', () => {
   assert.equal(REVEAL_CPS, 45);
+  assert.ok(MAX_LINE_MS <= 1000, 'a long line must not leave the screen seconds behind the call');
   const clock = newClock(); const q = line('agent_0', 190);                 // a typical opening question
   assert.equal(revealAt(clock, [q], 0).chars.get('agent_0'), 0);
-  assert.equal(revealAt(clock, [q], 4300).chars.get('agent_0'), 190, 'about 4 s');
+  assert.equal(revealAt(clock, [q], MAX_LINE_MS).chars.get('agent_0'), 190, 'the whole opening line, within MAX_LINE_MS');
+  const c2 = newClock(); const a = line('user_1', 14);                      // "Yes, speaking."
+  assert.equal(revealAt(c2, [a], 0).chars.get('user_1'), 0);
+  assert.equal(revealAt(c2, [a], ms(14)).chars.get('user_1'), 14, 'a short reply still types at REVEAL_CPS');
 });
 
 test('a line that arrives after the one above it finished starts when it arrives', () => {
@@ -47,7 +53,7 @@ test('words added to a finished line appear at once and never hide or restart th
   revealAt(clock, [line('user_0', 3), line('agent_1', 90)], 200);
   const r = revealAt(clock, [line('user_0', 29), line('agent_1', 90)], 1200);            // "No, we haven't changed banks." while the next line types
   assert.equal(r.chars.get('user_0'), 29);
-  assert.equal(r.chars.get('agent_1'), Math.floor(((1200 - 200) / 1000) * REVEAL_CPS));
+  assert.equal(r.chars.get('agent_1'), Math.min(90, Math.floor(((1200 - 200) / dur(90)) * 90)), 'the line below keeps its own clock (here already complete)');
 });
 
 test('reduced motion: no typing, every line whole at once, still in order', () => {
