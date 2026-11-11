@@ -1,6 +1,6 @@
 {
  "name": "hero-take",
- "description": "Recorded run of CC-0116",
+ "description": "Recorded run of CC-0116. Live transcript updates rebuilt on 2026-11-10 from the Retell updates stored during the call (production had stored them empty before fix bc3de79).",
  "recordedAt": "2026-11-10T22:28:44.650Z",
  "source": "recorded",
  "events": [
@@ -1067,17 +1067,362 @@
   },
   {
    "seq": 253,
-   "id": "594c7934-89b0-44a0-b25f-9dd577dddb35",
+   "id": "3e56dd3a-e3ac-4364-835b-03aa635b7238",
    "ts": "2026-11-10T22:27:05.000Z",
    "case_id": "CC-0116",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
-    "final": false,
+    "callId": "call_4bdcd8464716662c845cff13391",
     "items": [],
-    "callId": "call_4bdcd8464716662c845cff13391"
+    "final": false
    },
-   "delay_ms": 1000
+   "delay_ms": 380
+  },
+  {
+   "seq": 254,
+   "id": "1c04e098-2577-4687-bbdc-d67b273671eb",
+   "ts": "2026-11-10T22:27:11.000Z",
+   "case_id": "CC-0116",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_4bdcd8464716662c845cff13391",
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 0
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This ",
+      "tSec": 1
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 1442
+  },
+  {
+   "seq": 255,
+   "id": "5033af20-83cb-4ee3-a934-7087d9517b24",
+   "ts": "2026-11-10T22:27:13.000Z",
+   "case_id": "CC-0116",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_4bdcd8464716662c845cff13391",
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 0
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This ",
+      "tSec": 1
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "text": "yes ",
+      "tSec": 2
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 303
+  },
+  {
+   "seq": 256,
+   "id": "c15b9e64-7b07-470a-8f9a-0d1475077505",
+   "ts": "2026-11-10T22:27:18.000Z",
+   "case_id": "CC-0116",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_4bdcd8464716662c845cff13391",
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 0
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This ",
+      "tSec": 1
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "text": "yes ",
+      "tSec": 2
+     },
+     {
+      "id": "agent_3",
+      "role": "agent",
+      "text": "Thank you. Rice ",
+      "tSec": 3
+     },
+     {
+      "id": "user_4",
+      "role": "user",
+      "text": "Hello? ",
+      "tSec": 4
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 936
+  },
+  {
+   "seq": 257,
+   "id": "5e7b996b-93b6-4a81-8d25-102921537b06",
+   "ts": "2026-11-10T22:27:18.000Z",
+   "case_id": "CC-0116",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_4bdcd8464716662c845cff13391",
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 0
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This ",
+      "tSec": 1
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "text": "yes ",
+      "tSec": 2
+     },
+     {
+      "id": "user_3",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 3
+     },
+     {
+      "id": "agent_4",
+      "role": "agent",
+      "text": "Thank you. Rice ",
+      "tSec": 4
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 33
+  },
+  {
+   "seq": 258,
+   "id": "28e16a5a-ba41-449b-aa62-0679bd7a792d",
+   "ts": "2026-11-10T22:27:30.000Z",
+   "case_id": "CC-0116",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_4bdcd8464716662c845cff13391",
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 0
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This ",
+      "tSec": 1
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "text": "yes ",
+      "tSec": 2
+     },
+     {
+      "id": "agent_3",
+      "role": "agent",
+      "text": "Thank you. Rice ",
+      "tSec": 3
+     },
+     {
+      "id": "user_4",
+      "role": "user",
+      "text": "Hello? ",
+      "tSec": 4
+     },
+     {
+      "id": "agent_5",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 5
+     },
+     {
+      "id": "user_6",
+      "role": "user",
+      "text": "Yes, ",
+      "tSec": 6
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 2221
+  },
+  {
+   "seq": 259,
+   "id": "4c6b89b8-ac62-4811-b3e5-4178c15a35b2",
+   "ts": "2026-11-10T22:27:46.000Z",
+   "case_id": "CC-0116",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_4bdcd8464716662c845cff13391",
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 0
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This ",
+      "tSec": 1
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "text": "yes ",
+      "tSec": 2
+     },
+     {
+      "id": "agent_3",
+      "role": "agent",
+      "text": "Thank you. Rice ",
+      "tSec": 3
+     },
+     {
+      "id": "user_4",
+      "role": "user",
+      "text": "Hello? ",
+      "tSec": 4
+     },
+     {
+      "id": "agent_5",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 5
+     },
+     {
+      "id": "user_6",
+      "role": "user",
+      "text": "Yes. ",
+      "tSec": 6
+     },
+     {
+      "id": "agent_7",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Tuesday, November 10. Did someone at Acme Corp send that request?",
+      "tSec": 7
+     },
+     {
+      "id": "user_8",
+      "role": "user",
+      "text": "No. ",
+      "tSec": 8
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 2991
+  },
+  {
+   "seq": 260,
+   "id": "c15ddbc9-c43c-4c96-9b5d-5359643670e8",
+   "ts": "2026-11-10T22:27:49.000Z",
+   "case_id": "CC-0116",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_4bdcd8464716662c845cff13391",
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 0
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This ",
+      "tSec": 1
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "text": "yes ",
+      "tSec": 2
+     },
+     {
+      "id": "agent_3",
+      "role": "agent",
+      "text": "Thank you. Rice ",
+      "tSec": 3
+     },
+     {
+      "id": "user_4",
+      "role": "user",
+      "text": "Hello? ",
+      "tSec": 4
+     },
+     {
+      "id": "agent_5",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 5
+     },
+     {
+      "id": "user_6",
+      "role": "user",
+      "text": "Yes. ",
+      "tSec": 6
+     },
+     {
+      "id": "agent_7",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Tuesday, November 10. Did someone at Acme Corp send that request?",
+      "tSec": 7
+     },
+     {
+      "id": "user_8",
+      "role": "user",
+      "text": "No, we haven't changed banks. ",
+      "tSec": 8
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 549
   },
   {
    "seq": 264,
@@ -1095,7 +1440,82 @@
     "name": "report_answer",
     "callId": "call_4bdcd8464716662c845cff13391"
    },
-   "delay_ms": 8000
+   "delay_ms": 145
+  },
+  {
+   "seq": 265,
+   "id": "39c009d2-bca3-49cb-84b2-65b910bc2350",
+   "ts": "2026-11-10T22:27:56.000Z",
+   "case_id": "CC-0116",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_4bdcd8464716662c845cff13391",
+    "items": [
+     {
+      "id": "user_0",
+      "role": "user",
+      "text": "(unintelligible audio)",
+      "tSec": 0
+     },
+     {
+      "id": "agent_1",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This ",
+      "tSec": 1
+     },
+     {
+      "id": "user_2",
+      "role": "user",
+      "text": "yes ",
+      "tSec": 2
+     },
+     {
+      "id": "agent_3",
+      "role": "agent",
+      "text": "Thank you. Rice ",
+      "tSec": 3
+     },
+     {
+      "id": "user_4",
+      "role": "user",
+      "text": "Hello? ",
+      "tSec": 4
+     },
+     {
+      "id": "agent_5",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 5
+     },
+     {
+      "id": "user_6",
+      "role": "user",
+      "text": "Yes. ",
+      "tSec": 6
+     },
+     {
+      "id": "agent_7",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Tuesday, November 10. Did someone at Acme Corp send that request?",
+      "tSec": 7
+     },
+     {
+      "id": "user_8",
+      "role": "user",
+      "text": "No, we haven't changed banks. ",
+      "tSec": 8
+     },
+     {
+      "id": "agent_9",
+      "role": "agent",
+      "text": "Thank you for telling us. We'll keep using the details we already have, and our team will look into the request. Goodbye.",
+      "tSec": 9
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 6584
   },
   {
    "seq": 266,
@@ -1170,7 +1590,7 @@
     ],
     "callId": "call_4bdcd8464716662c845cff13391"
    },
-   "delay_ms": 7000
+   "delay_ms": 416
   },
   {
    "seq": 267,

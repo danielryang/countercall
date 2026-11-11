@@ -1,6 +1,6 @@
 {
  "name": "hero-take-3",
- "description": "Recorded run of CC-0120",
+ "description": "Recorded run of CC-0120. Live transcript updates rebuilt on 2026-11-10 from the Retell updates stored during the call (production had stored them empty before fix bc3de79).",
  "recordedAt": "2026-11-11T01:33:51.530Z",
  "source": "recorded",
  "events": [
@@ -1049,17 +1049,149 @@
   },
   {
    "seq": 353,
-   "id": "5f0f3ef7-73a5-4183-9a43-705f734b55c5",
+   "id": "19cd9d02-f98e-4179-b220-a900d776af0d",
    "ts": "2026-11-11T01:32:45.000Z",
    "case_id": "CC-0120",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
-    "final": false,
+    "callId": "call_81be07a523498055d50c9af99cd",
     "items": [],
-    "callId": "call_81be07a523498055d50c9af99cd"
+    "final": false
    },
-   "delay_ms": 2000
+   "delay_ms": 657
+  },
+  {
+   "seq": 354,
+   "id": "ffa32601-e28c-4113-9685-b8af891a52da",
+   "ts": "2026-11-11T01:32:58.000Z",
+   "case_id": "CC-0120",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_81be07a523498055d50c9af99cd",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes. ",
+      "tSec": 1
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 4153
+  },
+  {
+   "seq": 355,
+   "id": "8634be21-499e-47fe-94a1-199092c2095b",
+   "ts": "2026-11-11T01:33:00.000Z",
+   "case_id": "CC-0120",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_81be07a523498055d50c9af99cd",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes, speaking. ",
+      "tSec": 1
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 421
+  },
+  {
+   "seq": 356,
+   "id": "3e70cc07-a873-4407-a90c-0005d0403e2f",
+   "ts": "2026-11-11T01:33:14.000Z",
+   "case_id": "CC-0120",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_81be07a523498055d50c9af99cd",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes, speaking. ",
+      "tSec": 1
+     },
+     {
+      "id": "agent_2",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Tuesday, November 10. Did someone at Acme Corp send that request?",
+      "tSec": 2
+     },
+     {
+      "id": "user_3",
+      "role": "user",
+      "text": "No, we ",
+      "tSec": 3
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 4158
+  },
+  {
+   "seq": 357,
+   "id": "32c2379d-b868-4267-955a-73eebfe6e4db",
+   "ts": "2026-11-11T01:33:15.000Z",
+   "case_id": "CC-0120",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_81be07a523498055d50c9af99cd",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes, speaking. ",
+      "tSec": 1
+     },
+     {
+      "id": "agent_2",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Tuesday, November 10. Did someone at Acme Corp send that request?",
+      "tSec": 2
+     },
+     {
+      "id": "user_3",
+      "role": "user",
+      "text": "No, we have not changed banks. ",
+      "tSec": 3
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 273
   },
   {
    "seq": 358,
@@ -1077,7 +1209,52 @@
     "name": "report_answer",
     "callId": "call_81be07a523498055d50c9af99cd"
    },
-   "delay_ms": 8000
+   "delay_ms": 338
+  },
+  {
+   "seq": 359,
+   "id": "3038b4f0-c8c8-4acd-b66f-9eaad291ce5a",
+   "ts": "2026-11-11T01:33:23.000Z",
+   "case_id": "CC-0120",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_81be07a523498055d50c9af99cd",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes, speaking. ",
+      "tSec": 1
+     },
+     {
+      "id": "agent_2",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Tuesday, November 10. Did someone at Acme Corp send that request?",
+      "tSec": 2
+     },
+     {
+      "id": "user_3",
+      "role": "user",
+      "text": "No, we have not changed banks. ",
+      "tSec": 3
+     },
+     {
+      "id": "agent_4",
+      "role": "agent",
+      "text": "Thank you for telling us. We'll keep using the details we already have, and our team will look into the request. Goodbye.",
+      "tSec": 4
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 6798
   },
   {
    "seq": 360,
@@ -1122,7 +1299,7 @@
     ],
     "callId": "call_81be07a523498055d50c9af99cd"
    },
-   "delay_ms": 8000
+   "delay_ms": 1202
   },
   {
    "seq": 361,

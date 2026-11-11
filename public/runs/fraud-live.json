@@ -1,6 +1,6 @@
 {
  "name": "fraud-live",
- "description": "A real phone call: the vendor denies sending the bank-change request (recorded live).",
+ "description": "A real phone call: the vendor denies sending the bank-change request (recorded live). Live transcript updates rebuilt on 2026-11-10 from the Retell updates stored during the call (production had stored them empty before fix bc3de79).",
  "recordedAt": "2026-11-10T06:46:49.938Z",
  "source": "recorded",
  "events": [
@@ -1085,17 +1085,149 @@
   },
   {
    "seq": 104,
-   "id": "37d09071-9914-4a45-8d22-221a0de08397",
+   "id": "5fbd0ed0-8332-46fa-8a29-0d93c4cdbeed",
    "ts": "2026-11-10T06:45:48.000Z",
    "case_id": "CC-0108",
    "type": "call.transcript.delta",
    "actor": "voice_agent",
    "payload": {
-    "final": false,
+    "callId": "call_8cd83ca719295a5ed08b577af04",
     "items": [],
-    "callId": "call_8cd83ca719295a5ed08b577af04"
+    "final": false
    },
-   "delay_ms": 2000
+   "delay_ms": 809
+  },
+  {
+   "seq": 105,
+   "id": "807f7b2a-1031-42b1-b29d-e8c5b7b75194",
+   "ts": "2026-11-10T06:45:59.000Z",
+   "case_id": "CC-0108",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_8cd83ca719295a5ed08b577af04",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yeah. ",
+      "tSec": 1
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 3579
+  },
+  {
+   "seq": 106,
+   "id": "35f7fd39-1767-4c2e-9f7b-91ce661962ff",
+   "ts": "2026-11-10T06:46:01.000Z",
+   "case_id": "CC-0108",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_8cd83ca719295a5ed08b577af04",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes, speaking. ",
+      "tSec": 1
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 372
+  },
+  {
+   "seq": 107,
+   "id": "67a22df5-1641-470c-ba62-3fd649252759",
+   "ts": "2026-11-10T06:46:15.000Z",
+   "case_id": "CC-0108",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_8cd83ca719295a5ed08b577af04",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes, speaking. ",
+      "tSec": 1
+     },
+     {
+      "id": "agent_2",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Monday, November 9. Did someone at Acme Corp send that request?",
+      "tSec": 2
+     },
+     {
+      "id": "user_3",
+      "role": "user",
+      "text": "No. ",
+      "tSec": 3
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 4168
+  },
+  {
+   "seq": 108,
+   "id": "437a50e7-a975-4203-a6a1-74a04be77f98",
+   "ts": "2026-11-10T06:46:18.000Z",
+   "case_id": "CC-0108",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_8cd83ca719295a5ed08b577af04",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes, speaking. ",
+      "tSec": 1
+     },
+     {
+      "id": "agent_2",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Monday, November 9. Did someone at Acme Corp send that request?",
+      "tSec": 2
+     },
+     {
+      "id": "user_3",
+      "role": "user",
+      "text": "No, we haven't changed banks. ",
+      "tSec": 3
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 847
   },
   {
    "seq": 109,
@@ -1113,7 +1245,52 @@
     "name": "report_answer",
     "callId": "call_8cd83ca719295a5ed08b577af04"
    },
-   "delay_ms": 8000
+   "delay_ms": 225
+  },
+  {
+   "seq": 110,
+   "id": "0bbaa421-60ea-4b85-bf42-be73b1b8282f",
+   "ts": "2026-11-10T06:46:25.000Z",
+   "case_id": "CC-0108",
+   "type": "call.transcript.delta",
+   "actor": "voice_agent",
+   "payload": {
+    "callId": "call_8cd83ca719295a5ed08b577af04",
+    "items": [
+     {
+      "id": "agent_0",
+      "role": "agent",
+      "text": "Hello, this is an automated assistant calling on behalf of Rice Robotics. This call may be recorded. Am I speaking with someone in accounts receivable at Acme Corp?",
+      "tSec": 0
+     },
+     {
+      "id": "user_1",
+      "role": "user",
+      "text": "Yes, speaking. ",
+      "tSec": 1
+     },
+     {
+      "id": "agent_2",
+      "role": "agent",
+      "text": "Thank you. Rice Robotics received a request to change Acme Corp's bank account for payments. The request arrived by email on Monday, November 9. Did someone at Acme Corp send that request?",
+      "tSec": 2
+     },
+     {
+      "id": "user_3",
+      "role": "user",
+      "text": "No, we haven't changed banks. ",
+      "tSec": 3
+     },
+     {
+      "id": "agent_4",
+      "role": "agent",
+      "text": "Thank you for telling us. We'll keep using the details we already have, and our team will look into the request. Goodbye.",
+      "tSec": 4
+     }
+    ],
+    "final": false
+   },
+   "delay_ms": 6579
   },
   {
    "seq": 111,
@@ -1127,7 +1304,7 @@
     "monoUrl": null,
     "stereoUrl": null
    },
-   "delay_ms": 7000
+   "delay_ms": 421
   },
   {
    "seq": 112,
