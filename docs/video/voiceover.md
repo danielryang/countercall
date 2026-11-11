@@ -59,16 +59,16 @@ And when every check passes, the money still waits for a person.
 ## 5. How it works (3:02 to 3:57)
 
 **F1 · DANIEL · 13 s**
-One Next.js app. Email arrives by a signed webhook, Claude returns typed JSON, and Retell places the call. The number in the email never reaches the dialer.
+One Next.js app. Email arrives by a signed webhook, an agentic typesafe classifier returns typed JSON, and Retell places the call. The number in the email never reaches the dialer.
 
 **F2 · ERIC · 15 s**
 The models only report. Plain TypeScript decides: an unhandled outcome won't compile. "Confirmed" needs the right digits, no red flags, and a second reader that agrees. Even then, only a signed-in person releases the money.
 
 **F3 · SAKETH · 11 s**
-On our twenty hand-built emails, the live model got twenty of twenty, with no false alarms. With the model switched off, the rules alone still hold every bank change.
+On our twenty hand-built emails, the live model got twenty out of twenty, with no false alarms. With the model switched off, the rules alone still hold every bank change.
 
 **F4 · DANIEL · 16 s**
-We check the policy exhaustively: almost twenty-one million cases, zero unsafe releases. A seeded simulator loses, repeats and forges webhooks. It has found two real bugs. And the audit log is sealed, entry by entry, so a changed record shows up.
+We test every combination of call outcomes we model, almost twenty-one million, and none releases money unsafely. A seeded simulator loses, repeats and forges webhooks, and it found two real bugs. And the audit log is sealed, so a changed record shows up.
 
 ## 6. Close (3:57 to 4:12)
 
