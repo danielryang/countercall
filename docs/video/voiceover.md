@@ -24,7 +24,7 @@ So we automated the call.
 This is Rice Robotics' accounts payable. I'm sending the scam email now, through the same code path a real email takes.
 
 **B2 · DANIEL · 16 s**
-Claude reads it and flags the bank change, and the rules flag it too. Both Acme bills, twenty-four thousand eight hundred dollars, go on hold. Ramp is a mock here, built against Ramp's Developer API.
+Claude reads it and flags the bank change, and the rules flag it too. Both Acme bills, twenty-four thousand eight hundred dollars, go on hold. The mock is built against Ramp's Developer API.
 
 **B3 · ERIC · 9 s**
 It never dials a number from the email. It calls the one on Acme's W-9 from March 2025, the number we already had.
@@ -36,7 +36,7 @@ No voiceover. The hero take plays with its own audio.
 ## 4. After the call (2:12 to 3:02)
 
 **D1 · SAKETH · 8 s**
-Acme says no. The case is blocked, and the twenty-four eight stays on hold.
+Acme says no. The case is blocked, and the money stays on hold.
 
 **D2 · DANIEL · 7 s**
 Only a signed-in person can release money, by holding this button. Never the model.
@@ -45,7 +45,7 @@ Only a signed-in person can release money, by holding this button. Never the mod
 Every step lands in one append-only log, and the audit page rebuilds every case from it.
 
 **E1 · SAKETH · 7 s**
-Voicemail: the agent says nothing about the request, and a person gets a task.
+If it reaches voicemail, the agent leaves no details, and a person follows up.
 
 **E2 · DANIEL · 6 s**
 "I think so?" isn't a yes. Still held, and a person follows up.

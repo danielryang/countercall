@@ -93,8 +93,8 @@ the audit page rebuilds every case from it.
 
 20
 00:02:34,300 --> 00:02:40,600
-Voicemail: the agent says nothing about
-the request, and a person gets a task.
+If it reaches voicemail, the agent leaves
+no details, and a person follows up.
 
 21
 00:02:41,200 --> 00:02:46,600
