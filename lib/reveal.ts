@@ -10,7 +10,7 @@
 export const REVEAL_CPS = 45;
 /** Longest any one line takes to appear, in ms. Retell sends a line only after it was spoken, so a long line typed at REVEAL_CPS still left the
  *  screen seconds behind the audio on a real take (CC-0124). Capping the line keeps the order rule and catches up with the call. */
-export const MAX_LINE_MS = 800;
+export const MAX_LINE_MS = 2000;
 /** How long the whole transcript stays readable before the result replaces it, in ms. */
 export const READ_HOLD_MS = 3500;
 /** A result is never held back longer than this after it arrives, whatever the transcript is doing, in ms. */
