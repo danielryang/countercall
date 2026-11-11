@@ -71,7 +71,6 @@ function Foot({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void 
           <button type="button" className={link} onClick={() => replay.setSpeed(SPEEDS[(SPEEDS.indexOf(replay.speed) + 1) % SPEEDS.length])} aria-label="Playback speed">{replay.speed}{'\u00d7'}</button>
         </div>
       )}
-      <button type="button" className={`ml-auto ${link}`} onClick={() => setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length])} aria-label="Change theme">Theme: {theme}</button>
     </footer>
   );
 }

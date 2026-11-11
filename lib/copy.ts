@@ -115,13 +115,13 @@ export function headline(c: CaseView): Headline {
   const v = c.vendorName ?? 'the vendor'; const money = cents(c) ? fmtCents(cents(c)) : 'The payments';
   const o = c.call?.outcome;
   switch (c.state) {
-    case 'scanning': return { tone: 'progress', title: 'Reading a new email', sub: 'CounterCall checks every email sent to the accounts-payable inbox.' };
-    case 'cleared': return { tone: 'ok', title: 'Looks normal', sub: 'No bank change was requested, so nothing was held and nobody was called.' };
-    case 'flagged': return { tone: 'warn', title: 'Suspicious request found', sub: `Someone is asking to change where ${v} gets paid. Holding the payments now.` };
-    case 'held': return { tone: 'warn', title: 'Payments are on hold', sub: `${money} is frozen. Next, CounterCall phones ${v} on the number it already had on file, not any number from the email.` };
-    case 'calling': return { tone: 'progress', title: `Calling ${v}`, sub: 'Asking them directly: did you send this request? The call is automated and says so at the start.' };
-    case 'fraud_blocked': return { tone: 'danger', title: `Blocked. ${v} says they did not send this.`, sub: `The bank change was rejected and ${money} stays on hold. Only a person can release it.` };
-    case 'awaiting_approval': return { tone: 'ok', title: 'Verified by phone. Waiting for approval.', sub: `${v} confirmed the request and answered the security question. No money moves until a person approves.` };
+    case 'scanning': return { tone: 'progress', title: 'Reading a new email', sub: 'Checking it for a bank-change request.' };
+    case 'cleared': return { tone: 'ok', title: 'Looks normal', sub: 'No bank change requested. Nothing held.' };
+    case 'flagged': return { tone: 'warn', title: 'Suspicious request found', sub: `Someone wants to change where ${v} gets paid. Holding payments.` };
+    case 'held': return { tone: 'warn', title: 'Payments are on hold', sub: `${money} frozen. Calling ${v} on the number on file.` };
+    case 'calling': return { tone: 'progress', title: `Calling ${v}`, sub: 'Asking if they really sent this request.' };
+    case 'fraud_blocked': return { tone: 'danger', title: `Blocked. ${v} says they did not send this.`, sub: `${money} stays on hold. Only a person can release it.` };
+    case 'awaiting_approval': return { tone: 'ok', title: 'Verified by phone. Waiting for approval.', sub: `${v} confirmed it. No money moves until a person approves.` };
     case 'needs_human': return { tone: 'warn', title: 'Could not verify. A person needs to follow up.', sub: `${o ? REASON_TEXT[o.decision.reason].rule : plainTask(c.tasks.find((t) => t.status === 'open')?.reason ?? 'Verification did not complete')}. ${cents(c) ? `${money} stays on hold.` : ''}`.trim() };
     case 'released': return { tone: 'ok', title: 'Payment released', sub: c.release ? `Approved by ${c.release.approvedBy}.` : 'A person approved the release.' };
     case 'closed': return { tone: 'neutral', title: 'Case closed', sub: c.closed?.note ?? '' };

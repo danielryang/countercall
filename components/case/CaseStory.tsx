@@ -25,6 +25,13 @@ function Icon({ st }: { st: St }) {
 
 const md = (iso: string) => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
+/** One plain sentence under the result, only where it adds something the headline does not. */
+const RESULT_TEXT: Partial<Record<CaseView['state'], string>> = {
+  fraud_blocked: 'A person can still release the payments to the account already on file.',
+  awaiting_approval: 'Review and approve before any payment moves or the bank account changes.',
+  needs_human: 'A task was created for your team. The payments stay on hold.',
+};
+
 export function CaseStory({ c, onRelease, releaseBlocked, hot, onHot }: {
   c: CaseView; onRelease?: () => void; releaseBlocked?: string;
   /** signal ids lit up by the email pane (or by a row here); the case detail owns this state */
@@ -58,7 +65,7 @@ export function CaseStory({ c, onRelease, releaseBlocked, hot, onHot }: {
     key: 'email', st: c.decision ? 'done' : 'active',
     title: cleared ? 'Checked the email: nothing suspicious' : c.decision ? 'Flagged as suspicious' : 'Reading the email',
     hot: !!hotGroup,
-    summary: cleared ? 'No bank change was requested' : hotGroup ? hotGroup.text : reasons.length ? `${reasons[0]}${reasons.length > 1 ? ` \u00b7 +${reasons.length - 1} more` : ''}` : 'Looking for signs of a fake request',
+    summary: cleared ? '' : hotGroup ? hotGroup.text : reasons.length ? `${reasons.length} warning sign${reasons.length === 1 ? '' : 's'}` : 'Looking for signs of a fake request',
     body: groups.length ? (
       <ul className="-mx-1.5 space-y-0.5 text-[14px] leading-5">
         {rows.map((g) => {
@@ -107,7 +114,7 @@ export function CaseStory({ c, onRelease, releaseBlocked, hot, onHot }: {
   if (callExpected) steps.push({
     key: 'call', shrink: !!c.call, st: o ? 'done' : c.call ? 'active' : skipped ? 'warn' : 'pending',
     title: skipped ? 'Phone check did not run' : c.call ? `Called ${v} on the number we already had` : `Call ${v} on the number we already had`,
-    summary: skipped ? plainTask(openTask!.reason) : phone ? `${phone}${ct ? ` · from ${SOURCE_LABEL[ct.source] ?? ct.source}` : ''}` : 'Finding the number on file',
+    summary: skipped ? plainTask(openTask!.reason) : phone ?? 'Finding the number on file',
     body: (
       <div className="flex min-h-0 flex-col gap-3">
         <p className="shrink-0 text-[13px] leading-5 text-fg-muted" title={ct?.sourceDoc ?? undefined}>{phone ? <><span className="font-mono text-fg">{phone}</span> {'\u00b7'} from {ct ? `${SOURCE_LABEL[ct.source] ?? ct.source}, added ${ct.firstSeenAt.slice(0, 10)}` : 'the vendor record'} {'\u00b7'} <b className="font-medium text-fg">not</b> from the email</> : 'Looking up the verified number.'}</p>
@@ -124,17 +131,13 @@ export function CaseStory({ c, onRelease, releaseBlocked, hot, onHot }: {
     body: (
       <div className="space-y-3 text-[14px] leading-5">
         {ans && <p className="rounded-lg border border-rule bg-surface px-3 py-2"><span className="cap block">{v} said</span><span className="ev" data-verdict={c.state === 'fraud_blocked' ? 'no' : c.state === 'awaiting_approval' ? 'yes' : undefined}>{ans}</span></p>}
-        <p>{c.state === 'fraud_blocked' ? 'The bank change is rejected and the payments stay on hold. A person can release them to the account already on file.'
-          : c.state === 'awaiting_approval' ? 'A person must review and approve before any payment is released or the bank account changes.'
-          : c.state === 'needs_human' ? 'A task was created for your team. The payments stay on hold until someone verifies this by hand.'
-          : c.state === 'released' ? 'A person approved the release.' : 'CounterCall is working on it.'}</p>
-        <div className="flex items-center gap-3">
-          {!c.release && (
+        {RESULT_TEXT[c.state] && <p>{RESULT_TEXT[c.state]}</p>}
+        {canRelease && (   // only when there is something a person can release: nothing to click on a cleared or in-progress case
+          <div className="flex items-center gap-3">
             <button type="button" disabled={!canRelease || !onRelease} onClick={onRelease} title={!onRelease ? (releaseBlocked ?? 'Approval is not available here') : canRelease ? 'Review and approve' : 'Nothing to release yet'}
               className="shrink-0 whitespace-nowrap rounded-lg border border-fg px-3 py-1.5 text-[13px] enabled:hover:bg-fg enabled:hover:text-surface disabled:cursor-not-allowed disabled:border-rule disabled:text-fg-muted">Review and release{'…'}</button>
-          )}
-          <span className="cap">Only a person can release money. CounterCall never does it on its own.</span>
-        </div>
+          </div>
+        )}
       </div>
     ),
   });

@@ -45,13 +45,13 @@ export function CaseDetail({ c }: { c: CaseView }) {
     <div className="flex h-full min-h-0 flex-col gap-4 p-5">
       <StatusBanner c={c} nowMs={now} />
       <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,5fr)_minmax(0,6fr)] gap-4">
-        <Card title="The email" aside="text only"><EmailPane c={c} hot={hot} onHot={setHot} /></Card>
+        <Card title="The email"><EmailPane c={c} hot={hot} onHot={setHot} /></Card>
         {/* Flex column: the story may shrink an open call step (its transcript scrolls inside) so Result and the timing toggle stay on the stage; the column
             itself scrolls only as a fallback on very short windows. */}
         <div className="flex min-h-0 flex-col overflow-y-auto pr-1">
           <h2 className="shrink-0 px-2 pb-1 pt-1 text-[14px] font-medium">What CounterCall did</h2>
           <CaseStory key={c.id} c={c} hot={hot} onHot={setHot} onRelease={replay ? undefined : () => setOpen(true)} releaseBlocked="A replay is read-only. Open the live view to approve." />
-          {w && c.state !== 'scanning' && (
+          {w && finished && c.state !== 'scanning' && c.state !== 'cleared' && (   // timing is a footnote: offered only once the case is decided
             <div className="ml-10 mt-1 shrink-0">
               <button type="button" aria-expanded={timing} onClick={() => setTiming(!timing)} className="flex w-full items-baseline gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] text-fg-muted hover:bg-surface-raised hover:text-fg">
                 <span>{TIMING.title}</span>

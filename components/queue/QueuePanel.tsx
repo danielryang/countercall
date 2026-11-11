@@ -11,7 +11,6 @@ export function QueuePanel({ groups, selectedId, onSelect, listening }: { groups
   return (
     <nav aria-label="Cases" className="h-full overflow-y-auto px-2 pb-4">
       <div className="px-3 pt-4 text-[16px] font-semibold">Cases</div>
-      <p className="cap px-3 pb-2 pt-1">Every email to the AP inbox is checked. A suspicious bank change is put on hold and verified by phone.</p>
       {total === 0 ? (
         <div className="cap m-4 border border-dashed border-rule p-4">Watching {listening}<span className="scan-dots" /></div>
       ) : (
