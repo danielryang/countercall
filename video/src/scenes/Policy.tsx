@@ -65,18 +65,19 @@ function Panel({ x, lead, aside }: { x: Excerpt; lead: string; aside: ReactNode 
 
 export function Policy() {
   const { durationInFrames } = useVideoConfig();
-  const third = Math.floor(durationInFrames / 3);
+  // Panel switches land on the F2 words: "Confirmed needs" ~5 s, "Even then" ~10.8 s (docs/video/voiceover.md, read evenly over 15 s).
+  const second = Math.round(durationInFrames * (5 / 15)); const third = Math.round(durationInFrames * (10.8 / 15));
   return (
     <Frame label="Code decides, not the model" truth="Real source · read at build time">
-      <Sequence durationInFrames={third} layout="none">
+      <Sequence durationInFrames={second} layout="none">
         <Panel x={byId('nextState')} lead="A new outcome that is not handled will not compile."
           aside={<div className="flex gap-[12px]" style={{ zoom: 2 }}><Chip state="awaiting_approval" /><Chip state="fraud_blocked" /><Chip state="needs_human" /></div>} />
       </Sequence>
-      <Sequence from={third} durationInFrames={third} layout="none">
+      <Sequence from={second} durationInFrames={third - second} layout="none">
         <Panel x={byId('decideOutcome')} lead="Right digits, no red flags, a second reader agrees."
           aside={<div style={{ zoom: 2 }}><Stamp c={verified} /></div>} />
       </Sequence>
-      <Sequence from={third * 2} durationInFrames={durationInFrames - third * 2} layout="none">
+      <Sequence from={third} durationInFrames={durationInFrames - third} layout="none">
         <Panel x={byId('canRelease')} lead="Even then, only a signed-in person releases money."
           aside={<div style={{ zoom: 2 }}><Chip state="held" /></div>} />
       </Sequence>

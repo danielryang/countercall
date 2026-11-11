@@ -22,7 +22,7 @@ function Marker({ at, children }: { at: number; children: string }) {
 
 export function Problem() {
   const frame = useCurrentFrame();
-  const wire = progress(frame, 150, 40);
+  const wire = progress(frame, 200, 40);   // the wire moves on "the money goes to whoever sent it"
   return (
     <Frame label="The problem" truth="Fictional vendor · fictional email">
       <div className="grid h-full grid-cols-[1.15fr_1fr] gap-[64px]">
@@ -56,7 +56,7 @@ export function Problem() {
               </div>
             </Card>
           </div>
-          <div style={useRise(200, 20)} className="text-[30px] text-fg-muted">Same name, same invoice, new bank account. If AP pays it, the money goes to whoever sent the email.</div>
+          <div style={useRise(155, 20)} className="text-[30px] text-fg-muted">Same name, same invoice, new bank account. If AP pays it, the money goes to whoever sent the email.</div>
         </div>
       </div>
     </Frame>

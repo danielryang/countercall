@@ -8,7 +8,8 @@ import { FACTS, fmt } from '../facts';
 import { progress, useRise } from '../motion';
 import { sec } from '../timeline';
 
-const AT = { verifier: 6, sim: sec(5.2), audit: sec(10.6) };
+// Timed to F4 in docs/video/voiceover.md: "almost twenty-one million" ~3.3-4.2 s, "A seeded simulator" ~6.3 s, "found two real bugs" ~9.8 s, "And the audit log" ~11.2 s.
+const AT = { verifier: 6, count: sec(1.3), sim: sec(6.2), bugs: sec(9.7), audit: sec(11.2) };
 
 function Panel({ at, title, source, children }: { at: number; title: string; source: string; children: ReactNode }) {
   const rule = progress(useCurrentFrame(), at + 10, 30);
@@ -57,7 +58,7 @@ function Chain({ at }: { at: number }) {
 export function Assurance() {
   const frame = useCurrentFrame();
   const v = FACTS.verifier, s = FACTS.sim, a = FACTS.audit;
-  const count = progress(frame, AT.verifier, 40);
+  const count = progress(frame, AT.count, sec(2.8));   // finishes on "million"
   return (
     <Frame label="It checks its own safety" truth="Every number printed by the command under it">
       <div className="grid h-full grid-cols-3 gap-[40px] pb-[24px]">
@@ -81,7 +82,7 @@ export function Assurance() {
             <Row k="forged requests" v={fmt(s.forged)} />
             <Row k="lost webhooks settled" v={fmt(s.reaped)} />
           </div>
-          <div style={useRise(AT.sim + 40)} className="text-[24px] text-fg-muted">It has already found {s.bugs} real bugs, both fixed.</div>
+          <div style={useRise(AT.bugs)} className="text-[24px] text-fg-muted">It has already found {s.bugs} real bugs, both fixed.</div>
         </Panel>
         <Panel at={AT.audit} title="The audit log is sealed" source={a.source}>
           <Chain at={AT.audit + 12} />

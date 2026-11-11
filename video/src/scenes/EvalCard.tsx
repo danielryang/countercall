@@ -29,11 +29,11 @@ export function EvalCard() {
       <div className="grid h-full grid-cols-[1.2fr_1fr] gap-[48px] pb-[24px]">
         <Card className="justify-between px-[48px] py-[44px]">
           <div className="flex flex-col gap-[44px]">
-            <Big at={6} value={`${L.pass}/${L.n}`} label="fixtures correct, live" />
-            <Big at={18} value={`${L.recall[0]}/${L.recall[1]}`} label="bank changes held" />
-            <Big at={30} value={`${L.falsePositives[0]}/${L.falsePositives[1]}`} label="false alarms on normal mail" />
+            <Big at={90} value={`${L.pass}/${L.n}`} label="fixtures correct, live" />
+            <Big at={118} value={`${L.recall[0]}/${L.recall[1]}`} label="bank changes held" />
+            <Big at={145} value={`${L.falsePositives[0]}/${L.falsePositives[1]}`} label="false alarms on normal mail" />
           </div>
-          <div style={useRise(50)} className="flex flex-col gap-[14px] border-t border-rule pt-[28px]">
+          <div style={useRise(178)} className="flex flex-col gap-[14px] border-t border-rule pt-[28px]">   {/* the rules-only line lands on "With the model switched off" */}
             <div className="font-mono text-[20px] uppercase tracking-[0.08em] text-fg-muted">Live · {L.date} · {L.model} · N={L.n}</div>
             <div className="text-[30px]">{LIVE_LINE}</div>
             <div className="text-[22px] text-fg-muted">{RULES_LINE}</div>
@@ -47,7 +47,7 @@ export function EvalCard() {
           </div>
           <div className="grid grid-cols-1 gap-[6px] px-[20px] py-[12px]">
             {result.rows.map((r, i) => {
-              const p = progress(frame, 20 + i * 5, 10);
+              const p = progress(frame, 90 + i * 4, 10);   // the per-fixture list fills in with "twenty out of twenty"
               return (
                 <div key={r.id} className="flex items-center justify-between font-mono text-[18px] leading-[1.45]" style={{ opacity: p }}>
                   <span className="truncate pr-[16px]">{r.id}</span>

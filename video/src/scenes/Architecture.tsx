@@ -6,8 +6,16 @@ import { Frame } from '../components/Frame';
 import { progress } from '../motion';
 
 const BW = 250, BH = 120;
-// Pace: the step times below were written for 15 s; K squeezes them into the 13 s mark (timeline.ts F1) and leaves a 2 s hold at the end.
-const K = 0.85;
+// Pace: the step times below are authored order, not frames. toFrame() places them on the F1 voiceover (docs/video/voiceover.md, read evenly over 13 s):
+// email ~1 s, "signed webhook" ~3 s, the classifier ~4.3 s, "Retell places the call" ~7.2 s, "never reaches the dialer" ~11.5 s.
+const ANCHORS: readonly (readonly [number, number])[] = [[0, 30], [18, 90], [36, 130], [104, 215], [124, 235], [144, 255], [312, 330], [340, 345]];
+const toFrame = (at: number) => {
+  for (let i = 1; i < ANCHORS.length; i++) {
+    const [a0, f0] = ANCHORS[i - 1]; const [a1, f1] = ANCHORS[i];
+    if (at <= a1) return f0 + ((at - a0) / (a1 - a0)) * (f1 - f0);
+  }
+  return ANCHORS[ANCHORS.length - 1][1];
+};
 type Node = { id: string; label: string; sub: string; x: number; y: number; at: number; kind?: 'outside' | 'store' };
 const C = [0, 295, 590, 885, 1180, 1475];
 const R = [0, 330, 660];
@@ -60,7 +68,7 @@ const LIE_AT = 340;
 
 function EdgeView({ e }: { e: Edge }) {
   const frame = useCurrentFrame();
-  const p = progress(frame, e.at * K, 18);
+  const p = progress(frame, toFrame(e.at), 18);
   if (p <= 0) return null;
   const len = getLength(e.d);
   const mid = getPointAtLength(e.d, len / 2);
@@ -75,7 +83,7 @@ function EdgeView({ e }: { e: Edge }) {
 }
 
 function NodeView({ n }: { n: Node }) {
-  const p = progress(useCurrentFrame(), n.at * K, 16);
+  const p = progress(useCurrentFrame(), toFrame(n.at), 16);
   const border = n.kind === 'outside' ? 'border-dashed' : 'border-solid';
   return (
     <div className={`absolute flex flex-col justify-center gap-[8px] rounded-xl border border-rule ${border} ${n.kind === 'outside' ? 'bg-surface' : 'bg-surface-raised'} px-[22px]`}
@@ -88,8 +96,8 @@ function NodeView({ n }: { n: Node }) {
 
 export function Architecture() {
   const frame = useCurrentFrame();
-  const lie = progress(frame, LIE_AT * K, 24);
-  const stop = progress(frame, LIE_AT * K + 24, 10);
+  const lie = progress(frame, toFrame(LIE_AT), 24);
+  const stop = progress(frame, toFrame(LIE_AT) + 24, 10);
   const end = [N.call.x - 40, LIE_Y] as const;
   return (
     <Frame label="How it works" truth="Next.js on Vercel · one app">
