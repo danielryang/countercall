@@ -89,3 +89,22 @@ test('the challenge answer the vendor speaks never reaches a stored event, yet t
   const [o] = (await t.events(caseId)).filter((e) => e.type === 'call.outcome');
   assert.equal((o.payload.decision as { outcome: string }).outcome, 'CONFIRMED_LEGIT', 'the policy used the real digits from the database');
 });
+
+test('live transcript: during the call Retell sends the lines in transcript_with_tool_calls (transcript_object only after it ends); every update reaches the case', async () => {
+  const caseId = await t.heldCase('v_acme', '4321');
+  const callId = `call_live_${n++}`;
+  const started = await startCall({ q: t.q, emit: (e) => t.emit(e), createTask: t.createTask, callsEnabled: true, perVendorHourLimit: 1000, globalHourLimit: 1000, dial: async () => callId },
+    caseId, 'v_acme', { vendorName: 'Acme Corp', requestSummary: 'x' });
+  assert.equal(started.started, true);
+  const ctx = makeVoiceCtx(t.q, (e) => t.emit(e));
+  const agent1 = { role: 'agent', content: 'Hi, this is an automated assistant calling for Rice Robotics.' };
+  const user1 = { role: 'user', content: 'Yes.' };
+  const tool = { role: 'tool_call_invocation', tool_call_id: 't1', name: 'report_answer', arguments: '{}' };
+  const agent2 = { role: 'agent', content: 'Did someone at Acme send that request?' };
+  for (const lines of [[agent1], [agent1, user1], [agent1, user1, tool, agent2]]) {
+    await processRetellWebhook(ctx, { event: 'transcript_updated', call: { call_id: callId, metadata: { case_id: caseId }, transcript_object: [], transcript_with_tool_calls: lines } });
+  }
+  const deltas = (await t.events(caseId)).filter((e) => e.type === 'call.transcript.delta');
+  assert.deepEqual(deltas.map((e) => (e.payload.items as unknown[]).length), [1, 2, 3], 'one stored update per new line, none dropped as a duplicate; tool calls are not lines');
+  assert.deepEqual((deltas.at(-1)!.payload.items as { role: string }[]).map((i) => i.role), ['agent', 'user', 'agent']);
+});

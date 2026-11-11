@@ -40,7 +40,10 @@ const railPos = (t: number, s: Stage) => {
   const through = (from: number, to: number) => { const f = Math.min(1, Math.max(0, (t - from) / (to - from))); return 0.06 + 0.84 * (1 - (1 - f) ** 2); };
   if (s === 4) return 100;
   if (s === 0) return (through(0, T.flag) / 3) * 100;
-  if (s === 3) return ((1 + through(T.call, T.result)) / 3) * 100;
+  if (s === 3) {   // the call moves with the lines spoken, as in the app: a notch while the agent asks, another while the vendor answers
+    const typedFrac = (from: number, len: number) => Math.min(1, Math.max(0, (t - from) / (len * CPS_MS)));
+    return ((1 + 0.1 + 0.4 * typedFrac(AGENT_AT, SCENE.agent.length) + 0.4 * typedFrac(VENDOR_AT, SCENE.vendor.length)) / 3) * 100;
+  }
   return (1 / 3) * 100;
 };
 

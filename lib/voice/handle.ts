@@ -13,7 +13,8 @@ export interface VoiceCtx {
 export type RetellCall = {
   call_id: string; metadata?: { case_id?: string; attempt?: number };
   disconnection_reason?: string;
-  transcript_object?: { role: 'agent' | 'user'; content: string }[];
+  transcript_object?: { role: 'agent' | 'user'; content: string }[];                 // only filled in after the call ends
+  transcript_with_tool_calls?: { role: string; content?: unknown }[];               // what transcript_updated carries DURING the call: lines + tool calls
   recording_url?: string; recording_multi_channel_url?: string;
   call_analysis?: { call_summary?: string; custom_analysis_data?: Record<string, unknown> };
 };
@@ -23,7 +24,13 @@ export type ToolPayload = { name: string; args: Record<string, unknown>; call: R
 export const TOOL_NAMES = ['report_answer', 'report_challenge', 'report_flag'] as const;
 type ToolName = (typeof TOOL_NAMES)[number];
 
-const toItems = (call: RetellCall): TranscriptItem[] => (call.transcript_object ?? []).map((t, i) => ({ id: `${t.role}_${i}`, role: t.role, text: t.content, tSec: i }));
+/** The lines spoken so far. During the call Retell sends them only in transcript_with_tool_calls (agent and user lines plus tool calls, which are not
+ *  lines); transcript_object arrives after the call ends. Reading only transcript_object made every live update look empty (found 2026-11-10, CC-0117:
+ *  the transcript appeared all at once when the call ended). */
+const spokenLines = (call: RetellCall): { role: 'agent' | 'user'; content: string }[] =>
+  call.transcript_object?.length ? call.transcript_object
+    : (call.transcript_with_tool_calls ?? []).filter((t): t is { role: 'agent' | 'user'; content: string } => (t.role === 'agent' || t.role === 'user') && typeof t.content === 'string');
+const toItems = (call: RetellCall): TranscriptItem[] => spokenLines(call).map((t, i) => ({ id: `${t.role}_${i}`, role: t.role, text: t.content, tSec: i }));
 // No conversation will be analysed after these: the call never connected, so decide now (fail closed) instead of hanging in `calling`.
 const neverConnected = (reason?: string) => !!reason && (reason.startsWith('dial_') || reason.startsWith('error_'));
 

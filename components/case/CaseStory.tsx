@@ -109,7 +109,7 @@ export function CaseStory({ c, hot, onHot, email, timing, details, times }: {
   // Every step is on the timeline from the first frame (never growing mid-story); a step that has not happened yet is muted.
   if (!cleared) steps.push({
     key: 'call', name: 'Phone call', st: o ? 'done' : c.call ? 'active' : skipped ? 'warn' : 'pending',
-    title: skipped ? 'Did not run' : c.call ? (o ? 'Answered' : 'On the phone') : 'Waiting',
+    title: skipped ? 'Did not run' : !c.call ? 'Waiting' : o ? 'Answered' : c.call.status === 'dialing' ? 'Ringing' : 'On the phone',
     body: (
       <div className="flex h-full min-h-0 flex-col gap-4">
         {skipped ? <p className="text-[15px]">{plainTask(openTask!.reason)}.</p> : (
@@ -170,16 +170,23 @@ export function CaseStory({ c, hot, onHot, email, timing, details, times }: {
   let doneIdx = -1; for (let i = n - 1; i >= 0 && doneIdx < 0; i--) if (steps[i].st === 'done') doneIdx = i;
   const idx = at >= 0 ? at : doneIdx + 1;
   const live = at >= 0 && steps[at].st === 'active';
-  const creep = useCreep(live ? `${c.id}:${steps[idx].key}` : null);
-  // the end when finished; creeping through a step in progress; mid-step when a step needs a person; at the next step's start between steps
-  const pos = finished ? 100 : live ? ((idx + 0.06 + 0.84 * creep) / n) * 100 : at >= 0 ? ((idx + 0.5) / n) * 100 : (idx / n) * 100;
+  const onCall = live && steps[idx].key === 'call';
+  const creep = useCreep(live && !onCall ? `${c.id}:${steps[idx].key}` : null);
+  // The phone call moves with the call itself, never a clock: just inside the step while it rings, then one notch for every line spoken (each question
+  // the agent asks and each answer), up to 90% until the outcome lands. A step that lasts seconds (reading the email) creeps on a clock instead.
+  const spoken = c.call?.turns.filter((t) => t.text.trim()).length ?? 0;
+  const callFrac = !c.call || (c.call.status === 'dialing' && spoken === 0) ? 0.06 : Math.min(0.9, 0.16 + 0.1 * spoken);
+  // the end when finished; on the call, where the conversation is; creeping through another step in progress; mid-step when a step needs a person;
+  // at the next step's start between steps
+  const pos = finished ? 100 : onCall ? ((idx + callFrac) / n) * 100 : live ? ((idx + 0.06 + 0.84 * creep) / n) * 100 : at >= 0 ? ((idx + 0.5) / n) * 100 : (idx / n) * 100;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {/* The sequence as one timeline: labels above, one continuous rail, the time each step happened below. The rail is solid black up to where
           the case is and soft grey after it; the case's position is marked by the same black tick as the step checkpoints. When the case moves on,
           the black line and its tick glide to the next step (state change: the case advanced); while a step is in progress they creep forward
-          through it, fast and then slower (state change: CounterCall is working on this step). Finished: all black, no tick. */}
+          through it: on the phone call one notch per line spoken, on a short step on a clock (state change: CounterCall is working on this step).
+          Finished: all black, no tick. */}
       <div className="shrink-0">
         <div role="tablist" aria-label="What CounterCall did, step by step" className="grid" style={{ gridTemplateColumns: cols }}>
           {steps.map((s, i) => {

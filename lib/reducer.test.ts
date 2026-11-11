@@ -91,3 +91,12 @@ test('queue groups follow the state mapping and money formats as dollars', () =>
   assert.equal(GROUP_OF.calling, 'IN PROGRESS'); assert.equal(GROUP_OF.cleared, 'RESOLVED');
   assert.equal(fmtCents(heldCents(s)), '$24,800.00');
 });
+
+test('a live transcript update that lands after the final transcript never replaces it (Retell does not wait for one delivery before sending the next)', () => {
+  const r = run('fraud'); const s = reduce(r.events); const id = only(r); const final = s.cases[id].call!;
+  assert.equal(final.transcriptFinal, true);
+  assert.ok(final.turns.length > 0);
+  const delta = r.events.find((e) => e.type === 'call.transcript.delta' && e.case_id === id)!;
+  const late: Ev = { ...delta, seq: s.lastSeq + 1, payload: { ...delta.payload, items: [], final: false } };
+  assert.deepEqual(apply(s, late).cases[id].call!.turns, final.turns);
+});
