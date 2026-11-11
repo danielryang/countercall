@@ -3,11 +3,14 @@ import postgres from 'postgres';
 import { makeCaseStore } from './casestore';
 import { appendEvent, type Q } from './sink';
 import type { EmittedEvent } from './events';
+import { sslFor } from './pg-ssl';
 import { registerSink } from './voice/events';
 import type { CaseStore } from './voice/finalize';
 
-// Supabase transaction pooler: no prepared statements, one connection per serverless instance.
-const pg = postgres(process.env.DATABASE_URL ?? '', { prepare: false, max: 1, idle_timeout: 20, connect_timeout: 10 });
+// Supabase transaction pooler: no prepared statements, one connection per serverless instance, TLS on (lib/pg-ssl.ts).
+const url = process.env.DATABASE_URL ?? '';
+const ssl = sslFor(url);
+const pg = postgres(url, { prepare: false, max: 1, idle_timeout: 20, connect_timeout: 10, ...(ssl ? { ssl } : {}) });
 
 // One statement (or one whole transaction) in flight per instance: every entry point below goes through `serial`.
 // postgres.js pipelines (writes the next statement before the previous ReadyForQuery) while a parameterless statement is in flight and when
