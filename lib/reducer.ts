@@ -68,6 +68,7 @@ function reduceCase(c: CaseView, e: Ev): CaseView {
         connectedAt: p.status === 'connected' ? ts : call.connectedAt, endedAt: p.status === 'ended' || p.status === 'failed' ? ts : call.endedAt } }; }
     case 'call.transcript.delta': { const p = e.payload as unknown as P<'call.transcript.delta'>; const call = callFor(c, p.callId, ts); if (!call) return c;
       if (call.transcriptFinal && !p.final) return c;                                       // a live update that lands after the final one never replaces it
+      if (!p.final && p.items.length < call.turns.length) return c;                         // nor does an older, shorter one that lands late: live lines only grow
       return { ...c, call: { ...call, turns: p.items, transcriptFinal: p.final } }; }            // Retell re-sends the whole transcript: replace, never append
     case 'call.tool': { const p = e.payload as unknown as P<'call.tool'>; const call = callFor(c, p.callId, ts); if (!call) return c;
       return { ...c, call: { ...call, tools: [...call.tools, { name: p.name, args: p.args, seq: e.seq }] } }; }

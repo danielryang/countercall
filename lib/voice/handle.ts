@@ -10,27 +10,36 @@ export interface VoiceCtx {
   markEnded: (callId: string, disconnectionReason?: string) => Promise<void>;   // calls.ended_at / disconnection_reason (a no-op if already set)
 }
 
+/** One entry of Retell's transcript_with_tool_calls: a spoken line (role agent or user, string content) or a tool call or tool result (not a line). */
+type RetellTurn = { role: string; content?: unknown };
+
 export type RetellCall = {
   call_id: string; metadata?: { case_id?: string; attempt?: number };
   disconnection_reason?: string;
-  transcript_object?: { role: 'agent' | 'user'; content: string }[];                 // only filled in after the call ends
-  transcript_with_tool_calls?: { role: string; content?: unknown }[];               // what transcript_updated carries DURING the call: lines + tool calls
+  transcript_object?: { role: 'agent' | 'user'; content: string }[];                 // only once the call has ended (call_ended, call_analyzed)
+  transcript_with_tool_calls?: RetellTurn[];                                        // the same: only once the call has ended
   recording_url?: string; recording_multi_channel_url?: string;
   call_analysis?: { call_summary?: string; custom_analysis_data?: Record<string, unknown> };
 };
-export type RetellWebhook = { event: 'call_started' | 'call_ended' | 'call_analyzed' | 'transcript_updated' | `transfer_${string}`; call: RetellCall };
+export type RetellWebhook = {
+  event: 'call_started' | 'call_ended' | 'call_analyzed' | 'transcript_updated' | `transfer_${string}`; call: RetellCall;
+  transcript_with_tool_calls?: RetellTurn[];        // transcript_updated only: the transcript so far, at the TOP level of the body next to `call`
+};
 export type ToolPayload = { name: string; args: Record<string, unknown>; call: RetellCall };
 
 export const TOOL_NAMES = ['report_answer', 'report_challenge', 'report_flag'] as const;
 type ToolName = (typeof TOOL_NAMES)[number];
 
-/** The lines spoken so far. During the call Retell sends them only in transcript_with_tool_calls (agent and user lines plus tool calls, which are not
- *  lines); transcript_object arrives after the call ends. Reading only transcript_object made every live update look empty (found 2026-11-10, CC-0117:
- *  the transcript appeared all at once when the call ended). */
-const spokenLines = (call: RetellCall): { role: 'agent' | 'user'; content: string }[] =>
-  call.transcript_object?.length ? call.transcript_object
-    : (call.transcript_with_tool_calls ?? []).filter((t): t is { role: 'agent' | 'user'; content: string } => (t.role === 'agent' || t.role === 'user') && typeof t.content === 'string');
-const toItems = (call: RetellCall): TranscriptItem[] => spokenLines(call).map((t, i) => ({ id: `${t.role}_${i}`, role: t.role, text: t.content, tSec: i }));
+/** The lines spoken so far. During the call Retell sends them ONLY in the top-level transcript_with_tool_calls of transcript_updated (lines plus tool
+ *  calls and tool results, which are not lines); call.transcript_object and call.transcript_with_tool_calls are filled in once the call ends. Reading only
+ *  the call's own fields made every live update look empty, so the transcript appeared all at once when the call ended (found 2026-11-10 from the stored
+ *  Retell bodies of CC-0120's call: the top-level list held 2, 4, then 8 entries while call.transcript_object was absent). */
+const isLine = (t: RetellTurn): t is { role: 'agent' | 'user'; content: string } => (t.role === 'agent' || t.role === 'user') && typeof t.content === 'string';
+const spokenLines = ({ call, transcript_with_tool_calls: live }: RetellWebhook) => {
+  const src: RetellTurn[] = call.transcript_object?.length ? call.transcript_object : live?.length ? live : (call.transcript_with_tool_calls ?? []);
+  return src.filter(isLine);
+};
+const toItems = (p: RetellWebhook): TranscriptItem[] => spokenLines(p).map((t, i) => ({ id: `${t.role}_${i}`, role: t.role, text: t.content, tSec: i }));
 // No conversation will be analysed after these: the call never connected, so decide now (fail closed) instead of hanging in `calling`.
 const neverConnected = (reason?: string) => !!reason && (reason.startsWith('dial_') || reason.startsWith('error_'));
 
@@ -44,10 +53,10 @@ export async function processRetellWebhook(ctx: VoiceCtx, p: RetellWebhook): Pro
       await ctx.emit({ ...base, type: 'call.status', status: 'connected' });
       break;
     case 'transcript_updated':
-      await ctx.emit({ ...base, type: 'call.transcript.delta', items: toItems(call), final: false });
+      await ctx.emit({ ...base, type: 'call.transcript.delta', items: toItems(p), final: false });
       break;
     case 'call_ended':
-      await ctx.emit({ ...base, type: 'call.transcript.delta', items: toItems(call), final: true });
+      await ctx.emit({ ...base, type: 'call.transcript.delta', items: toItems(p), final: true });
       await ctx.emit({ ...base, type: 'call.status', status: neverConnected(call.disconnection_reason) ? 'failed' : 'ended', disconnectionReason: call.disconnection_reason });
       await ctx.markEnded(call.call_id, call.disconnection_reason);
       if (neverConnected(call.disconnection_reason)) await finalizeCall(ctx.store, caseId, call.call_id, call, ctx.emit);

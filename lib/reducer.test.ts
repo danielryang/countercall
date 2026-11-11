@@ -100,3 +100,16 @@ test('a live transcript update that lands after the final transcript never repla
   const late: Ev = { ...delta, seq: s.lastSeq + 1, payload: { ...delta.payload, items: [], final: false } };
   assert.deepEqual(apply(s, late).cases[id].call!.turns, final.turns);
 });
+
+test('live transcript lines only grow: an older, shorter update that lands late never shrinks the transcript on screen; more words on the same lines replace it', () => {
+  const r = run('fraud'); const id = only(r);
+  const live = r.events.filter((e) => e.type === 'call.transcript.delta' && e.case_id === id && !(e.payload as { final: boolean }).final);
+  const last = live.at(-1)!; const items = (last.payload as { items: { id: string; text: string }[] }).items;
+  assert.ok(items.length >= 2, 'the recorded run has a live update with several lines');
+  const mid = reduce(r.events.filter((e) => e.seq <= last.seq));
+  assert.deepEqual(mid.cases[id].call!.turns, items);
+  const late = (its: unknown[]): Ev => ({ ...last, seq: mid.lastSeq + 1, payload: { ...last.payload, items: its } });
+  assert.deepEqual(apply(mid, late(items.slice(0, 1))).cases[id].call!.turns, items, 'a shorter live update is an older one');
+  const grown = [...items.slice(0, -1), { ...items.at(-1)!, text: `${items.at(-1)!.text} and more` }];
+  assert.deepEqual(apply(mid, late(grown)).cases[id].call!.turns, grown, 'the same lines with more words replace it');
+});
